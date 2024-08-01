@@ -6,9 +6,8 @@ on:
      - main
 
 jobs:
-
   build:
-    name: Build
+    name: Build and Release
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -24,3 +23,25 @@ jobs:
 
     - name: Copy overrides
       run: cp -r ./overrides ./publish
+      
+    - name: Create zip of publish directory
+      run: zip -r warcraft-plugin.zip ./publish
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.sha }}
+        release_name: Release ${{ github.sha }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./publish
+        asset_name: warcraft-plugin.zip
+        asset_content_type: application/zip
