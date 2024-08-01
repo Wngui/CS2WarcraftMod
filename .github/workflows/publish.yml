@@ -10,6 +10,14 @@ jobs:
     name: Build and Release
     runs-on: ubuntu-latest
     steps:
+    
+    - name: Generate build number
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      id: buildnumber
+      uses: onyxmueller/build-tag-number@v1
+      with:
+        token: ${{secrets.github_token}}
+    
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -31,8 +39,8 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
+        tag_name: ${{ steps.buildnumber.outputs.build_number }}
+        release_name: Release ${{ steps.buildnumber.outputs.build_number }}
         draft: false
         prerelease: false
       env:
