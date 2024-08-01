@@ -23,7 +23,7 @@ You can try out the plugin here: steam://connect/136.244.80.208:27015
 Each class has 3 passive abilities and an ultimate which is unlocked at max level 16.
 Ultimate can be activated by binding it in the console, example
      ```
-     binx x ultimate
+     bind x ultimate
      ```
 
 ## Class Abilities
