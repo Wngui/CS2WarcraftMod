@@ -1,6 +1,6 @@
-# CS2Warcraft
-
-![00198-3001460831](https://github.com/user-attachments/assets/7aece590-36ba-4084-a4ca-bbb5adfd28dc)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7aece590-36ba-4084-a4ca-bbb5adfd28dc" alt="00198-3001460831" width="40%">
+</p>
 
 # Warcraft Mod for CS2
 
@@ -10,15 +10,15 @@ An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system, inspir
 
 The mod introduces seven unique classes:
 
-- Barbarian
-- Mage
-- Necromancer
-- Paladin
-- Ranger
-- Rogue
-- Shapeshifter
+- $\textcolor{red}{\text{Barbarian}}$
+- $\textcolor{blue}{\text{Mage}}$
+- $\textcolor{purple}{\text{Necromancer}}$
+- $\textcolor{orange}{\text{Paladin}}$
+- $\textcolor{green}{\text{Ranger}}$
+- $\textcolor{gray}{\text{Rogue}}$
+- $\textcolor{brown}{\text{Shapeshifter}}$
 
-You can try out the plugin here: [Connect to Server](steam://connect/136.244.80.208:27015)
+You can try out the plugin here: steam://connect/136.244.80.208:27015 (copy into browser url)
 
 ## Setup
 
@@ -36,13 +36,12 @@ You can try out the plugin here: [Connect to Server](steam://connect/136.244.80.
      mp_autoteambalance 0
      mp_limitteams 0
      ```
-
-3. **Rename Zombie Bots**
-   - Copy `botprofile.vpk` to `\game\csgo\overrides`.
-   - Add the following line in `gameinfo.gi` under the metamod line:
-     ```
-     Game csgo/overrides/botprofile.vpk
-     ```
+   - **Rename Zombie Bots**
+     - Copy `botprofile.vpk` to `\game\csgo\overrides`.
+     - Add the following line in `gameinfo.gi` under the metamod line:
+       ```
+       Game csgo/overrides/botprofile.vpk
+       ```
 
 ## Author Notes
 
