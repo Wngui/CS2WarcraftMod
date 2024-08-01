@@ -1,0 +1,26 @@
+name: Deploy Warcraft plugin
+on: 
+    workflow_dispatch:
+    push:
+     branches:
+     - main
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x.x' # Use the version of .NET you need
+
+    - name: Publish build artifacts
+      run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish
+
+    - name: Copy overrides
+      run: cp -r ./overrides ./publish
