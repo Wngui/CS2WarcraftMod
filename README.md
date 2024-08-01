@@ -10,13 +10,13 @@ An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system, inspir
 
 The mod introduces seven unique classes:
 
-- $\textcolor{red}{\text{Barbarian}}$
-- $\textcolor{blue}{\text{Mage}}$
-- $\textcolor{purple}{\text{Necromancer}}$
-- $\textcolor{orange}{\text{Paladin}}$
-- $\textcolor{green}{\text{Ranger}}$
-- $\textcolor{gray}{\text{Rogue}}$
-- $\textcolor{brown}{\text{Shapeshifter}}$
+- **Barbarian**
+- **Mage**
+- **Necromancer**
+- **Paladin**
+- **Ranger**
+- **Rogue**
+- **Shapeshifter**
 
 You can try out the plugin here: steam://connect/136.244.80.208:27015
 
@@ -25,6 +25,57 @@ Ultimate can be activated by binding it in the console, example
      ```
      binx x ultimate
      ```
+
+## Class Abilities
+
+### Barbarian
+
+- **Carnage**: Increase damage dealt with shotguns.
+- **Battle-Hardened**: Increase your health by 20/40/60/80/100.
+- **Throwing Axe**: Chance to hurl an exploding throwing axe when firing.
+- **Bloodlust**: Grants infinite ammo, movement speed, and health regeneration. 
+
+### Mage
+
+- **Fireball**: Infuses molotovs with fire magic, causing a huge explosion on impact.
+- **Ice Beam**: Chance to freeze enemies in place.
+- **Mana Shield**: Passive magical shield, which regenerates armor over time.
+- **Teleport**: When you press your ultimate key, you will teleport to the spot you're aiming.
+
+### Necromancer
+
+- **Life Drain**: Harness dark magic to siphon health from foes and restore your own vitality.
+- **Poison Cloud**: Infuses smoke grenades with potent toxins, damaging enemies over time.
+- **Splintered Soul**: Chance to cheat death with a fraction of vitality.
+- **Raise Dead**: Resurrect powerful undead minions to fight alongside you. 
+
+### Paladin
+
+- **Healing Aura**: Emit an aura that gradually heals nearby allies over time.
+- **Holy Shield**: Surround yourself with a protective barrier that absorbs incoming damage.
+- **Smite**: Infuse your attacks with divine energy, potentially stripping enemy armor.
+- **Divine Resurrection**: Instantly revive a random fallen ally.
+
+### Ranger
+
+- **Light Footed**: Nimbly perform a dash in midair, by pressing jump.
+- **Ensnare Trap**: Place a trap by throwing a decoy.
+- **Marksman**: Additional damage with scoped weapons.
+- **Arrowstorm**: Call down a deadly volley of arrows using the ultimate key.
+
+### Rogue
+
+- **Stealth**: Become partially invisible for 1/2/3/4/5 seconds, when killing someone.
+- **Sneak Attack**: When you hit an enemy in the back, you do an additional 5/10/15/20/25 damage.
+- **Blade Dance**: Increases movement speed and damage with knives.
+- **Smokebomb**: When nearing death, you will automatically drop a smokebomb, letting you cheat death. 
+
+### Shapeshifter
+
+- **Adaptive Disguise**: Chance to spawn with an enemy disguise, revealed upon attacking.
+- **Doppelganger**: Create a temporary inanimate clone of yourself, using a decoy grenade.
+- **Imposter Syndrome**: Chance to be notified when revealed by enemies on radar.
+- **Morphling**: Transform into an unassuming object. 
 
 ## Setup
 
@@ -42,7 +93,7 @@ Ultimate can be activated by binding it in the console, example
      mp_autoteambalance 0
      mp_limitteams 0
      ```
-   - **Rename Zombie Bots**
+   - Rename Zombie Bots
      - Copy `botprofile.vpk` to `\game\csgo\overrides`.
      - Add the following line in `gameinfo.gi` under the metamod line:
        ```
