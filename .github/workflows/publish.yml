@@ -1,9 +1,9 @@
 name: Deploy Warcraft plugin
 on: 
-    workflow_dispatch:
-    push:
-     branches:
-     - main
+  workflow_dispatch:
+  push:
+    branches:
+    - main
 
 jobs:
   build:
@@ -15,8 +15,8 @@ jobs:
       id: buildnumber
       uses: onyxmueller/build-tag-number@v1
       with:
-        token: ${{secrets.github_token}}
-    
+        token: ${{ secrets.github_token }}
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -26,13 +26,15 @@ jobs:
         dotnet-version: '8.x.x' # Use the version of .NET you need
 
     - name: Publish build artifacts
-      run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish
+      run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish/WarcraftPlugin
 
     - name: Copy overrides
       run: cp -r ./overrides ./publish
       
-    - name: Create zip of publish directory
-      run: zip -r warcraft-plugin.zip ./publish
+    - name: Create zip of publish directory contents
+      run: |
+        cd publish
+        zip -r ../warcraft-plugin.zip * # Zip the contents of the publish folder
 
     - name: Create Release
       id: create_release
@@ -47,10 +49,10 @@ jobs:
 
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./warcraft-plugin.zip
         asset_name: warcraft-plugin.zip
         asset_content_type: application/zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
