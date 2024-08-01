@@ -18,7 +18,7 @@ The mod introduces seven unique classes:
 - **Rogue**
 - **Shapeshifter**
 
-You can try out the plugin here: steam://connect/136.244.80.208:27015
+You can try out the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
 
 Each class has 3 passive abilities and an ultimate which is unlocked at max level 16.
 Ultimate can be activated by binding it in the console, example
