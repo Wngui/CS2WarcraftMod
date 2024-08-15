@@ -26,6 +26,19 @@ Ultimate can be activated by binding it in the console, example
      bind x ultimate
      ```
 
+## Commands
+```!class``` - Change current class
+
+```!skills``` - Opens skill selection menu
+
+```!reset``` - Reset skill points for current class
+
+```!factoryreset``` - Completely resets all progress on all classes
+
+```!addxp <amount>``` - Admin only, adds x amount of xp to current class
+
+```!commands``` - Lists all commands
+
 ## Class Abilities
 
 ### Barbarian
