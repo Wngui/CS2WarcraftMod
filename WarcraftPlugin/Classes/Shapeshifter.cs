@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using System;
@@ -30,9 +31,10 @@ namespace WarcraftPlugin.Races
 
         private bool _isShapeshifted = false;
         private bool _isDisguised = false;
-        private string _playerModel = string.Empty;
+        private CDynamicProp _playerShapeshiftProp;
         private CDynamicProp _cameraProp;
         private Timer _checkSpottedTimer;
+        private string _initialPlayerModel;
         private readonly List<string> _weaponList = [];
 
         public override void Register()
@@ -71,7 +73,7 @@ namespace WarcraftPlugin.Races
 
         private void PlayerSpawn(EventPlayerSpawn spawn)
         {
-            _playerModel = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName;
+            _initialPlayerModel = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName;
             BreakTransformation();
 
             //Disguise
@@ -200,6 +202,8 @@ namespace WarcraftPlugin.Races
 
         private void UnShapeshift()
         {
+            _playerShapeshiftProp?.Remove();
+
             base.SetDefaultAppearance();
 
             _isShapeshifted = false;
@@ -233,22 +237,32 @@ namespace WarcraftPlugin.Races
             //Check if reshapeshifting
             if (_isShapeshifted)
             {
-                Player.PlayerPawn.Value.SetModel(Props[Random.Shared.Next(Props.Count - 1)]);
-                Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBaseEntity", "m_CBodyComponent");
+                _playerShapeshiftProp.SetModel(Props[Random.Shared.Next(Props.Count - 1)]);
                 return;
             }
 
             BreakTransformation();
             WeaponStrip();
 
-            Player.PlayerPawn.Value.SetColor(Color.White);
+            Player.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
 
             _cameraProp = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
             _cameraProp.DispatchSpawn();
             _cameraProp.SetColor(Color.FromArgb(0, 255, 255, 255));
 
-            Player.PlayerPawn.Value.SetModel(Props[Random.Shared.Next(Props.Count - 1)]);
-            Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBaseEntity", "m_CBodyComponent");
+            _playerShapeshiftProp = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic_override");
+            _playerShapeshiftProp.DispatchSpawn();
+
+            _playerShapeshiftProp.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_NEVER;
+            _playerShapeshiftProp.Collision.SolidFlags = 12;
+            _playerShapeshiftProp.Collision.SolidType = SolidType_t.SOLID_VPHYSICS;
+            _playerShapeshiftProp.Spawnflags = 256U;
+
+            _playerShapeshiftProp.SetModel(Props[Random.Shared.Next(Props.Count - 1)]);
+
+            _playerShapeshiftProp.Teleport(Player.PlayerPawn.Value.AbsOrigin, Player.PlayerPawn.Value.AbsRotation, new Vector());
+            _playerShapeshiftProp.SetParent(Player.PlayerPawn.Value);
+
             Player.PlayerPawn.Value.CameraServices.ViewEntity.Raw = _cameraProp.EntityHandle.Raw;
             Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBasePlayerPawn", "m_pCameraServices");
             Player.PlaySound("sounds/player/footsteps/water_exit_01.vsnd");
