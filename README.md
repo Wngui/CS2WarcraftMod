@@ -18,13 +18,26 @@ The mod introduces seven unique classes:
 - **Rogue**
 - **Shapeshifter**
 
-You can try out the plugin here: steam://connect/136.244.80.208:27015
+You can try out the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
 
 Each class has 3 passive abilities and an ultimate which is unlocked at max level 16.
 Ultimate can be activated by binding it in the console, example
      ```
      bind x ultimate
      ```
+
+## Commands
+```!class``` - Change current class
+
+```!skills``` - Opens skill selection menu
+
+```!reset``` - Unassign skill points for current class
+
+```!factoryreset``` - Completely resets all your progress on all classes
+
+```!addxp <amount>``` - Admin only, adds x amount of xp to current class
+
+```!commands``` - Lists all commands
 
 ## Class Abilities
 
@@ -83,6 +96,8 @@ Ultimate can be activated by binding it in the console, example
    - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`.
 
 2. **Necromancer's Ultimate Setup**
+
+   *These steps are not stricly nessesary to get the plugin working, but the necromancers ult may not work correctly without them.*
    - Download [MultiAddonManager](https://github.com/Source2ZE/MultiAddonManager/releases).
    - Add the following to `multiaddonmanager.cfg`:
      ```
