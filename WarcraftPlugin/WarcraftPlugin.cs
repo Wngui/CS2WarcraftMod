@@ -14,10 +14,18 @@ using WarcraftPlugin.Helpers;
 using System.Text.RegularExpressions;
 using WarcraftPlugin.Resources;
 using CounterStrikeSharp.API.Modules.Admin;
+using WarcraftPlugin.Adverts;
 using CounterStrikeSharp.API.Modules.Cvars;
+using System.Text.Json.Serialization;
 
 namespace WarcraftPlugin
 {
+    public class Config : BasePluginConfig
+    {
+        [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
+        [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = false;
+    }
+
     public static class WarcraftPlayerExtensions
     {
         public static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
@@ -208,7 +216,7 @@ namespace WarcraftPlugin
         }
     }
 
-    public class WarcraftPlugin : BasePlugin
+    public class WarcraftPlugin : BasePlugin, IPluginConfig<Config>
     {
         private static WarcraftPlugin _instance;
         public static WarcraftPlugin Instance => _instance;
@@ -226,6 +234,7 @@ namespace WarcraftPlugin
         public RaceManager classManager;
         public EffectManager EffectManager;
         public CooldownManager CooldownManager;
+        public AdvertManager AdvertManager;
         private Database _database;
 
         public int XpPerKill = 40;
@@ -235,6 +244,8 @@ namespace WarcraftPlugin
         public int BotQuota = 10;
 
         public List<WarcraftPlayer> Players => WarcraftPlayers.Values.ToList();
+
+        public Config Config { get; set; } = null!;
 
         public WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
@@ -288,6 +299,12 @@ namespace WarcraftPlugin
 
             CooldownManager = new CooldownManager();
             CooldownManager.Initialize();
+
+            if (Config.ShowCommandAdverts)
+            {
+                AdvertManager = new AdvertManager();
+                AdvertManager.Initialize();
+            }
 
             AddCommand("ultimate", "ultimate", UltimatePressed);
 
@@ -472,6 +489,11 @@ namespace WarcraftPlugin
             var races = classManager.GetAllClasses();
             foreach (var race in races.OrderBy(x => x.DisplayName))
             {
+                if (Config.DeactivatedClasses.Contains(race.InternalName, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
                 menu.AddMenuOption(race.DisplayName, (player, option) =>
                 {
                     _database.SaveClientToDatabase(player);
@@ -579,6 +601,11 @@ namespace WarcraftPlugin
 
             MenuManager.OpenChatMenu(wcPlayer.GetPlayer(), menu);
             wcPlayer.GetPlayer().PrintToChat(" ");
+        }
+
+        public void OnConfigParsed(Config config)
+        {
+            Config = config;
         }
     }
 }
