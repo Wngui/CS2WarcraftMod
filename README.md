@@ -115,6 +115,15 @@ Ultimate can be activated by binding it in the console, example
        Game csgo/overrides/botprofile.vpk
        ```
 
+## Configuration examples
+```json
+{
+  "DeactivatedClasses": ["Shapeshifter"], //Disables Shapeshifter from the plugin, disable multiple classes by seperating with comma
+  "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands 
+  "ConfigVersion": 1
+}
+```
+
 ## Author Notes
 
 By releasing this mod, I sincerely hope it will aid the community in developing RPG mods and support aspiring plugin authors. This project involved significant effort and the discovery of new techniques. Please consider contributing back to the community. Special thanks to the knowledgeable members on Discord for their invaluable assistance.
