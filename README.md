@@ -115,10 +115,10 @@ Ultimate can be activated by binding it in the console, example
        Game csgo/overrides/botprofile.vpk
        ```
 
-## Configuration examples
+## Configuration example
 ```json
 {
-  "DeactivatedClasses": ["Shapeshifter"], //Disables Shapeshifter from the plugin, disable multiple classes by seperating with comma
+  "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands 
   "ConfigVersion": 1
 }
