@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -9,10 +10,12 @@ namespace WarcraftPlugin
     public class EventSystem
     {
         private readonly WarcraftPlugin _plugin;
+        private readonly Config _config;
 
-        public EventSystem(WarcraftPlugin plugin)
+        public EventSystem(WarcraftPlugin plugin, Config config)
         {
             _plugin = plugin;
+            _config = config;
         }
 
         public void Initialize()
@@ -133,6 +136,14 @@ namespace WarcraftPlugin
             var warcraftPlayer = player.GetWarcraftPlayer();
             var race = player.GetWarcraftPlayer()?.GetClass();
 
+            if (_config.DeactivatedClasses.Contains(race.InternalName, StringComparer.InvariantCultureIgnoreCase))
+            {
+                player.PrintToChat($"{ChatColors.Green}{race.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
+                player.ExecuteClientCommandFromServer("class");
+                player.ChangeTeam(CsTeam.Spectator);
+                return HookResult.Continue;
+            }
+
             if (race != null)
             {
                 var message = $"{race.DisplayName} ({warcraftPlayer.currentLevel})\n" +
@@ -201,7 +212,7 @@ namespace WarcraftPlugin
 
             if (victim.IsValid && attacker.IsValid && (attacker != victim))
             {
-                if((bool)victim?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
+                if ((bool)victim?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
                 {
                     attacker?.PlaySound("sounds/physics/flesh/flesh_bloody_break.vsnd");
                 }

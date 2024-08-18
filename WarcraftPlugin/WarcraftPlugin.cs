@@ -370,7 +370,7 @@ namespace WarcraftPlugin
                 OnMapStartHandler(null);
             }
 
-            _eventSystem = new EventSystem(this);
+            _eventSystem = new EventSystem(this, Config);
             _eventSystem.Initialize();
 
             _database.Initialize(ModuleDirectory);
@@ -507,7 +507,11 @@ namespace WarcraftPlugin
                     _database.SaveCurrentClass(player);
                     _database.LoadClientFromDatabase(player, XpSystem);
 
-                    player.PlayerPawn.Value.CommitSuicide(false, false);
+                    if (player.PawnIsAlive)
+                    {
+                        player.PlayerPawn.Value.CommitSuicide(false, false);
+                    }
+
                     RefreshPlayerName(player.GetWarcraftPlayer());
                 });
             }
