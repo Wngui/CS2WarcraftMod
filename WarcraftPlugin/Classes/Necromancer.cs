@@ -166,7 +166,10 @@ namespace WarcraftPlugin.Races
                 foreach (var zombie in zombies)
                 {
                     zombie.Respawn();
-                    zombie.PlayerPawn.Value.SetModel("characters/models/nozb1/skeletons_player_model/skeleton_player_model_2/skeleton_nozb2_pm.vmdl");
+                    if (WarcraftPlugin.Instance.Config.NecromancerUseZombieModel)
+                    {
+                        zombie.PlayerPawn.Value.SetModel("characters/models/nozb1/skeletons_player_model/skeleton_player_model_2/skeleton_nozb2_pm.vmdl");
+                    }
                     zombie.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(60, 60), new QAngle(), new Vector());
                     zombie.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
                     zombie.RemoveWeapons();
@@ -220,7 +223,7 @@ namespace WarcraftPlugin.Races
                 {
                     foreach (var player in playersInHurtZone)
                     {
-                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1)*2, Owner);
+                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Owner);
                     }
                 }
             }

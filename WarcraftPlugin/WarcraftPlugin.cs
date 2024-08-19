@@ -22,8 +22,11 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 2;
+
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = false;
+        [JsonPropertyName("NecromancerUseZombieModel")] public bool NecromancerUseZombieModel { get; set; } = true;
     }
 
     public static class WarcraftPlayerExtensions

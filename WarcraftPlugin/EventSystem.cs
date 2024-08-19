@@ -136,16 +136,16 @@ namespace WarcraftPlugin
             var warcraftPlayer = player.GetWarcraftPlayer();
             var race = player.GetWarcraftPlayer()?.GetClass();
 
-            if (_config.DeactivatedClasses.Contains(race.InternalName, StringComparer.InvariantCultureIgnoreCase))
-            {
-                player.PrintToChat($"{ChatColors.Green}{race.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
-                player.ExecuteClientCommandFromServer("class");
-                player.ChangeTeam(CsTeam.Spectator);
-                return HookResult.Continue;
-            }
-
             if (race != null)
             {
+                if (_config.DeactivatedClasses.Contains(race.InternalName, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    player.PrintToChat($"{ChatColors.Green}{race.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
+                    player.ExecuteClientCommandFromServer("class");
+                    player.ChangeTeam(CsTeam.Spectator);
+                    return HookResult.Continue;
+                }
+
                 var message = $"{race.DisplayName} ({warcraftPlayer.currentLevel})\n" +
                 (warcraftPlayer.IsMaxLevel ? "" : $"Experience: {warcraftPlayer.currentXp}/{warcraftPlayer.amountToLevel}\n") +
                 $"{warcraftPlayer.statusMessage}";
