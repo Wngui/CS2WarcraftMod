@@ -119,8 +119,9 @@ Ultimate can be activated by binding it in the console, example
 ```json
 {
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
-  "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands 
-  "ConfigVersion": 1
+  "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
+  "NecromancerUseZombieModel": false, //Disable Necromancer custom zombie model (disabling need for multiaddon manager)
+  "ConfigVersion": 2
 }
 ```
 
