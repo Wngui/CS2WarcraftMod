@@ -97,7 +97,7 @@ Ultimate can be activated by binding it in the console, example
 
 2. **Necromancer's Ultimate Setup**
 
-   *These steps are not stricly nessesary to get the plugin working, but the necromancers ult may not work correctly without them. See configuration section you proceed without them*
+   *These steps are not stricly nessesary to get the plugin working, but the necromancers ult may not work correctly without them.*
    - Download [MultiAddonManager](https://github.com/Source2ZE/MultiAddonManager/releases).
    - Add the following to `multiaddonmanager.cfg`:
      ```
