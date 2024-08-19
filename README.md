@@ -116,6 +116,7 @@ Ultimate can be activated by binding it in the console, example
        ```
 
 ## Configuration example
+*counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
 ```json
 {
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
