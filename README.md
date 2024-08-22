@@ -107,7 +107,7 @@ Ultimate can be activated by binding it in the console, example
      ```
      mp_autoteambalance 0
      mp_limitteams 0
-     bot_difficulty 4 // Should be 4 or less to avoid spawning 'zombie' bots
+     bot_difficulty 4 // 4 or less to avoid spawning 'zombie' bots
      ```
    - Rename Zombie Bots
      - Copy `botprofile.vpk` to `\game\csgo\overrides`.
