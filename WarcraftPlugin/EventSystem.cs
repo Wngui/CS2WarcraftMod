@@ -108,8 +108,8 @@ namespace WarcraftPlugin
             if (attacker != null && (!attacker.IsValid || !attacker.PawnIsAlive)) return HookResult.Continue;
 
             //Zombie attack logic
-            if (attacker != null && attacker.IsBot && (bool)attacker?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
-            {
+            if (attacker != null && attacker.IsBot && attacker.OwnerEntity.Value != null && (bool)attacker?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
+            { 
                 var owner = new CCSPlayerPawn(attacker.OwnerEntity.Value.Handle);
                 var controller = new CCSPlayerController(owner.Controller.Value.Handle);
                 victim.SetHp(victim.PlayerPawn.Value.Health + @event.DmgHealth);
