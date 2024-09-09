@@ -88,7 +88,13 @@ Ultimate can be activated by binding it in the console, example
 - **Adaptive Disguise**: Chance to spawn with an enemy disguise, revealed upon attacking.
 - **Doppelganger**: Create a temporary inanimate clone of yourself, using a decoy grenade.
 - **Imposter Syndrome**: Chance to be notified when revealed by enemies on radar.
-- **Morphling**: Transform into an unassuming object. 
+- **Morphling**: Transform into an unassuming object.
+
+### Tinker
+- **Attack Drone**: Deploy a drone that attacks nearby enemies.
+- **Spare Parts**: Chance to not lose ammo when firing 
+- **Spring Trap**: Deploy a trap which launches players into the air.
+- **Drone Swarm**: Summon a swarm of attack drones that damage all nearby enemies.
 
 ## Setup
 
