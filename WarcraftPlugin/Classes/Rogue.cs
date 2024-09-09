@@ -8,7 +8,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Rogue : WarcraftClass
     {
@@ -91,7 +91,7 @@ namespace WarcraftPlugin.Races
             var activeWeaponName = pawn.WeaponServices!.ActiveWeapon.Value.DesignerName;
             if (activeWeaponName == "weapon_knife")
             {
-                pawn.VelocityModifier = 1 + (0.05f * WarcraftPlayer.GetAbilityLevel(2));
+                pawn.VelocityModifier = 1 + 0.05f * WarcraftPlayer.GetAbilityLevel(2);
             }
             else
             {

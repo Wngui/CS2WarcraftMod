@@ -9,7 +9,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
-using WarcraftPlugin.Races;
 using WarcraftPlugin.Helpers;
 using System.Text.RegularExpressions;
 using WarcraftPlugin.Resources;
@@ -17,6 +16,8 @@ using CounterStrikeSharp.API.Modules.Admin;
 using WarcraftPlugin.Adverts;
 using CounterStrikeSharp.API.Modules.Cvars;
 using System.Text.Json.Serialization;
+using WarcraftPlugin.Events;
+using WarcraftPlugin.Classes;
 
 namespace WarcraftPlugin
 {
@@ -97,7 +98,7 @@ namespace WarcraftPlugin
             if (GetFreeSkillPoints(wcPlayer) > 0)
                 WarcraftPlugin.ShowSkillPointMenu(wcPlayer);
 
-            wcPlayer.GetPlayer().PlaySound("play sounds/ui/achievement_earned.vsnd");
+            wcPlayer.GetPlayer().PlayLocalSound("play sounds/ui/achievement_earned.vsnd");
             Utility.SpawnParticle(wcPlayer.GetPlayer().PlayerPawn.Value.AbsOrigin, "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", 1);
             WarcraftPlugin.RefreshPlayerName(wcPlayer);
         }
@@ -214,7 +215,7 @@ namespace WarcraftPlugin
 
         public void GrantAbilityLevel(int abilityIndex)
         {
-            Player.PlaySound("sounds/buttons/button9.vsnd");
+            Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
         }
     }
@@ -343,16 +344,18 @@ namespace WarcraftPlugin
                 manifest.AddResource("models/weapons/w_eq_beartrap_dropped.vmdl");
                 manifest.AddResource("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
                 manifest.AddResource("models/tools/bullet_hit_marker.vmdl");
-                manifest.AddResource("models/dev/grenade_trajectory/grenade_target.vmdl"); //not used
-                manifest.AddResource("models/props_junk/garbage_glassbottle003a.vmdl"); //not used
-                manifest.AddResource("models/generic/bust_02/bust_02_a.vmdl"); //not used
+                manifest.AddResource("models/generic/bust_02/bust_02_a.vmdl"); //destructable prop
                 manifest.AddResource("models/weapons/w_muzzlefireshape.vmdl"); //fireball
+                manifest.AddResource("models/weapons/w_eq_bumpmine.vmdl"); //drone
+                manifest.AddResource("models/anubis/structures/pillar02_base01.vmdl"); //spring trap
+
                 //manifest.AddResource("models/weapons/w_eq_tablet_dropped.vmdl");
                 //manifest.AddResource("models/weapons/w_eq_tablet.vmdl");
                 //manifest.AddResource("models/generic/conveyor_control_panel_01/conveyor_control_screen_01.vmdl");
                 //"models/props/crates/csgo_drop_crate_community_22.vmdl", shop???
                 //sounds/ui/panorama/claim_gift_01.vsnd_c // shop sound??
                 //sounds/physics/metal/playertag_pickup_01.vsnd_c //shop sound
+                manifest.AddResource("sounds/physics/body/body_medium_break3.vsnd");
 
                 //sounds/music/survival_review_victory.vsnd_c // cool track
 
@@ -528,12 +531,12 @@ namespace WarcraftPlugin
             if (warcraftPlayer.GetAbilityLevel(3) < 1)
             {
                 client.PrintToCenter("No levels in ultimate");
-                client.PlaySound("sounds/ui/menu_invalid.vsnd");
+                client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
             }
             else if (!warcraftPlayer.GetClass().IsAbilityReady(3))
             {
                 client.PrintToCenter($"Ultimate ready in {Math.Ceiling(warcraftPlayer.GetClass().AbilityCooldownRemaining(3))}s");
-                client.PlaySound("sounds/ui/menu_invalid.vsnd");
+                client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
             }
             else
             {

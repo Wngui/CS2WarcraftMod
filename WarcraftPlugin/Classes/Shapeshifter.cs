@@ -1,6 +1,5 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -8,15 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using WarcraftPlugin.Effects;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
-using WarcraftPlugin.Resources;
 using static CounterStrikeSharp.API.Core.Listeners;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Shapeshifter : WarcraftClass
     {
@@ -125,7 +122,7 @@ namespace WarcraftPlugin.Races
                 if (rolledValue <= chanceToAlert)
                 {
                     Player.PrintToCenter($"[Spotted]");
-                    Player.PlaySound("sounds/ui/panorama/ping_alert_01.vsnd");
+                    Player.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
                     Player.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + 0.2f;
                     Utilities.SetStateChanged(Player.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
                 }
@@ -147,7 +144,7 @@ namespace WarcraftPlugin.Races
 
             Player.PlayerPawn.Value.SetModel(enemyplayer?.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
             Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}Disguised{ChatColors.Default} as {teamToDisguise}", 1);
-            Player.PlaySound("sounds/ui/armsrace_final_kill_knife.vsnd");
+            Player.PlayLocalSound("sounds/ui/armsrace_final_kill_knife.vsnd");
             _isDisguised = true;
         }
 
@@ -167,6 +164,7 @@ namespace WarcraftPlugin.Races
             BreakTransformation();
             _checkSpottedTimer?.Kill();
         }
+
         public override void PlayerChangingToAnotherRace()
         {
             BreakTransformation();
@@ -193,7 +191,7 @@ namespace WarcraftPlugin.Races
 
         private void UnDisguise()
         {
-            base.SetDefaultAppearance();
+            SetDefaultAppearance();
 
             _isDisguised = false;
 
@@ -204,7 +202,7 @@ namespace WarcraftPlugin.Races
         {
             _playerShapeshiftProp?.Remove();
 
-            base.SetDefaultAppearance();
+            SetDefaultAppearance();
 
             _isShapeshifted = false;
 
@@ -265,7 +263,7 @@ namespace WarcraftPlugin.Races
 
             Player.PlayerPawn.Value.CameraServices.ViewEntity.Raw = _cameraProp.EntityHandle.Raw;
             Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBasePlayerPawn", "m_pCameraServices");
-            Player.PlaySound("sounds/player/footsteps/water_exit_01.vsnd");
+            Player.PlayLocalSound("sounds/player/footsteps/water_exit_01.vsnd");
 
             WarcraftPlugin.Instance.RegisterListener<OnTick>(UpdateCamera);
 
@@ -287,7 +285,7 @@ namespace WarcraftPlugin.Races
                 return;
             }
 
-            _cameraProp.Teleport(Player.CalculatePositionInFront(-110, 90), Player.PlayerPawn.Value.V_angle, new Vector());
+            _cameraProp.Teleport(Player.CalculatePositionInFront(new Vector(-110, 0, 90)), Player.PlayerPawn.Value.V_angle, new Vector());
         }
 
         private void WeaponStrip()

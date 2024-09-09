@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Modules.Utils;
+﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using g3;
 using MIConvexHull;
 using System;
@@ -88,6 +89,12 @@ namespace WarcraftPlugin.Helpers
             var randomPoint = box.Center + x * box.AxisX + y * box.AxisY + z * box.AxisZ;
 
             return randomPoint.ToVector();
+        }
+
+        public static Box3d ToBox3d(this CCollisionProperty collision, Vector worldPosition)
+        {
+            Vector worldCenter = worldPosition.With().Add(z: collision.Mins.Z + (collision.Maxs.Z - collision.Mins.Z) / 2);
+            return CreateBoxAroundPoint(worldCenter, collision.Maxs.X * 2, collision.Maxs.Y * 2, collision.Maxs.Z);
         }
 
         public static Vector Add(this Vector vector, float x = 0, float y = 0, float z = 0)

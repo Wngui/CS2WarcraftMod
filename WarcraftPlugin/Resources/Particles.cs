@@ -10,6 +10,7 @@
             "particles/maps/de_overpass/chicken_impact_burst2.vpcf", //[X] chicken burst
             "particles/blood_impact/blood_impact_basic.vpcf", //[X] blood basic
             "particles/inferno_fx/molotov_fire01.vpcf", //[X] fire trail
+            "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", //[X] drone shoot
             "particles/ambient_fx/aircraft_navgreen.vpcf", // little green orb
             "particles/ambient_fx/aircraft_navred.vpcf", // little red orb
             "particles/ambient_fx/ambient_smokestack.vpcf", //light smokestack
@@ -258,7 +259,7 @@
             "particles/inferno_fx/incendiary_child_flame01a.vpcf", //firesparks
             "particles/inferno_fx/incendiary_child_flame03a.vpcf", //small fire
             "particles/inferno_fx/incendiary_explosion.vpcf", //blue,yellow fire
-            "particles/inferno_fx/incendiary_fire01.vpcf", //medium firespark
+            "particles/inferno_fx/incendiary_fire01.vpcf", //medium firespark - cool player effect
             "particles/inferno_fx/incendiary_groundfire_outlineset.vpcf", //blue ground fire
             "particles/inferno_fx/incgrenade_thrown_trail.vpcf", //small firetrail
             "particles/maps/de_inferno/inferno_paper_burst.vpcf", //burst with falling small pecies

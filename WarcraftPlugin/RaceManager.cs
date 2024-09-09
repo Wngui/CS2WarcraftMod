@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WarcraftPlugin.Races;
+using WarcraftPlugin.Classes;
 
 namespace WarcraftPlugin
 {
@@ -19,6 +19,7 @@ namespace WarcraftPlugin
             RegisterRace<Paladin>();
             RegisterRace<Necromancer>();
             RegisterRace<Shapeshifter>();
+            RegisterRace<Tinker>();
         }
 
         private void RegisterRace<T>() where T : WarcraftClass, new()

@@ -1,7 +1,4 @@
-﻿using CounterStrikeSharp.API.Modules.Entities;
-using CounterStrikeSharp.API.Modules.Timers;
-using System;
-using System.Numerics;
+﻿using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Cooldowns
@@ -61,7 +58,7 @@ namespace WarcraftPlugin.Cooldowns
         {
             var ability = wcplayer.GetClass().GetAbility(abilityIndex);
 
-            wcplayer.GetPlayer().PlaySound("sounds/weapons/taser/taser_charge_ready.vsnd");
+            wcplayer.GetPlayer().PlayLocalSound("sounds/weapons/taser/taser_charge_ready.vsnd");
 
             wcplayer.GetPlayer().PrintToCenter($"{ability.DisplayName} ready");
         }

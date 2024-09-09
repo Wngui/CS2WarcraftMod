@@ -13,7 +13,7 @@ using g3;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Ranger : WarcraftClass
     {
@@ -74,7 +74,7 @@ namespace WarcraftPlugin.Races
             {
                 var victim = @event.Userid;
                 victim.TakeDamage(markmansLevel * 2, Player);
-                Utility.SpawnParticle(Player.CalculatePositionInFront(10, 60), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
+                Utility.SpawnParticle(Player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
                 Utility.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
             }
         }
@@ -128,11 +128,11 @@ namespace WarcraftPlugin.Races
 
             directionAngle.Y +=
                         (buttonState & (ulong)PlayerButtons.Back) != 0 ? 180 :
-                        ((buttonState & (ulong)PlayerButtons.Moveleft) != 0 ? 90 :
-                        ((buttonState & (ulong)PlayerButtons.Moveright) != 0 ? -90 : 0));
+                        (buttonState & (ulong)PlayerButtons.Moveleft) != 0 ? 90 :
+                        (buttonState & (ulong)PlayerButtons.Moveright) != 0 ? -90 : 0;
 
             var directionVec = new Vector();
-            NativeAPI.AngleVectors(directionAngle.Handle, directionVec.Handle, IntPtr.Zero, IntPtr.Zero);
+            NativeAPI.AngleVectors(directionAngle.Handle, directionVec.Handle, nint.Zero, nint.Zero);
 
             // Always shoot us up a little bit if were on the ground and not aiming up.
             if (directionVec.Z < 0.275)
@@ -146,7 +146,7 @@ namespace WarcraftPlugin.Races
             Player.PlayerPawn.Value.AbsVelocity.Y = directionVec.Y;
             Player.PlayerPawn.Value.AbsVelocity.Z = directionVec.Z;
 
-            Player.PlaySound("sounds/player/footsteps/jump_launch_01.vsnd");
+            Player.PlayLocalSound("sounds/player/footsteps/jump_launch_01.vsnd");
         }
 
         private void BeginDashCooldown()
@@ -259,7 +259,7 @@ namespace WarcraftPlugin.Races
                         player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Owner);
                         player.PlayerPawn.Value.VelocityModifier = 0;
                         player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
-                        Utility.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
+                        Utility.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                     }
                 }
                 //Clean-up
@@ -310,7 +310,7 @@ namespace WarcraftPlugin.Races
             public override void OnStart()
             {
                 //Geometry.DrawVertices(_hurtBox.ComputeVertices()); //debug
-                Owner.PlaySound("sounds/music/damjanmravunac_01/deathcam.vsnd");
+                Owner.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
             }
 
             public override void OnTick()
@@ -337,7 +337,7 @@ namespace WarcraftPlugin.Races
                     {
                         player.TakeDamage(1, Owner);
                         player.PlayerPawn.Value.VelocityModifier = 0;
-                        Utility.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
+                        Utility.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                     }
                 }
             }

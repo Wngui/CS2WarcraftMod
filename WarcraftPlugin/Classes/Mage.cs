@@ -10,7 +10,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Linq;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Mage : WarcraftClass
     {
@@ -65,11 +65,11 @@ namespace WarcraftPlugin.Races
                 float deltaY = playerOrigin.Y - ping.Y;
                 float deltaZ = playerOrigin.Z - ping.Z;
                 float distance = (float)Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-                float newX = ping.X + (deltaX / distance) * offset;
-                float newY = ping.Y + (deltaY / distance) * offset;
-                float newZ = ping.Z + (deltaZ / distance) * offset;
+                float newX = ping.X + deltaX / distance * offset;
+                float newY = ping.Y + deltaY / distance * offset;
+                float newZ = ping.Z + deltaZ / distance * offset;
 
-                Player.PlaySound("sounds/weapons/fx/nearmiss/bulletltor06.vsnd");
+                Player.PlayLocalSound("sounds/weapons/fx/nearmiss/bulletltor06.vsnd");
                 Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 20), "particles/ui/ui_electric_exp_glow.vpcf", 3);
                 Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_distort.vpcf", 2);
                 Player.PlayerPawn.Value.Teleport(new Vector(newX, newY, newZ), Player.PlayerPawn.Value.AbsRotation, new Vector());
@@ -98,7 +98,7 @@ namespace WarcraftPlugin.Races
 
         private void RegenManaShield()
         {
-            if (Player == null || !Player.PawnIsAlive || !Player.PlayerPawn.IsValid) 
+            if (Player == null || !Player.PawnIsAlive || !Player.PlayerPawn.IsValid)
             {
                 _manaShieldTimer?.Kill();
                 return;
@@ -150,7 +150,7 @@ namespace WarcraftPlugin.Races
                 particle.SetParent(molotov);
 
                 Vector velocity = Player.CalculateVelocityAwayFromPlayer(1800);
-                molotov.Teleport(Player.CalculatePositionInFront(60, 60), molotov.AbsRotation, velocity);
+                molotov.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), molotov.AbsRotation, velocity);
 
             }
         }
@@ -187,7 +187,7 @@ namespace WarcraftPlugin.Races
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;
 
-            Utility.DrawLaserBetween(Utility.ToCenterOrigin(Owner), Utility.ToCenterOrigin(Target), Color.Cyan);
+            Utility.DrawLaserBetween(Owner.ToCenterOrigin(), Target.ToCenterOrigin(), Color.Cyan);
             targetPlayerModel.SetColor(Color.Cyan);
         }
 

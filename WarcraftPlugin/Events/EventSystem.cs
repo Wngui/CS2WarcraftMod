@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Numerics;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 
-namespace WarcraftPlugin
+namespace WarcraftPlugin.Events
 {
     public class EventSystem
     {
@@ -33,6 +35,48 @@ namespace WarcraftPlugin
             _plugin.RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre);
             _plugin.RegisterEventHandler<EventGrenadeThrown>(GrenadeThrown);
             _plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(SmokeGrenadeDetonate);
+
+            //Custom events
+            _plugin.AddTimer(1, PlayerSpottedOnRadar, TimerFlags.REPEAT);
+        }
+
+        private void PlayerSpottedOnRadar()
+        {
+            var players = Utilities.GetPlayers();
+            var playerDictionary = players.ToDictionary(player => player.Index);
+
+            foreach (var spottedPlayer in players)
+            {
+                if (!spottedPlayer.IsValid || !spottedPlayer.PawnIsAlive) continue;
+
+                var spottedByMask = spottedPlayer.PlayerPawn.Value.EntitySpottedState.SpottedByMask;
+
+                for (int i = 0; i < spottedByMask.Length; i++)
+                {
+                    uint mask = spottedByMask[i];
+                    int baseId = i * 32;
+
+                    while (mask != 0)
+                    {
+                        int playerIndex = baseId + BitOperations.TrailingZeroCount(mask) + 1; // Offset by 1 to match the 1-based index
+
+                        if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsValid && spottedByPlayer.PawnIsAlive)
+                        {
+                            if (!spottedPlayer.IsBot)
+                            {
+                                spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_by_player", new EventSpottedPlayer() { UserId = spottedByPlayer });
+                            }
+
+                            if (!spottedByPlayer.IsBot)
+                            {
+                                spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_player", new EventSpottedPlayer() { UserId = spottedPlayer });
+                            }
+                        }
+
+                        mask &= mask - 1;
+                    }
+                }
+            }
         }
 
         private HookResult SmokeGrenadeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
@@ -109,7 +153,7 @@ namespace WarcraftPlugin
 
             //Zombie attack logic
             if (attacker != null && attacker.IsBot && attacker.OwnerEntity.Value != null && (bool)attacker?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
-            { 
+            {
                 var owner = new CCSPlayerPawn(attacker.OwnerEntity.Value.Handle);
                 var controller = new CCSPlayerController(owner.Controller.Value.Handle);
                 victim.SetHp(victim.PlayerPawn.Value.Health + @event.DmgHealth);
@@ -172,7 +216,9 @@ namespace WarcraftPlugin
             var victim = @event.Userid;
             var headshot = @event.Headshot;
 
-            if (attacker.IsValid && victim.IsValid && (attacker != victim) && !attacker.IsBot)
+            if(attacker == null || victim == null) return HookResult.Continue;
+
+            if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot)
             {
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_killed_other", @event);
                 var weaponName = attacker.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.DesignerName;
@@ -210,11 +256,11 @@ namespace WarcraftPlugin
                 attacker.PrintToChat(xpString);
             }
 
-            if (victim.IsValid && attacker.IsValid && (attacker != victim))
+            if (victim.IsValid && attacker.IsValid && attacker != victim)
             {
-                if ((bool)victim?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
+                if ((bool)victim?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase) && victim.IsBot)
                 {
-                    attacker?.PlaySound("sounds/physics/flesh/flesh_bloody_break.vsnd");
+                    attacker?.PlayLocalSound("sounds/physics/flesh/flesh_bloody_break.vsnd");
                 }
                 victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_death", @event);
             }

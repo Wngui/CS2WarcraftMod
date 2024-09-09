@@ -9,16 +9,15 @@ using CounterStrikeSharp.API.Modules.Memory;
 using System.Runtime.InteropServices;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Linq;
-using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin.Helpers
 {
     public static class Utility
     {
-        static public void DrawLaserBetween(Vector startPos, Vector endPos, Color? color = null, float duration = 1, float width = 2)
+        static public CBeam DrawLaserBetween(Vector startPos, Vector endPos, Color? color = null, float duration = 1, float width = 2)
         {
             CBeam beam = Utilities.CreateEntityByName<CBeam>("beam");
-            if (beam == null) return;
+            if (beam == null) return null;
 
             beam.Render = color ?? Color.Red;
             beam.Width = width;
@@ -29,6 +28,7 @@ namespace WarcraftPlugin.Helpers
             beam.EndPos.Z = endPos.Z;
             beam.DispatchSpawn();
             WarcraftPlugin.Instance.AddTimer(duration, beam.Remove);
+            return beam;
         }
 
         public static Vector ToCenterOrigin(this CCSPlayerController player)
@@ -94,6 +94,17 @@ namespace WarcraftPlugin.Helpers
             smokeEffect.DispatchSpawn();*/
         }
 
+        public static MemoryFunctionVoid<CBaseEntity, string, int, float, float> CBaseEntity_EmitSoundParamsFunc = new(
+            Environment.OSVersion.Platform == PlatformID.Unix
+            ? @"\x48\xB8\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x55\x48\x89\xE5\x41\x55\x41\x54\x49\x89\xFC\x53\x48\x89\xF3"
+            : @"\x48\x8B\xC4\x48\x89\x58\x10\x48\x89\x70\x18\x55\x57\x41\x56\x48\x8D\xA8\x08\xFF\xFF\xFF"
+            );
+
+        public static void EmitSound(this CBaseEntity entity, string soundpath, int pitch = 1, float volume = 1, float delay = 0)
+        {
+            CBaseEntity_EmitSoundParamsFunc?.Invoke(entity, soundpath, pitch, volume, delay);
+        }
+
         public static MemoryFunctionVoid<CBaseEntity, CBaseEntity, CUtlStringToken, matrix3x4_t> CBaseEntity_SetParent = new(
         Environment.OSVersion.Platform == PlatformID.Unix
             ? @"\x48\x85\xF6\x74\x2A\x48\x8B\x47\x10\xF6\x40\x31\x02\x75\x2A\x48\x8B\x46\x10\xF6\x40\x31\x02\x75\x2A\xB8\x2A\x2A\x2A\x2A"
@@ -108,6 +119,17 @@ namespace WarcraftPlugin.Helpers
             CBaseEntity_SetParent.Invoke(childEntity, parentEntity, null, null);
             // If not teleported, the childrenEntity will not follow the parentEntity correctly.
             childEntity.Teleport(origin, new QAngle(IntPtr.Zero), new Vector(IntPtr.Zero));
+        }
+
+        public static void SetParent(this CBaseEntity childEntity, CBaseEntity parentEntity, Vector offset = null, QAngle rotation = null)
+        {
+            if (!childEntity.IsValid || !parentEntity.IsValid) return;
+
+            offset = offset == null ? new Vector(IntPtr.Zero) : parentEntity.AbsOrigin.With().Add(x: offset.X, y: offset.Y, z: offset.Z);
+            rotation ??= new QAngle(IntPtr.Zero);
+
+            childEntity.Teleport(offset, rotation, new Vector(IntPtr.Zero));
+            childEntity.SetParent(parentEntity);
         }
 
         public static MemoryFunctionWithReturn<nint, nint, nint, nint, nint, nint, int, CSmokeGrenadeProjectile> CSmokeGrenadeProjectile_CreateFunc = new(
@@ -149,7 +171,7 @@ namespace WarcraftPlugin.Helpers
             Utilities.SetStateChanged(entity, "CBaseModelEntity", "m_clrRender");
         }
 
-        public static void PlaySound(this CCSPlayerController player, string soundPath)
+        public static void PlayLocalSound(this CCSPlayerController player, string soundPath)
         {
             if (player == null || !player.IsValid) return;
 
@@ -170,31 +192,35 @@ namespace WarcraftPlugin.Helpers
             return velocity;
         }
 
-        public static Vector CalculatePositionInFront(this CCSPlayerController player, float offSetXY, float offSetZ = 0)
+        public static Vector CalculatePositionInFront(this CCSPlayerController player, Vector offset)
         {
-            var pawn = player.PlayerPawn.Value;
-            // Extract yaw angle from player's rotation QAngle
+            var pawn = player.PlayerPawn.Value ?? throw new InvalidOperationException("PlayerPawn is not set.");
             float yawAngle = pawn.EyeAngles.Y;
+            return player.PlayerPawn.Value.CalculatePositionInFront(offset, yawAngle);
+        }
 
-            // Convert yaw angle from degrees to radians
+        public static Vector CalculatePositionInFront(this CBaseModelEntity entity, Vector offset, float? yawAngle = null)
+        {
+            yawAngle ??= entity.AbsRotation.Y;
+            // Extract yaw angle from player's rotation QAngle and convert to radians
             float yawAngleRadians = (float)(yawAngle * Math.PI / 180.0);
 
             // Calculate offsets in x and y directions
-            float offsetX = offSetXY * (float)Math.Cos(yawAngleRadians);
-            float offsetY = offSetXY * (float)Math.Sin(yawAngleRadians);
+            float offsetX = offset.X * MathF.Cos(yawAngleRadians) - offset.Y * MathF.Sin(yawAngleRadians);
+            float offsetY = offset.X * MathF.Sin(yawAngleRadians) + offset.Y * MathF.Cos(yawAngleRadians);
 
-            // Calculate position in front of the player
+            // Calculate the new position in front of the player
             var positionInFront = new Vector
             {
-                X = pawn.AbsOrigin.X + offsetX,
-                Y = pawn.AbsOrigin.Y + offsetY,
-                Z = pawn.AbsOrigin.Z + offSetZ
+                X = entity.AbsOrigin.X + offsetX,
+                Y = entity.AbsOrigin.Y + offsetY,
+                Z = entity.AbsOrigin.Z + offset.Z
             };
 
             return positionInFront;
         }
 
-        public static Vector CalculateVelocity(Vector positionA, Vector positionB, float timeDuration)
+        public static Vector CalculateTravelVelocity(Vector positionA, Vector positionB, float timeDuration)
         {
             // Step 1: Determine direction from A to B
             Vector directionVector = positionB - positionA;
@@ -287,6 +313,23 @@ namespace WarcraftPlugin.Helpers
             {
                 player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Raw = matchedWeapon.Raw;
                 player.DropActiveWeapon();
+            }
+        }
+
+        public static bool IsPlayerInSpottedByMask(Span<uint> spottedByMask, int playerId)
+        {
+            int maskIndex = playerId >> 5; // Bitwise shift instead of division by 32
+            int bitPosition = playerId & 31; // Bitwise AND instead of modulo 32
+
+            // Combined single check with bitwise operation
+            return (maskIndex < spottedByMask.Length) && ((spottedByMask[maskIndex] & (1u << bitPosition)) != 0);
+        }
+
+        public static void RemoveIfValid(this CBaseEntity obj)
+        {
+            if (obj != null && obj.IsValid)
+            {
+                obj?.Remove();
             }
         }
     }

@@ -9,7 +9,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Drawing;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Barbarian : WarcraftClass
     {
@@ -69,14 +69,14 @@ namespace WarcraftPlugin.Races
 
             var rotation = new QAngle(0, Player.PlayerPawn.Value.EyeAngles.Y + 90, 0);
 
-            throwingAxe.Teleport(Player.CalculatePositionInFront(60, 60), rotation, velocity);
+            throwingAxe.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), rotation, velocity);
             throwingAxe.DispatchSpawn();
             throwingAxe.SetModel("models/weapons/v_axe.vmdl");
             Schema.SetSchemaValue(throwingAxe.Handle, "CBaseGrenade", "m_hThrower", Player.PlayerPawn.Raw); //Fixes killfeed
 
             throwingAxe.AcceptInput("InitializeSpawnFromWorld");
             throwingAxe.Damage = 40;
-            throwingAxe.DmgRadius = 80;
+            throwingAxe.DmgRadius = 180;
             throwingAxe.DetonateTime = float.MaxValue;
             DispatchEffect(new ThrowingAxeEffect(Player, throwingAxe, 2));
         }
@@ -116,7 +116,7 @@ namespace WarcraftPlugin.Races
                 var victim = @event.Userid;
                 victim.TakeDamage(carnageLevel * 5f, Player);
                 Utility.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
-                Player.PlaySound("sounds/physics/body/body_medium_break3.vsnd");
+                Player.PlayLocalSound("sounds/physics/body/body_medium_break3.vsnd");
             }
         }
     }
@@ -129,7 +129,7 @@ namespace WarcraftPlugin.Races
 
         public override void OnStart()
         {
-            Owner.PlaySound("sounds/player/effort_m_09.vsnd");
+            Owner.PlayLocalSound("sounds/player/effort_m_09.vsnd");
         }
 
         public override void OnTick()
@@ -162,7 +162,7 @@ namespace WarcraftPlugin.Races
         {
             Owner.PlayerPawn.Value.VelocityModifier = 1.3f;
             Owner.PlayerPawn.Value.SetColor(Color.IndianRed);
-            Owner.PlaySound("sounds/vo/agents/balkan/t_death03.vsnd");
+            Owner.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");
         }
 
         public override void OnTick()
@@ -173,7 +173,7 @@ namespace WarcraftPlugin.Races
             //Regenerate healthw
             if (Owner.PlayerPawn.Value.Health < Owner.PlayerPawn.Value.MaxHealth)
             {
-                Owner.SetHp(Owner.PlayerPawn.Value.Health + 1); 
+                Owner.SetHp(Owner.PlayerPawn.Value.Health + 1);
             }
 
             //Rage growth spurt

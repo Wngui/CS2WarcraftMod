@@ -10,7 +10,7 @@ using System.Linq;
 using g3;
 using WarcraftPlugin.Models;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Necromancer : WarcraftClass
     {
@@ -80,7 +80,7 @@ namespace WarcraftPlugin.Races
                         Player.Respawn();
                         Player.SetHp(1);
                         Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
-                        Player.PlaySound("sounds/ambient/atmosphere/cs_cable_rattle02.vsnd");
+                        Player.PlayLocalSound("sounds/ambient/atmosphere/cs_cable_rattle02.vsnd");
                     });
                 }
             }
@@ -160,7 +160,7 @@ namespace WarcraftPlugin.Races
             WarcraftPlugin.Instance.AddTimer(0.1f, () =>
             {
                 Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 20), "particles/explosions_fx/explosion_child_water_splash03b.vpcf");
-                Player.PlaySound("sounds/ui/armsrace_become_leader_team.vsnd");
+                Player.PlayLocalSound("sounds/ui/armsrace_become_leader_team.vsnd");
                 var zombies = Utilities.GetPlayers().Where(x => x.IsBot).OrderByDescending(x => x.CreateTime).Take(_maxZombies).ToList();
 
                 foreach (var zombie in zombies)
@@ -170,7 +170,7 @@ namespace WarcraftPlugin.Races
                     {
                         zombie.PlayerPawn.Value.SetModel("characters/models/nozb1/skeletons_player_model/skeleton_player_model_2/skeleton_nozb2_pm.vmdl");
                     }
-                    zombie.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(60, 60), new QAngle(), new Vector());
+                    zombie.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), new QAngle(), new Vector());
                     zombie.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
                     zombie.RemoveWeapons();
                     zombie.GiveNamedItem("weapon_knife");

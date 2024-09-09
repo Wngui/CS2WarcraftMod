@@ -8,7 +8,7 @@ using System.Linq;
 using WarcraftPlugin.Models;
 using System.Drawing;
 
-namespace WarcraftPlugin.Races
+namespace WarcraftPlugin.Classes
 {
     public class Paladin : WarcraftClass
     {
@@ -131,14 +131,14 @@ namespace WarcraftPlugin.Races
             {
                 _hasUsedDivineResurrection = true;
                 // Generate a random index within the range of players
-                int randomIndex = Random.Shared.Next(0, deadTeamPlayers.Count()-1);
+                int randomIndex = Random.Shared.Next(0, deadTeamPlayers.Count() - 1);
 
                 // Get the random player
                 var playerToRevive = deadTeamPlayers.ElementAt(randomIndex);
 
                 //Revive
                 playerToRevive.Respawn();
-                playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(60, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
+                playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), Player.PlayerPawn.Value.EyeAngles, new Vector());
 
                 playerToRevive.PrintToChat(" " + $"{ChatColors.Green}You have been revived!{ChatColors.Default}");
                 Utilities.GetPlayers().ForEach(x =>
@@ -164,7 +164,7 @@ namespace WarcraftPlugin.Races
                 {
                     victim.SetArmor(victim.PlayerPawn.Value.ArmorValue - WarcraftPlayer.GetAbilityLevel(2) * 5);
                     Utility.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
-                    Player.PlaySound("sounds/weapons/taser/taser_hit.vsnd");
+                    Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
                 }
             }
         }
