@@ -140,7 +140,6 @@ namespace WarcraftPlugin.Models
                         _fireRateTimer = WarcraftPlugin.Instance.AddTimer(_fireRate, () =>
                         {
                             IsFireRateCooldown = false; _target = null;
-                            //_lazerDot?.RemoveIfValid();
                         });
                     }
 
@@ -159,7 +158,6 @@ namespace WarcraftPlugin.Models
                 else
                 {
                     _target = null;
-                    //_lazerDot?.RemoveIfValid();
                 }
             }
         }
@@ -168,7 +166,7 @@ namespace WarcraftPlugin.Models
         {
             //particle effect from turret
             Utility.SpawnParticle(muzzle, "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", 1);
-            _turret.EmitSound("Weapon_AK47.Single");
+            _turret.EmitSound("Weapon_M4A1.Silenced");
         }
 
         private void FireRocket(Vector muzzle, Vector endPos)
