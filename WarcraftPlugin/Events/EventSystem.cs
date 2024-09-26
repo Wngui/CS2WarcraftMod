@@ -258,10 +258,6 @@ namespace WarcraftPlugin.Events
 
             if (victim.IsValid && attacker.IsValid && attacker != victim)
             {
-                if ((bool)victim?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase) && victim.IsBot)
-                {
-                    attacker?.PlayLocalSound("sounds/physics/flesh/flesh_bloody_break.vsnd");
-                }
                 victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_death", @event);
             }
 
