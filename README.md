@@ -1,6 +1,9 @@
 <p align="center">
   <img src="https://github.com/user-attachments/assets/7aece590-36ba-4084-a4ca-bbb5adfd28dc" alt="00198-3001460831" width="40%">
 </p>
+<p align="center">
+  (https://www.youtube.com/watch?v=Z9HdF47zPss)
+</p>
 
 # Warcraft Mod for CS2
 
