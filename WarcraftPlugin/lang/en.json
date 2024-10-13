@@ -1,7 +1,7 @@
 {
-  "menu.selection.left": "<font color='red'>▶ </font>",
-  "menu.selection.right": "<font color='red'> ◀</font>",
+  "menu.selection.left": "<font color='red' class='fontSize-s'>▶ </font>",
+  "menu.selection.right": "<font color='red' class='fontSize-s'> ◀</font>",
   "menu.title.prefix": "",
   "menu.more.options.below": "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''>",
-  "menu.bottom.text": "<center><font size='0.2' color='red'>Navigate:</font><font color='orange'> ↑↓</font><font color='white'> | </font><font color='red'>Select: </font><font color='orange'>Enter</font><font color='white'> | </font><font color='red'>Exit: </font><font color='orange'>TAB</font></center>"
+  "menu.bottom.text": "<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-sm'> ↑↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>Enter</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>"
 }

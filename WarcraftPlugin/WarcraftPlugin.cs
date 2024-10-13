@@ -560,7 +560,9 @@ namespace WarcraftPlugin
         public static void ShowSkillPointMenu2(WarcraftPlayer wcPlayer)
         {
             var warcraftClass = wcPlayer.GetClass();
-            var skillsMenu = Menu.MenuManager.CreateMenu($"{warcraftClass.DisplayName} Skills Menu [{XpSystem.GetFreeSkillPoints(wcPlayer)} available]");
+
+            var skillsMenu = Menu.MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.Name}' class='fontSize-m'>{warcraftClass.DisplayName}</font><br>
+                <font color='#90EE90' class='fontSize-s'>Level up skills ({XpSystem.GetFreeSkillPoints(wcPlayer)} available)</font>");
 
             for (int i = 0;i < 3; i++)
             {
@@ -574,10 +576,10 @@ namespace WarcraftPlugin
                     color = ChatColors.Grey;
                 }
 
-                var displayString = $"{color}{ability.DisplayName}{ChatColors.Default} [{abilityLevel}/{WarcraftPlayer.GetMaxAbilityLevel(i)}]";
-                //{ability.GetDescription(0)}
+                var displayString = $"<font color='white' class='fontSize-sm'>{ability.DisplayName} [{abilityLevel}/{WarcraftPlayer.GetMaxAbilityLevel(i)}]</font>";
+                var subDisplayString= $"<font color='#D3D3D3' class='fontSize-s'>{ability.GetDescription(i)}</font>";
 
-                skillsMenu.Add(displayString, (p, opt) =>
+                skillsMenu.Add(displayString, subDisplayString, (p, opt) =>
                 {
                     if (XpSystem.GetFreeSkillPoints(wcPlayer) > 0)
                         wcPlayer.GrantAbilityLevel(i);

@@ -158,9 +158,14 @@ public class MenuPlayer
         while (i < VisibleOptions && option != null)
         {
             if (option == CurrentChoice)
-                builder.AppendLine($"{Localizer?["menu.selection.left"]} {option.Value.OptionDisplay} {Localizer?["menu.selection.right"]} <br>");
+            {
+                builder.AppendLine($"{Localizer?["menu.selection.left"]} {option.Value.OptionDisplay} {Localizer?["menu.selection.right"]}<br>");
+                if (option.Value.SubOptionDisplay != null) builder.AppendLine($"{option.Value.SubOptionDisplay}<br>");
+            }
             else
+            {
                 builder.AppendLine($"{option.Value.OptionDisplay} <br>");
+            }
             option = option.Next;
             i++;
         }
@@ -171,7 +176,9 @@ public class MenuPlayer
                 $"{Localizer?["menu.more.options.below"]}");
         }
 
-        builder.AppendLine("<br><br>" + $"{Localizer?["menu.bottom.text"]}");
+        builder.AppendLine("<br><br>");
+        builder.AppendLine($"{Localizer?["menu.bottom.text"]}");
+        builder.AppendLine("<br>");
         //builder.AppendLine("</div>");
         CenterHtml = builder.ToString();
     }
