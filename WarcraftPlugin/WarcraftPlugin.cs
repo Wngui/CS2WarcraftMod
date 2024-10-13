@@ -18,6 +18,11 @@ using CounterStrikeSharp.API.Modules.Cvars;
 using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Classes;
+using WarcraftPlugin.Menu;
+using System.Diagnostics;
+using System.Drawing;
+using CounterStrikeSharp.API.Modules.Entities;
+using System.Numerics;
 
 namespace WarcraftPlugin
 {
@@ -96,7 +101,7 @@ namespace WarcraftPlugin
         private static void PerformLevelupEvents(WarcraftPlayer wcPlayer)
         {
             if (GetFreeSkillPoints(wcPlayer) > 0)
-                WarcraftPlugin.ShowSkillPointMenu(wcPlayer);
+                WarcraftPlugin.ShowSkillPointMenu2(wcPlayer);
 
             wcPlayer.GetPlayer().PlayLocalSound("play sounds/ui/achievement_earned.vsnd");
             Utility.SpawnParticle(wcPlayer.GetPlayer().PlayerPawn.Value.AbsOrigin, "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", 1);
@@ -288,6 +293,7 @@ namespace WarcraftPlugin
         public override void Load(bool hotReload)
         {
             base.Load(hotReload);
+            MenuAPI.Load(this, hotReload);
 
             _instance ??= this;
 
@@ -324,11 +330,13 @@ namespace WarcraftPlugin
 
             AddCommand("addxp", "addxp", CommandAddXp);
 
-            AddCommand("skills", "skills", (client, _) => ShowSkillPointMenu(GetWcPlayer(client)));
-            AddCommand("level", "skills", (client, _) => ShowSkillPointMenu(GetWcPlayer(client)));
+            AddCommand("skills", "skills", (client, _) => ShowSkillPointMenu2(GetWcPlayer(client)));
+            AddCommand("level", "skills", (client, _) => ShowSkillPointMenu2(GetWcPlayer(client)));
 
             AddCommand("rpg_help", "list all commands", CommandHelp);
             AddCommand("commands", "list all commands", CommandHelp);
+            AddCommand("wcs", "list all commands", CommandHelp);
+            AddCommand("war3menu", "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
             RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
@@ -409,7 +417,7 @@ namespace WarcraftPlugin
 
             if (XpSystem.GetFreeSkillPoints(wcPlayer) > 0)
             {
-                ShowSkillPointMenu(wcPlayer);
+                ShowSkillPointMenu2(wcPlayer);
             }
         }
 
@@ -522,7 +530,7 @@ namespace WarcraftPlugin
                 });
             }
 
-            MenuManager.OpenChatMenu(client, menu);
+            CounterStrikeSharp.API.Modules.Menu.MenuManager.OpenChatMenu(client, menu);
         }
 
         private void UltimatePressed(CCSPlayerController? client, CommandInfo commandinfo)
@@ -547,6 +555,38 @@ namespace WarcraftPlugin
         public override void Unload(bool hotReload)
         {
             base.Unload(hotReload);
+        }
+
+        public static void ShowSkillPointMenu2(WarcraftPlayer wcPlayer)
+        {
+            var warcraftClass = wcPlayer.GetClass();
+            var skillsMenu = Menu.MenuManager.CreateMenu($"{warcraftClass.DisplayName} Skills Menu [{XpSystem.GetFreeSkillPoints(wcPlayer)} available]");
+
+            for (int i = 0;i < 3; i++)
+            {
+                var ability = warcraftClass.GetAbility(i);
+                var abilityLevel = wcPlayer.GetAbilityLevel(i);
+
+                char color = ChatColors.Gold;
+
+                if (wcPlayer.GetAbilityLevel(i) == WarcraftPlayer.GetMaxAbilityLevel(i) || XpSystem.GetFreeSkillPoints(wcPlayer) == 0)
+                {
+                    color = ChatColors.Grey;
+                }
+
+                var displayString = $"{color}{ability.DisplayName}{ChatColors.Default} [{abilityLevel}/{WarcraftPlayer.GetMaxAbilityLevel(i)}]";
+                //{ability.GetDescription(0)}
+
+                skillsMenu.Add(displayString, (p, opt) =>
+                {
+                    if (XpSystem.GetFreeSkillPoints(wcPlayer) > 0)
+                        wcPlayer.GrantAbilityLevel(i);
+
+                    Menu.MenuManager.OpenMainMenu(wcPlayer.Player, skillsMenu);
+                });
+
+                Menu.MenuManager.OpenMainMenu(wcPlayer.Player, skillsMenu);
+            }
         }
 
         public static void ShowSkillPointMenu(WarcraftPlayer wcPlayer)
@@ -609,7 +649,7 @@ namespace WarcraftPlugin
                 }, disabled);
             }
 
-            MenuManager.OpenChatMenu(wcPlayer.GetPlayer(), menu);
+            CounterStrikeSharp.API.Modules.Menu.MenuManager.OpenChatMenu(wcPlayer.GetPlayer(), menu);
             wcPlayer.GetPlayer().PrintToChat(" ");
         }
 

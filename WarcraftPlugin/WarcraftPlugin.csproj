@@ -24,6 +24,11 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="lang\en.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 	<Import Project=".\PostBuild.targets" Condition="Exists('.\PostBuild.targets')" />
   
 </Project>

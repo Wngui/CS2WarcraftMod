@@ -1,0 +1,7 @@
+{
+  "menu.selection.left": "<font color='red'>▶ </font>",
+  "menu.selection.right": "<font color='red'> ◀</font>",
+  "menu.title.prefix": "",
+  "menu.more.options.below": "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''>",
+  "menu.bottom.text": "<center><font size='0.2' color='red'>Navigate:</font><font color='orange'> ↑↓</font><font color='white'> | </font><font color='red'>Select: </font><font color='orange'>Enter</font><font color='white'> | </font><font color='red'>Exit: </font><font color='orange'>TAB</font></center>"
+}
