@@ -56,13 +56,9 @@ public static class MenuAPI
             {
                 player.ScrollDown();
             }
-            else if ((player.Buttons & PlayerButtons.Moveright) == 0 && (player.player.Buttons & PlayerButtons.Moveright) != 0)
+            else if ((player.Buttons & PlayerButtons.Jump) == 0 && (player.player.Buttons & PlayerButtons.Jump) != 0)
             {
                 player.Choose();
-            }
-            else if ((player.Buttons & PlayerButtons.Moveleft) == 0 && (player.player.Buttons & PlayerButtons.Moveleft) != 0)
-            {
-                player.CloseSubMenu();
             }
 
             if (((long)player.player.Buttons & 8589934592) == 8589934592)

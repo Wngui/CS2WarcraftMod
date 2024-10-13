@@ -20,15 +20,21 @@ public class MenuPlayer
 
     public void OpenMainMenu(Menu menu)
     {
-        //if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
-        //{
-        //    player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
-        //    Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 0);
-        //    Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
-        //}
+        if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
+        {
+            player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 0);
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+        }
 
         if (menu == null)
         {
+            if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
+            {
+                player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+                Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+                Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+            }
             MainMenu = null;
             CurrentChoice = null;
             CenterHtml = "";
@@ -88,12 +94,12 @@ public class MenuPlayer
     {
         if (CurrentChoice?.Value.Parent?.Prev == null)
         {
-            //if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
-            //{
-            //    player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
-            //    Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
-            //    Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
-            //}
+            if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
+            {
+                player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+                Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+                Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+            }
 
             return;
         }
@@ -150,10 +156,6 @@ public class MenuPlayer
         int i = 0;
         LinkedListNode<MenuOption>? option = MenuStart!;
         builder.AppendLine($"{option.Value.Parent?.Title}<br>");
-        //if (option.Value.Parent?.Title != "")
-        //{
-        //    builder.AppendLine($"{Localizer?["menu.title.prefix"]}{option.Value.Parent?.Title}</u><font color='white'><br>");
-        //}
 
         while (i < VisibleOptions && option != null)
         {
@@ -176,10 +178,9 @@ public class MenuPlayer
                 $"{Localizer?["menu.more.options.below"]}");
         }
 
-        builder.AppendLine("<br><br>");
+        builder.AppendLine("<br>");
         builder.AppendLine($"{Localizer?["menu.bottom.text"]}");
         builder.AppendLine("<br>");
-        //builder.AppendLine("</div>");
         CenterHtml = builder.ToString();
     }
 }

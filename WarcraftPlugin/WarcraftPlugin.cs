@@ -19,10 +19,7 @@ using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Classes;
 using WarcraftPlugin.Menu;
-using System.Diagnostics;
 using System.Drawing;
-using CounterStrikeSharp.API.Modules.Entities;
-using System.Numerics;
 
 namespace WarcraftPlugin
 {
@@ -100,9 +97,6 @@ namespace WarcraftPlugin
 
         private static void PerformLevelupEvents(WarcraftPlayer wcPlayer)
         {
-            if (GetFreeSkillPoints(wcPlayer) > 0)
-                WarcraftPlugin.ShowSkillPointMenu2(wcPlayer);
-
             wcPlayer.GetPlayer().PlayLocalSound("play sounds/ui/achievement_earned.vsnd");
             Utility.SpawnParticle(wcPlayer.GetPlayer().PlayerPawn.Value.AbsOrigin, "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", 1);
             WarcraftPlugin.RefreshPlayerName(wcPlayer);
@@ -330,8 +324,8 @@ namespace WarcraftPlugin
 
             AddCommand("addxp", "addxp", CommandAddXp);
 
-            AddCommand("skills", "skills", (client, _) => ShowSkillPointMenu2(GetWcPlayer(client)));
-            AddCommand("level", "skills", (client, _) => ShowSkillPointMenu2(GetWcPlayer(client)));
+            AddCommand("skills", "skills", (client, _) => ShowSkillPointMenu(GetWcPlayer(client)));
+            AddCommand("level", "skills", (client, _) => ShowSkillPointMenu(GetWcPlayer(client)));
 
             AddCommand("rpg_help", "list all commands", CommandHelp);
             AddCommand("commands", "list all commands", CommandHelp);
@@ -417,7 +411,7 @@ namespace WarcraftPlugin
 
             if (XpSystem.GetFreeSkillPoints(wcPlayer) > 0)
             {
-                ShowSkillPointMenu2(wcPlayer);
+                ShowSkillPointMenu(wcPlayer);
             }
         }
 
@@ -557,41 +551,58 @@ namespace WarcraftPlugin
             base.Unload(hotReload);
         }
 
-        public static void ShowSkillPointMenu2(WarcraftPlayer wcPlayer)
+        public static void ShowSkillPointMenu(WarcraftPlayer wcPlayer)
         {
             var warcraftClass = wcPlayer.GetClass();
 
-            var skillsMenu = Menu.MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.Name}' class='fontSize-m'>{warcraftClass.DisplayName}</font><br>
+            var skillsMenu = Menu.MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.Name}' class='fontSize-m'>{warcraftClass.DisplayName}</font><font color='gold' class='fontSize-sm'> - Level {wcPlayer.GetLevel()}</font><br>
                 <font color='#90EE90' class='fontSize-s'>Level up skills ({XpSystem.GetFreeSkillPoints(wcPlayer)} available)</font>");
 
-            for (int i = 0;i < 3; i++)
+            for (int i = 0;i < 4; i++)
             {
                 var ability = warcraftClass.GetAbility(i);
                 var abilityLevel = wcPlayer.GetAbilityLevel(i);
 
-                char color = ChatColors.Gold;
+                var color = Color.White;
 
-                if (wcPlayer.GetAbilityLevel(i) == WarcraftPlayer.GetMaxAbilityLevel(i) || XpSystem.GetFreeSkillPoints(wcPlayer) == 0)
+                if (abilityLevel == WarcraftPlayer.GetMaxAbilityLevel(i) || XpSystem.GetFreeSkillPoints(wcPlayer) == 0)
                 {
-                    color = ChatColors.Grey;
+                    color = Color.Gray;
                 }
 
-                var displayString = $"<font color='white' class='fontSize-sm'>{ability.DisplayName} [{abilityLevel}/{WarcraftPlayer.GetMaxAbilityLevel(i)}]</font>";
+                var displayString = $"<font color='{color.Name}' class='fontSize-sm'>{ability.DisplayName} [{abilityLevel}/{WarcraftPlayer.GetMaxAbilityLevel(i)}]</font>";
+
+                if (i == 3 && abilityLevel != WarcraftPlayer.GetMaxAbilityLevel(i)) //Ultimate ability
+                {
+                    if(wcPlayer.currentLevel == MaxLevel)
+                    {
+                        color = Color.MediumPurple;
+                        displayString = $"<font color='{color.Name}' class='fontSize-sm'>{ability.DisplayName} [{abilityLevel}/{WarcraftPlayer.GetMaxAbilityLevel(i)}]</font>";
+                    }
+                    else
+                    {
+                        color = Color.Gray;
+                        displayString = $"<font color='{color.Name}' class='fontSize-sm'>{ability.DisplayName} [lvl. 16 required]</font>";
+                    }
+                }
+
                 var subDisplayString= $"<font color='#D3D3D3' class='fontSize-s'>{ability.GetDescription(i)}</font>";
 
+                var abilityIndex = i;
                 skillsMenu.Add(displayString, subDisplayString, (p, opt) =>
                 {
+                    Console.WriteLine(abilityIndex);
                     if (XpSystem.GetFreeSkillPoints(wcPlayer) > 0)
-                        wcPlayer.GrantAbilityLevel(i);
+                        wcPlayer.GrantAbilityLevel(abilityIndex);
 
-                    Menu.MenuManager.OpenMainMenu(wcPlayer.Player, skillsMenu);
+                    ShowSkillPointMenu(wcPlayer); //TODO select preselected option
                 });
-
-                Menu.MenuManager.OpenMainMenu(wcPlayer.Player, skillsMenu);
             }
+
+            Menu.MenuManager.OpenMainMenu(wcPlayer.Player, skillsMenu);
         }
 
-        public static void ShowSkillPointMenu(WarcraftPlayer wcPlayer)
+        public static void ShowSkillPointMenu2(WarcraftPlayer wcPlayer)
         {
             wcPlayer.GetPlayer().PrintToChat(" ");
             var menu = new ChatMenu($"Level up skills ({XpSystem.GetFreeSkillPoints(wcPlayer)} available)");
