@@ -37,7 +37,7 @@ Ultimate can be activated by binding it in the console, example
 
 ```!reset``` - Unassign skill points for current class
 
-```!factoryreset``` - Completely resets all your progress on all classes
+```!factoryreset``` - Completely resets progress for current class
 
 ```!addxp <amount>``` - Admin only, adds x amount of xp to current class
 
