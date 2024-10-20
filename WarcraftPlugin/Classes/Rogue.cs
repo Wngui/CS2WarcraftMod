@@ -27,16 +27,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("stealth", "Stealth",
-                i => $"{ChatColors.BlueGrey}Become partially invisible for {ChatColors.Green}1/2/3/4/5{ChatColors.BlueGrey} seconds, when killing someone."));
+                i => $"Become partially invisible for 1/2/3/4/5 seconds, when killing someone."));
 
             AddAbility(new WarcraftAbility("sneak_attack", "Sneak Attack",
-                i => $"{ChatColors.BlueGrey}When you hit an enemy in the back, you do an aditional {ChatColors.Blue}5/10/15/20/25{ChatColors.BlueGrey} damage."));
+                i => $"When you hit an enemy in the back, you do an aditional 5/10/15/20/25 damage."));
 
             AddAbility(new WarcraftAbility("blade_dance", "Blade Dance",
-                i => $"{ChatColors.BlueGrey}Increases movement speed and damage with {ChatColors.Yellow}knives{ChatColors.BlueGrey}."));
+                i => $"Increases movement speed and damage with knives."));
 
             AddAbility(new WarcraftCooldownAbility("smokebomb", "Smokebomb",
-                i => $"{ChatColors.BlueGrey}When nearing death, you will automatically drop a {ChatColors.Red}smokebomb{ChatColors.BlueGrey}, letting you cheat death.",
+                i => $"When nearing death, you will automatically drop a smokebomb, letting you cheat death.",
                 50f));
 
             HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);

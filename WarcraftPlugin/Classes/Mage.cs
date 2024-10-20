@@ -30,16 +30,16 @@ namespace WarcraftPlugin.Classes
         {
 
             AddAbility(new WarcraftAbility("fireball", "Fireball",
-                i => $"{ChatColors.BlueGrey}Infuses molotovs with {ChatColors.Green}fire magic{ChatColors.BlueGrey}, causing a huge explosion on impact."));
+                i => $"Infuses molotovs with fire magic, causing a huge explosion on impact."));
 
             AddAbility(new WarcraftAbility("ice_beam", "Ice beam",
-                i => $"{ChatColors.BlueGrey}Chance to {ChatColors.Blue}freeze{ChatColors.BlueGrey} enemies in place."));
+                i => $"Chance to freeze enemies in place."));
 
             AddAbility(new WarcraftAbility("mana_shield", "Mana Shield",
-                i => $"{ChatColors.BlueGrey}Passive {ChatColors.Yellow}magical shield{ChatColors.BlueGrey}, which regenerates armor over time."));
+                i => $"Passive magical shield, which regenerates armor over time."));
 
             AddAbility(new WarcraftCooldownAbility("teleport", "Teleport",
-                i => $"{ChatColors.BlueGrey}When you press your ultimate key, you will {ChatColors.Red}teleport{ChatColors.BlueGrey} to the spot you're aiming.",
+                i => $"When you press your ultimate key, you will teleport to the spot you're aiming.",
                 20f));
 
             HookEvent<EventPlayerDeath>("player_death", PlayerDeath);

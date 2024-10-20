@@ -44,7 +44,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     else
                     {
                         color = Color.Gray;
-                        displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} [lvl. 16 required]</font>";
+                        displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} (level 16)</font>";
                     }
                 }
 

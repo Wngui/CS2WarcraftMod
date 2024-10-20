@@ -29,16 +29,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("carnage", "Carnage",
-                i => $"{ChatColors.BlueGrey}Increase damage dealt with {ChatColors.Green}shotguns."));
+                i => $"Increase damage dealt with shotguns."));
 
             AddAbility(new WarcraftAbility("battle_hardened", "Battle-Hardened",
-                i => $"{ChatColors.BlueGrey}Increase your health by {ChatColors.Blue}20/40/60/80/100."));
+                i => $"Increase your health by 20/40/60/80/100."));
 
             AddAbility(new WarcraftAbility("throwing_axe", "Throwing Axe",
-                i => $"{ChatColors.BlueGrey}Chance to hurl an exploding {ChatColors.Yellow}throwing axe{ChatColors.BlueGrey} when firing."));
+                i => $"Chance to hurl an exploding throwing axe when firing."));
 
             AddAbility(new WarcraftCooldownAbility("bloodlust", "Bloodlust",
-                i => $"{ChatColors.BlueGrey}Grants {ChatColors.Red}infinite ammo, movement speed & health regeneration.",
+                i => $"Grants infinite ammo, movement speed & health regeneration.",
                 50f));
 
             HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);

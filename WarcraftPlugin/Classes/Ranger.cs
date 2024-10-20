@@ -35,16 +35,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("light_footed", "Light footed",
-                i => $"{ChatColors.BlueGrey}Nimbly perform a dash in midair, by pressing {ChatColors.Green}jump{ChatColors.Default}"));
+                i => $"Nimbly perform a dash in midair, by pressing jump"));
 
             AddAbility(new WarcraftAbility("ensnare_trap", "Ensnare trap",
-                i => $"{ChatColors.BlueGrey}Place a trap by throwing a {ChatColors.Blue}decoy{ChatColors.Default}"));
+                i => $"Place a trap by throwing a decoy"));
 
             AddAbility(new WarcraftAbility("marksman", "Marksman",
-                i => $"{ChatColors.BlueGrey}Additional damage with {ChatColors.Yellow}scoped weapons{ChatColors.Default}"));
+                i => $"Additional damage with scoped weapons"));
 
             AddAbility(new WarcraftCooldownAbility("arrowstorm", "Arrowstorm",
-                i => $"{ChatColors.BlueGrey}Call down a {ChatColors.Red}deadly volley of arrows{ChatColors.BlueGrey} using the ultimate key",
+                i => $"Call down a deadly volley of arrows using the ultimate key",
                 50f));
 
             HookEvent<EventPlayerJump>("player_jump", PlayerJump);

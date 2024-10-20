@@ -40,7 +40,7 @@ namespace WarcraftPlugin.Core
                 ");
         }
 
-        public bool ClientExistsInDatabase(ulong steamid)
+        public bool PlayerExistsInDatabase(ulong steamid)
         {
             return _connection.ExecuteScalar<int>("select count(*) from players where steamid = @steamid",
                 new { steamid }) > 0;
@@ -51,7 +51,7 @@ namespace WarcraftPlugin.Core
             Console.WriteLine($"Adding client to database {player.SteamID}");
             _connection.Execute(@"
             INSERT INTO players (`steamid`, `currentRace`)
-	        VALUES(@steamid, 'barbarian')",
+	        VALUES(@steamid, 'ranger')",
                 new { steamid = player.SteamID });
         }
 
@@ -64,6 +64,9 @@ namespace WarcraftPlugin.Core
             if (dbPlayer == null)
             {
                 AddNewPlayerToDatabase(player);
+                dbPlayer = _connection.QueryFirstOrDefault<DatabasePlayer>(@"
+                    SELECT * FROM `players` WHERE `steamid` = @steamid",
+                    new { steamid = player.SteamID });
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"
@@ -99,7 +102,7 @@ namespace WarcraftPlugin.Core
             return raceInformation.AsList();
         }
 
-        public void SaveClientToDatabase(CCSPlayerController player)
+        public void SavePlayerToDatabase(CCSPlayerController player)
         {
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
             Server.PrintToConsole($"Saving {player.PlayerName} to database...");
@@ -149,7 +152,7 @@ namespace WarcraftPlugin.Core
                 var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
                 if (wcPlayer == null) continue;
 
-                SaveClientToDatabase(player);
+                SavePlayerToDatabase(player);
             }
         }
 

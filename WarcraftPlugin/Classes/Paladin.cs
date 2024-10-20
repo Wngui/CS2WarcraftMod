@@ -28,16 +28,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("healing_aura", "Healing Aura",
-                i => $"{ChatColors.BlueGrey}Emit an aura that gradually {ChatColors.Green}heals{ChatColors.BlueGrey} nearby allies over time."));
+                i => $"Emit an aura that gradually heals nearby allies over time."));
 
             AddAbility(new WarcraftAbility("holy_shield", "Holy Shield",
-                i => $"{ChatColors.BlueGrey}Surround yourself with a {ChatColors.Blue}protective barrier{ChatColors.BlueGrey} that absorbs incoming damage.")); //could be reworked to negate some damage instead (fits more with smite&undead)
+                i => $"Surround yourself with a protective barrier that absorbs incoming damage.")); //could be reworked to negate some damage instead (fits more with smite&undead)
 
             AddAbility(new WarcraftAbility("smite", "Smite",
-                i => $"{ChatColors.BlueGrey}Infuse your attacks with {ChatColors.Yellow}divine{ChatColors.BlueGrey} energy, potentially stripping enemy armor."));
+                i => $"Infuse your attacks with divine energy, potentially stripping enemy armor."));
 
             AddAbility(new WarcraftAbility("divine_resurrection", "Divine Resurrection",
-                i => $"{ChatColors.BlueGrey}Instantly {ChatColors.Red}revive{ChatColors.BlueGrey} a random fallen ally."));
+                i => $"Instantly revive a random fallen ally."));
 
             HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
             HookEvent<EventPlayerDeath>("player_death", PlayerDeath);

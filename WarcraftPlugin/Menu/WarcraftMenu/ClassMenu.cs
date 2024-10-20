@@ -37,7 +37,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
             var totalLevels = warcraftClassInformations.Sum(x => x.CurrentLevel);
 
-            var classMenu = MenuManager.CreateMenu(@$"<font color='orange' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><font color='orange' class='{FontSizes.FontSizeSm}'> ( </font><font color='gold' class='{FontSizes.FontSizeM}'>!class</font><font color='orange' class='{FontSizes.FontSizeSm}'> )</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
+            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><font color='darkgrey' class='{FontSizes.FontSizeSm}'> ( </font><font color='darkgrey' class='{FontSizes.FontSizeM}'>!class</font><font color='darkgrey' class='{FontSizes.FontSizeSm}'> )</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
 
             foreach (var warClassInformation in warcraftClassInformations
                 .OrderByDescending(x => x.CurrentLevel)

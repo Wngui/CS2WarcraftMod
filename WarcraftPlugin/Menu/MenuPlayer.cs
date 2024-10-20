@@ -184,15 +184,15 @@ public class MenuPlayer
         {
             builder.AppendLine($"{Localizer?["menu.more.options.below"]}");
         }
-        //if (option == null && MenuStart.List.Count > VisibleOptions)
-        //{
-        //    builder.AppendLine($"<img src='https://dummyimage.com/1x16/000/fff'><br>");
-        //}
+        if (option == null && MenuStart.List.Count > VisibleOptions)
+        {
+            builder.AppendLine($"<center><img src='https://dummyimage.com/1x16/000/fff'></center><br>");
+        }
 
         if (CurrentChoice?.Value?.SubOptionDisplay != null)
         {
             var subOptionTextSpace = CalculateTextSpace(CurrentChoice?.Value?.SubOptionDisplay);
-            if (subOptionTextSpace < 59)
+            if (subOptionTextSpace < 56)
             {
                 builder.AppendLine($"<font class='{FontSizes.FontSizeM}'>ㅤ</font><br>");
             }

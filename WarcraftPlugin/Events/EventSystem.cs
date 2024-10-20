@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
@@ -101,14 +102,40 @@ namespace WarcraftPlugin.Events
 
         private HookResult RoundStart(EventRoundStart @event, GameEventInfo info)
         {
-            Utilities.GetPlayers().ForEach(p =>
+            Utilities.GetPlayers().ForEach(player =>
             {
-                var warcraftPlayer = p.GetWarcraftPlayer();
+                var warcraftPlayer = player.GetWarcraftPlayer();
+                var warcraftClass = warcraftPlayer?.GetClass();
                 warcraftPlayer?.GetClass()?.InvokeEvent("round_start", @event);
 
-                if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
+                if (warcraftClass != null)
                 {
-                    SkillsMenu.Show(warcraftPlayer);
+                    if (_config.DeactivatedClasses.Contains(warcraftClass.InternalName, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        player.PrintToChat($"{ChatColors.Green}{warcraftClass.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
+                        player.ExecuteClientCommandFromServer("class");
+                        player.ChangeTeam(CsTeam.Spectator);
+                        return;
+                    }
+
+                    if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
+                    {
+                        SkillsMenu.Show(warcraftPlayer);
+                    }
+                    else
+                    {
+                        var message = $"{warcraftClass.DisplayName} ({warcraftPlayer.currentLevel})\n" +
+                        (warcraftPlayer.IsMaxLevel ? "" : $"Experience: {warcraftPlayer.currentXp}/{warcraftPlayer.amountToLevel}\n") +
+                        $"{warcraftPlayer.statusMessage}";
+
+                        player.PrintToCenter(message);
+                    }
+
+                    Server.NextFrame(() =>
+                    {
+                        WarcraftPlugin.Instance.EffectManager.ClearEffects(player);
+                        warcraftClass.ResetCooldowns();
+                    });
                 }
             });
             return HookResult.Continue;
@@ -189,32 +216,16 @@ namespace WarcraftPlugin.Events
             var player = @event.Userid;
 
             var warcraftPlayer = player.GetWarcraftPlayer();
-            var race = player.GetWarcraftPlayer()?.GetClass();
+            var warcraftClass = warcraftPlayer?.GetClass();
 
-            if (race != null)
+            if (warcraftClass != null)
             {
-                if (_config.DeactivatedClasses.Contains(race.InternalName, StringComparer.InvariantCultureIgnoreCase))
-                {
-                    player.PrintToChat($"{ChatColors.Green}{race.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
-                    player.ExecuteClientCommandFromServer("class");
-                    player.ChangeTeam(CsTeam.Spectator);
-                    return HookResult.Continue;
-                }
-
-                var message = $"{race.DisplayName} ({warcraftPlayer.currentLevel})\n" +
-                (warcraftPlayer.IsMaxLevel ? "" : $"Experience: {warcraftPlayer.currentXp}/{warcraftPlayer.amountToLevel}\n") +
-                $"{warcraftPlayer.statusMessage}";
-
-                player.PrintToCenter(message);
-
                 var name = @event.EventName;
                 Server.NextFrame(() =>
                 {
                     WarcraftPlugin.Instance.EffectManager.ClearEffects(player);
-                    race.SetDefaultAppearance();
-                    race.ResetCooldowns();
-
-                    race.InvokeEvent(name, @event);
+                    warcraftClass.SetDefaultAppearance();
+                    warcraftClass.InvokeEvent(name, @event);
                 });
             }
 

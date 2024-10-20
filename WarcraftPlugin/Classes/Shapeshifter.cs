@@ -38,16 +38,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("adaptive_disguise", "Adaptive Disguise",
-                i => $"{ChatColors.BlueGrey}Chance to spawn with an {ChatColors.Green}enemy disguise{ChatColors.BlueGrey}, revealed upon attacking."));
+                i => $"Chance to spawn with an enemy disguise, revealed upon attacking."));
 
             AddAbility(new WarcraftAbility("doppelganger", "Doppelganger",
-                i => $"{ChatColors.BlueGrey}Create a temporary {ChatColors.Blue}inanimate clone{ChatColors.BlueGrey} of yourself, using a decoy grenade."));
+                i => $"Create a temporary inanimate clone of yourself, using a decoy grenade."));
 
             AddAbility(new WarcraftAbility("imposter_syndrom", "Imposter syndrom",
-                i => $"{ChatColors.BlueGrey}Chance to be notified when {ChatColors.Yellow}revealed{ChatColors.BlueGrey} by enemies on radar."));
+                i => $"Chance to be notified when revealed by enemies on radar."));
 
             AddAbility(new WarcraftCooldownAbility("morphling", "Morphling",
-                i => $"{ChatColors.BlueGrey}Transform into an {ChatColors.Red}unassuming object{ChatColors.BlueGrey}.",
+                i => $"Transform into an unassuming object.",
                 20f));
 
             HookAbility(3, Ultimate);

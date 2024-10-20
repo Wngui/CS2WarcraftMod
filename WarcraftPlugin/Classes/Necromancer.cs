@@ -31,16 +31,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("life_drain", "Life Drain",
-                i => $"{ChatColors.BlueGrey}Harness dark magic to {ChatColors.Green}siphon health{ChatColors.BlueGrey} from foes and restore your own vitality."));
+                i => $"Harness dark magic to siphon health from foes and restore your own vitality."));
 
             AddAbility(new WarcraftAbility("poison_cloud", "Poison Cloud",
-                i => $"{ChatColors.BlueGrey}Infuses smoke grenades with {ChatColors.Blue}potent toxins{ChatColors.BlueGrey}, damaging enemies over time."));
+                i => $"Infuses smoke grenades with potent toxins, damaging enemies over time."));
 
             AddAbility(new WarcraftAbility("splintered_soul", "Splintered Soul",
-                i => $"{ChatColors.BlueGrey}Chance to {ChatColors.Yellow}cheat death{ChatColors.BlueGrey} with a fraction of vitality."));
+                i => $"Chance to cheat death with a fraction of vitality."));
 
             AddAbility(new WarcraftCooldownAbility("raise_dead", "Raise Dead",
-                i => $"{ChatColors.BlueGrey}Resurrect powerful {ChatColors.Red}undead minions{ChatColors.BlueGrey} to fight alongside you.",
+                i => $"Resurrect powerful undead minions to fight alongside you.",
                 50f));
 
             HookEvent<EventPlayerSpawn>("round_end", PlayerSpawn);

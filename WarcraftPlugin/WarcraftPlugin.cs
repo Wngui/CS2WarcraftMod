@@ -47,7 +47,7 @@ namespace WarcraftPlugin
         public static WarcraftPlugin Instance => _instance;
 
         public override string ModuleName => "Warcraft";
-        public override string ModuleVersion => "1.0.0";
+        public override string ModuleVersion => "2.0.0";
 
         public const int MaxLevel = 16;
         public const int MaxSkillLevel = 5;
@@ -264,7 +264,7 @@ namespace WarcraftPlugin
             if (!player.IsValid || player.IsBot) return;
 
             SetWcPlayer(player, null);
-            _database.SaveClientToDatabase(player);
+            _database.SavePlayerToDatabase(player);
         }
 
         private void OnMapStartHandler(string mapName)
@@ -303,7 +303,7 @@ namespace WarcraftPlugin
             // No bots, invalid clients or non-existent clients.
             if (!player.IsValid || player.IsBot) return;
 
-            if (!_database.ClientExistsInDatabase(player.SteamID))
+            if (!_database.PlayerExistsInDatabase(player.SteamID))
             {
                 _database.AddNewPlayerToDatabase(player);
             }
@@ -316,7 +316,7 @@ namespace WarcraftPlugin
 
         public void ChangeClass(CCSPlayerController player, string classInternalName)
         {
-            _database.SaveClientToDatabase(player);
+            _database.SavePlayerToDatabase(player);
 
             // Dont do anything if were already that race.
             if (classInternalName == player.GetWarcraftPlayer().className) return;
