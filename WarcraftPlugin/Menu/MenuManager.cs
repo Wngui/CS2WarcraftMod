@@ -4,11 +4,11 @@ namespace WarcraftPlugin.Menu;
 
 public static class MenuManager
 {
-    public static void OpenMainMenu(CCSPlayerController player, Menu menu)
+    public static void OpenMainMenu(CCSPlayerController player, Menu menu, int selectedOptionIndex = 0)
     {
         if (player == null)
             return;
-        MenuAPI.Players[player.Slot].OpenMainMenu(menu);
+        MenuAPI.Players[player.Slot].OpenMainMenu(menu, selectedOptionIndex);
     }
 
     public static void CloseMenu(CCSPlayerController player)
@@ -39,11 +39,12 @@ public static class MenuManager
         MenuAPI.Players[player.Slot].OpenSubMenu(menu);
     }
 
-    public static Menu CreateMenu(string title = "")
+    public static Menu CreateMenu(string title = "", int resultsBeforePaging = 4)
     {
         Menu menu = new()
         {
             Title = title,
+            ResultsBeforePaging = resultsBeforePaging,
         };
         return menu;
     }

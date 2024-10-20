@@ -7,6 +7,7 @@ using CounterStrikeSharp.API;
 using System.Linq;
 using WarcraftPlugin.Models;
 using System.Drawing;
+using WarcraftPlugin.Core;
 
 namespace WarcraftPlugin.Classes
 {

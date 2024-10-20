@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
@@ -18,7 +20,7 @@ public class MenuPlayer
     public static IStringLocalizer Localizer = null;
     public PlayerButtons Buttons { get; set; }
 
-    public void OpenMainMenu(Menu menu)
+    public void OpenMainMenu(Menu menu, int selectedOptionIndex = 0)
     {
         if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
         {
@@ -41,9 +43,15 @@ public class MenuPlayer
             return;
         }
         MainMenu = menu;
-        VisibleOptions = menu.Title != "" ? 4 : 5;
-        CurrentChoice = MainMenu.Options?.First;
-        MenuStart = CurrentChoice;
+        VisibleOptions = menu.ResultsBeforePaging;
+        MenuStart = MainMenu.Options?.First;
+        CurrentChoice = MenuStart;
+
+        //Set the selected option based on index
+        for (int i = 0; i < selectedOptionIndex; i++)
+        {
+            CurrentChoice = CurrentChoice.Next;
+        }
 
         CurrentChoice?.Value.OnSelect?.Invoke(player, CurrentChoice.Value);
 
@@ -60,7 +68,7 @@ public class MenuPlayer
             return;
         }
 
-        VisibleOptions = menu.Title != "" ? 4 : 5;
+        VisibleOptions = menu.ResultsBeforePaging;
         CurrentChoice = menu.Options?.First;
         MenuStart = CurrentChoice;
         UpdateCenterHtml();
@@ -75,7 +83,7 @@ public class MenuPlayer
             return;
         }
 
-        VisibleOptions = menu.Value.Parent?.Title != "" ? 4 : 5;
+        VisibleOptions = menu.Value.Parent?.ResultsBeforePaging ?? 4;
         CurrentChoice = menu;
         if (CurrentChoice.Value.Index >= 5)
         {
@@ -166,21 +174,46 @@ public class MenuPlayer
             }
             else
             {
-                builder.AppendLine($"{option.Value.OptionDisplay} <br>");
+                builder.AppendLine($"{option.Value.OptionDisplay}<br>");
             }
             option = option.Next;
             i++;
         }
 
         if (option != null)
-        { // more options
-            builder.AppendLine(
-                $"{Localizer?["menu.more.options.below"]}");
+        {
+            builder.AppendLine($"{Localizer?["menu.more.options.below"]}");
+        }
+        //if (option == null && MenuStart.List.Count > VisibleOptions)
+        //{
+        //    builder.AppendLine($"<img src='https://dummyimage.com/1x16/000/fff'><br>");
+        //}
+
+        if (CurrentChoice?.Value?.SubOptionDisplay != null)
+        {
+            var subOptionTextSpace = CalculateTextSpace(CurrentChoice?.Value?.SubOptionDisplay);
+            if (subOptionTextSpace < 59)
+            {
+                builder.AppendLine($"<font class='{FontSizes.FontSizeM}'>ㅤ</font><br>");
+            }
+            else
+            {
+                builder.AppendLine($"<font class='{FontSizes.FontSizeXs}'>ㅤ</font><br>");
+            }
         }
 
-        builder.AppendLine("<br>");
         builder.AppendLine($"{Localizer?["menu.bottom.text"]}");
         builder.AppendLine("<br>");
         CenterHtml = builder.ToString();
+    }
+
+    private static int CalculateTextSpace(string subOptionDisplay)
+    {
+        // Use a regular expression to remove all HTML-like tags
+        string pattern = @"<[^>]+>";
+        string cleanedString = Regex.Replace(subOptionDisplay, pattern, string.Empty);
+
+        // Return the length of the cleaned string
+        return cleanedString.Length;
     }
 }

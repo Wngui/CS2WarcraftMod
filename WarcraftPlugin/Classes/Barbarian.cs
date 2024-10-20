@@ -8,6 +8,7 @@ using WarcraftPlugin.Effects;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Drawing;
+using WarcraftPlugin.Core;
 
 namespace WarcraftPlugin.Classes
 {
@@ -20,7 +21,7 @@ namespace WarcraftPlugin.Classes
             TModel = "characters/models/tm_phoenix_heavy/tm_phoenix_heavy.vmdl",
             CTModel = "characters/models/ctm_heavy/ctm_heavy.vmdl"
         };
-        public override Color DefaultColor => Color.Khaki;
+        public override Color DefaultColor => Color.Brown;
 
         private readonly int _battleHardenedHealthMultiplier = 20;
         private readonly float _bloodlustLength = 10;

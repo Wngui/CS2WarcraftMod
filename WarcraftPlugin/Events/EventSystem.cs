@@ -5,7 +5,9 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
+using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Menu.WarcraftMenu;
 
 namespace WarcraftPlugin.Events
 {
@@ -99,7 +101,16 @@ namespace WarcraftPlugin.Events
 
         private HookResult RoundStart(EventRoundStart @event, GameEventInfo info)
         {
-            Utilities.GetPlayers().ForEach(p => { p.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("round_start", @event); });
+            Utilities.GetPlayers().ForEach(p =>
+            {
+                var warcraftPlayer = p.GetWarcraftPlayer();
+                warcraftPlayer?.GetClass()?.InvokeEvent("round_start", @event);
+
+                if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
+                {
+                    SkillsMenu.Show(warcraftPlayer);
+                }
+            });
             return HookResult.Continue;
         }
 
@@ -216,7 +227,7 @@ namespace WarcraftPlugin.Events
             var victim = @event.Userid;
             var headshot = @event.Headshot;
 
-            if(attacker == null || victim == null) return HookResult.Continue;
+            if (attacker == null || victim == null) return HookResult.Continue;
 
             if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot)
             {

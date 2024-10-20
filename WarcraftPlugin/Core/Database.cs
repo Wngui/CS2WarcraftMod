@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace WarcraftPlugin
+namespace WarcraftPlugin.Core
 {
     public class Database
     {
@@ -18,25 +19,25 @@ namespace WarcraftPlugin
                     $"Data Source={Path.Join(directory, "database.db")}");
 
             _connection.Execute(@"
-CREATE TABLE IF NOT EXISTS `players` (
-	`steamid` UNSIGNED BIG INT NOT NULL,
-	`currentRace` VARCHAR(32) NOT NULL DEFAULT 'barbarian',
-  `name` VARCHAR(64),
-	PRIMARY KEY (`steamid`));");
+                CREATE TABLE IF NOT EXISTS `players` (
+	                `steamid` UNSIGNED BIG INT NOT NULL,
+	                `currentRace` VARCHAR(32) NOT NULL DEFAULT 'barbarian',
+                  `name` VARCHAR(64),
+	                PRIMARY KEY (`steamid`));");
 
-            _connection.Execute(@"
-CREATE TABLE IF NOT EXISTS `raceinformation` (
-  `steamid` UNSIGNED BIG INT NOT NULL,
-  `racename` VARCHAR(32) NOT NULL,
-  `currentXP` INT NULL DEFAULT 0,
-  `currentLevel` INT NULL DEFAULT 1,
-  `amountToLevel` INT NULL DEFAULT 100,
-  `ability1level` TINYINT NULL DEFAULT 0,
-  `ability2level` TINYINT NULL DEFAULT 0,
-  `ability3level` TINYINT NULL DEFAULT 0,
-  `ability4level` TINYINT NULL DEFAULT 0,
-  PRIMARY KEY (`steamid`, `racename`));
-");
+                            _connection.Execute(@"
+                CREATE TABLE IF NOT EXISTS `raceinformation` (
+                  `steamid` UNSIGNED BIG INT NOT NULL,
+                  `racename` VARCHAR(32) NOT NULL,
+                  `currentXP` INT NULL DEFAULT 0,
+                  `currentLevel` INT NULL DEFAULT 1,
+                  `amountToLevel` INT NULL DEFAULT 100,
+                  `ability1level` TINYINT NULL DEFAULT 0,
+                  `ability2level` TINYINT NULL DEFAULT 0,
+                  `ability3level` TINYINT NULL DEFAULT 0,
+                  `ability4level` TINYINT NULL DEFAULT 0,
+                  PRIMARY KEY (`steamid`, `racename`));
+                ");
         }
 
         public bool ClientExistsInDatabase(ulong steamid)
@@ -45,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `raceinformation` (
                 new { steamid }) > 0;
         }
 
-        public void AddNewClientToDatabase(CCSPlayerController player)
+        public void AddNewPlayerToDatabase(CCSPlayerController player)
         {
             Console.WriteLine($"Adding client to database {player.SteamID}");
             _connection.Execute(@"
@@ -54,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `raceinformation` (
                 new { steamid = player.SteamID });
         }
 
-        public WarcraftPlayer LoadClientFromDatabase(CCSPlayerController player, XpSystem xpSystem)
+        public WarcraftPlayer LoadPlayerFromDatabase(CCSPlayerController player, XpSystem xpSystem)
         {
             var dbPlayer = _connection.QueryFirstOrDefault<DatabasePlayer>(@"
             SELECT * FROM `players` WHERE `steamid` = @steamid",
@@ -62,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `raceinformation` (
 
             if (dbPlayer == null)
             {
-                AddNewClientToDatabase(player);
+                AddNewPlayerToDatabase(player);
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"
@@ -78,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `raceinformation` (
                     new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
             }
 
-            var raceInformation = _connection.QueryFirst<DatabaseRaceInformation>(@"
+            var raceInformation = _connection.QueryFirst<DatabaseClassInformation>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid AND `racename` = @racename",
                 new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
 
@@ -87,6 +88,15 @@ CREATE TABLE IF NOT EXISTS `raceinformation` (
             WarcraftPlugin.Instance.SetWcPlayer(player, wcPlayer);
 
             return wcPlayer;
+        }
+
+        public List<DatabaseClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
+        {
+            var raceInformation = _connection.Query<DatabaseClassInformation>(@"
+            SELECT * from `raceinformation` where `steamid` = @steamid",
+                new { steamid = player.SteamID });
+
+            return raceInformation.AsList();
         }
 
         public void SaveClientToDatabase(CCSPlayerController player)
@@ -108,22 +118,22 @@ CREATE TABLE IF NOT EXISTS `raceinformation` (
             }
 
             _connection.Execute(@"
-UPDATE `raceinformation` SET `currentXP` = @currentXp,
- `currentLevel` = @currentLevel,
- `ability1level` = @ability1Level,
- `ability2level` = @ability2Level,
- `ability3level` = @ability3Level,
- `ability4level` = @ability4Level,
- `amountToLevel` = @amountToLevel WHERE `steamid` = @steamid AND `racename` = @racename;",
+                UPDATE `raceinformation` SET `currentXP` = @currentXp,
+                 `currentLevel` = @currentLevel,
+                 `ability1level` = @ability1Level,
+                 `ability2level` = @ability2Level,
+                 `ability3level` = @ability3Level,
+                 `ability4level` = @ability4Level,
+                 `amountToLevel` = @amountToLevel WHERE `steamid` = @steamid AND `racename` = @racename;",
                 new
                 {
-                    currentXp = wcPlayer.currentXp,
-                    currentLevel = wcPlayer.currentLevel,
+                    wcPlayer.currentXp,
+                    wcPlayer.currentLevel,
                     ability1Level = wcPlayer.GetAbilityLevel(0),
                     ability2Level = wcPlayer.GetAbilityLevel(1),
                     ability3Level = wcPlayer.GetAbilityLevel(2),
                     ability4Level = wcPlayer.GetAbilityLevel(3),
-                    amountToLevel = wcPlayer.amountToLevel,
+                    wcPlayer.amountToLevel,
                     steamid = player.SteamID,
                     racename = wcPlayer.className
                 });
@@ -135,7 +145,7 @@ UPDATE `raceinformation` SET `currentXP` = @currentXp,
             foreach (var player in playerEntities)
             {
                 if (!player.IsValid) continue;
-                
+
                 var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
                 if (wcPlayer == null) continue;
 
@@ -165,7 +175,7 @@ UPDATE `raceinformation` SET `currentXP` = @currentXp,
         public string Name { get; set; }
     }
 
-    public class DatabaseRaceInformation
+    public class DatabaseClassInformation
     {
         public ulong SteamId { get; set; }
         public string RaceName { get; set; }

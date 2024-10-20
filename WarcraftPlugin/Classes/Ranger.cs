@@ -12,6 +12,7 @@ using CounterStrikeSharp.API.Modules.Memory;
 using g3;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
+using WarcraftPlugin.Core;
 
 namespace WarcraftPlugin.Classes
 {

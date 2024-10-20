@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using WarcraftPlugin.Core;
 using WarcraftPlugin.Effects;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Helpers;
@@ -35,16 +36,16 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             AddAbility(new WarcraftAbility("attack_drone", "Attack Drone",
-                i => $"{ChatColors.BlueGrey}deploy a {ChatColors.Green}gun drone{ChatColors.BlueGrey} that attacks nearby enemies."));
+                i => $"Deploy a gun drone that attacks nearby enemies."));
 
             AddAbility(new WarcraftAbility("spare_parts", "Spare Parts",
-                i => $"{ChatColors.BlueGrey}Chance to {ChatColors.Blue}not lose ammo{ChatColors.BlueGrey} when firing "));
+                i => $"Chance to not lose ammo when firing "));
 
             AddAbility(new WarcraftAbility("spring_trap", "Spring Trap",
-                i => $"{ChatColors.BlueGrey}Deploy a {ChatColors.Yellow}trap{ChatColors.BlueGrey} which launches players into the air."));
+                i => $"Deploy a trap which launches players into the air."));
 
             AddAbility(new WarcraftCooldownAbility("drone_swarm", "Drone Swarm",
-                i => $"{ChatColors.BlueGrey}Summon a {ChatColors.Red}swarm of attack drones{ChatColors.BlueGrey} that damage all nearby enemies.",
+                i => $"Summon a swarm of attack drones that damage all nearby enemies.",
                 50f));
 
             HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);

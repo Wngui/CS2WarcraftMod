@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Modules.Timers;
+using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Cooldowns

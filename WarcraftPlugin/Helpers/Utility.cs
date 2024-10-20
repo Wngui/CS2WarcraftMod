@@ -332,5 +332,30 @@ namespace WarcraftPlugin.Helpers
                 obj?.Remove();
             }
         }
+
+        public static Color AdjustBrightness(this Color color, float factor)
+        {
+            // Ensure the factor is between 0 (black) and 1 (original color) or higher
+            factor = Math.Clamp(factor, 0f, 2f); // Clamping to a sensible range for brightness adjustment
+
+            // Calculate the new RGB values
+            int r = (int)(color.R + (255 - color.R) * (factor - 1));
+            int g = (int)(color.G + (255 - color.G) * (factor - 1));
+            int b = (int)(color.B + (255 - color.B) * (factor - 1));
+
+            // Ensure the values are within the 0-255 range
+            r = Math.Clamp(r, 0, 255);
+            g = Math.Clamp(g, 0, 255);
+            b = Math.Clamp(b, 0, 255);
+
+            return Color.FromArgb(color.A, r, g, b);
+        }
+
+
+        public static string ToHex(this Color color)
+        {
+            // Format the color into hex (including alpha if needed)
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
     }
 }

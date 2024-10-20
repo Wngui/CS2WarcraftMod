@@ -2,6 +2,6 @@
   "menu.selection.left": "<font color='red' class='fontSize-s'>▶ </font>",
   "menu.selection.right": "<font color='red' class='fontSize-s'> ◀</font>",
   "menu.title.prefix": "",
-  "menu.more.options.below": "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''>",
+  "menu.more.options.below": "<center><img src='https://s2.ezgif.com/tmp/ezgif-2-e1f7637ca2.gif'></center><br>",
   "menu.bottom.text": "<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-s'> W↑ S↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>Space</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>"
 }

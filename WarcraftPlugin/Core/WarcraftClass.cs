@@ -8,7 +8,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Utils;
 
-namespace WarcraftPlugin
+namespace WarcraftPlugin.Core
 {
     public interface IWarcraftAbility
     {

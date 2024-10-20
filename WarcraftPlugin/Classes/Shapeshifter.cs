@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using WarcraftPlugin.Core;
 using WarcraftPlugin.Effects;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
