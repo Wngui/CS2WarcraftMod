@@ -11,7 +11,7 @@ An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system, inspir
 
 ## Features
 
-The mod introduces seven unique classes:
+The mod introduces eight unique classes:
 
 - **Barbarian**
 - **Mage**
@@ -20,6 +20,7 @@ The mod introduces seven unique classes:
 - **Ranger**
 - **Rogue**
 - **Shapeshifter**
+- **Tinker**
 
 You can try out the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
 
