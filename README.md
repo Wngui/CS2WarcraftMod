@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7aece590-36ba-4084-a4ca-bbb5adfd28dc" alt="00198-3001460831" width="40%">
+  <img src="https://github.com/user-attachments/assets/7aece590-36ba-4084-a4ca-bbb5adfd28dc" width="40%">
 </p>
 <p align="center">
   (https://www.youtube.com/watch?v=Z9HdF47zPss)
@@ -7,11 +7,12 @@
 
 # Warcraft Mod for CS2
 
-An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system, inspired by Roflmuffin's initial Warcraft example plugin.
+An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system, based on Roflmuffin's Warcraft example plugin.
+You can try out the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
 
 ## Features
 
-The mod introduces eight unique classes:
+Eight unique classes:
 
 - **Barbarian**
 - **Mage**
@@ -22,13 +23,15 @@ The mod introduces eight unique classes:
 - **Shapeshifter**
 - **Tinker**
 
-You can try out the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
-
 Each class has 3 passive abilities and an ultimate which is unlocked at max level 16.
+
+![image](https://github.com/user-attachments/assets/3a96b1ba-0173-4b3e-8e2a-43b1ac091247)
+
 Ultimate can be activated by binding it in the console, example
      ```
      bind x ultimate
      ```
+
 
 ## Commands
 ```!class``` - Change current class
@@ -102,10 +105,11 @@ Ultimate can be activated by binding it in the console, example
 
 ## Setup
 
-1. **Install the Plugin**
+**Install the Plugin**
    - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`.
 
-2. **Necromancer's Ultimate Setup**
+<details>
+<summary><b>Necromancer's Ultimate Setup</b> - <i>Optional</i></summary>
 
    *These steps are not stricly nessesary to get the plugin working, but the necromancers ult may not work correctly without them.*
    - Download [MultiAddonManager](https://github.com/Source2ZE/MultiAddonManager/releases).
@@ -125,6 +129,7 @@ Ultimate can be activated by binding it in the console, example
        ```
        Game csgo/overrides/botprofile.vpk
        ```
+</details>
 
 ## Configuration example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
