@@ -233,7 +233,7 @@ namespace WarcraftPlugin.Classes
 
             public override void OnTick()
             {
-                if (!IsTriggered && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
+                if (!IsTriggered && _trigger.IsValid && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
                 {
                     IsTriggered = true;
                     _trigger?.Remove();
