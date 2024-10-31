@@ -191,7 +191,7 @@ namespace WarcraftPlugin.Classes
 
             WarcraftPlugin.Instance.AddTimer(1f, () =>
             {
-                DispatchEffect(new EnsnaringTrapEffect(Player, trap, trigger, 120));
+                DispatchEffect(new EnsnaringTrapEffect(Player, trap, trigger, 20));
             });
         }
         #endregion
@@ -280,8 +280,8 @@ namespace WarcraftPlugin.Classes
             {
                 if (!IsTriggered)
                 {
-                    _trap?.Remove();
-                    _trigger?.Remove();
+                    _trap?.RemoveIfValid();
+                    _trigger?.RemoveIfValid();
                 }
             }
         }
