@@ -236,7 +236,7 @@ namespace WarcraftPlugin.Classes
                 if (!IsTriggered && _trigger.IsValid && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
                 {
                     IsTriggered = true;
-                    _trigger?.Remove();
+                    _trigger?.RemoveIfValid();
 
                     TriggerTrap();
                 }
@@ -264,16 +264,14 @@ namespace WarcraftPlugin.Classes
                     }
                 }
                 //Clean-up
-                Timer timer = null;
-                timer = WarcraftPlugin.Instance.AddTimer(3f, () =>
+                WarcraftPlugin.Instance.AddTimer(3f, () =>
                 {
                     foreach (var player in playersInTrap)
                     {
                         player.PlayerPawn.Value.MovementServices.Maxspeed = 260;
                     }
-                    _trap?.Remove();
-                    timer.Kill();
-                }, TimerFlags.REPEAT);
+                    _trap?.RemoveIfValid();
+                });
             }
 
             public override void OnFinish()

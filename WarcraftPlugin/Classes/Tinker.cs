@@ -197,7 +197,7 @@ namespace WarcraftPlugin.Classes
 
             public override void OnTick()
             {
-                if (!IsTriggered && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
+                if (!IsTriggered && _trigger.IsValid && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
                 {
                     IsTriggered = true;
                     _trigger?.Remove();
@@ -228,15 +228,15 @@ namespace WarcraftPlugin.Classes
                 }
 
                 //Clean-up
-                _trap?.Remove();
+                _trap?.RemoveIfValid();
             }
 
             public override void OnFinish()
             {
                 if (!IsTriggered)
                 {
-                    _trap?.Remove();
-                    _trigger?.Remove();
+                    _trap?.RemoveIfValid();
+                    _trigger?.RemoveIfValid();
                 }
             }
         }
