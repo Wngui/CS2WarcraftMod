@@ -20,7 +20,6 @@ using WarcraftPlugin.Classes;
 using WarcraftPlugin.Menu;
 using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Core;
-using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin
 {
@@ -331,11 +330,6 @@ namespace WarcraftPlugin
                 player.PlayerPawn.Value.CommitSuicide(false, false);
             }
             RefreshPlayerName(player.GetWarcraftPlayer());
-
-            if (XpSystem.GetFreeSkillPoints(player.GetWarcraftPlayer()) > 0)
-            {
-                SkillsMenu.Show(player.GetWarcraftPlayer());
-            }
         }
 
         private void UltimatePressed(CCSPlayerController? client, CommandInfo commandinfo)

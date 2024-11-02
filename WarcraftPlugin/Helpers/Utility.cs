@@ -27,7 +27,7 @@ namespace WarcraftPlugin.Helpers
             beam.EndPos.Y = endPos.Y;
             beam.EndPos.Z = endPos.Z;
             beam.DispatchSpawn();
-            WarcraftPlugin.Instance.AddTimer(duration, beam.Remove);
+            WarcraftPlugin.Instance.AddTimer(duration, () => beam.RemoveIfValid());
             return beam;
         }
 
@@ -46,12 +46,7 @@ namespace WarcraftPlugin.Helpers
             particle.StartActive = true;
             particle?.DispatchSpawn();
 
-            Timer timer = null;
-            timer = WarcraftPlugin.Instance.AddTimer(duration, () =>
-            {
-                if(particle.IsValid) particle?.Remove();
-                timer?.Kill();
-            }, TimerFlags.REPEAT);
+            WarcraftPlugin.Instance.AddTimer(duration, () => particle?.RemoveIfValid());
 
             return particle;
         }

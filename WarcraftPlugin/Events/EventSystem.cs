@@ -3,7 +3,6 @@ using System.Linq;
 using System.Numerics;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
@@ -26,6 +25,7 @@ namespace WarcraftPlugin.Events
         public void Initialize()
         {
             _plugin.RegisterEventHandler<EventPlayerDeath>(PlayerDeathHandler);
+            _plugin.RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
             _plugin.RegisterEventHandler<EventPlayerSpawn>(PlayerSpawnHandler);
             _plugin.RegisterEventHandler<EventPlayerHurt>(PlayerHurtHandler, HookMode.Pre);
             _plugin.RegisterEventHandler<EventItemEquip>(PlayerItemEquip);
@@ -240,7 +240,7 @@ namespace WarcraftPlugin.Events
 
             if (attacker == null || victim == null) return HookResult.Continue;
 
-            if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot)
+            if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot && attacker.PlayerPawn.IsValid && attacker.PawnIsAlive && !attacker.ControllingBot)
             {
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_killed_other", @event);
                 var weaponName = attacker.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.DesignerName;
@@ -285,6 +285,18 @@ namespace WarcraftPlugin.Events
 
             WarcraftPlugin.Instance.EffectManager.ClearEffects(victim);
 
+            return HookResult.Continue;
+        }
+
+        private HookResult PlayerDisconnectHandler(EventPlayerDisconnect @event, GameEventInfo info)
+        {
+            var player = @event.Userid;
+            if (player != null && player.IsValid)
+            {
+                var mockDeathEvent = new EventPlayerDeath(0);
+                mockDeathEvent.Userid = @event.Userid;
+                player?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_death", mockDeathEvent);
+            }
             return HookResult.Continue;
         }
 

@@ -71,7 +71,7 @@ namespace WarcraftPlugin.Classes
             _healingAuraTimer?.Kill();
             _healingAuraTimer = WarcraftPlugin.Instance.AddTimer(5f, () =>
             {
-                if (Player == null || !Player.PawnIsAlive || !Player.PlayerPawn.IsValid)
+                if (Player == null || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
                 {
                     _healingAuraTimer?.Kill();
                     return;

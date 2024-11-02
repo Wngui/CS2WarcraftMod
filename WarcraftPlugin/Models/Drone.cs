@@ -72,22 +72,24 @@ namespace WarcraftPlugin.Models
 
         public void Deactivate()
         {
+            _target = null;
+
             _turret?.RemoveIfValid();
             _model?.RemoveIfValid();
             _drone?.RemoveIfValid();
-
-            _target = null;
             _lazerDot?.RemoveIfValid();
+
             IsFireRateCooldown = false;
         }
 
         public void Update()
         {
+            if (!_owner.IsValid || !_drone.IsValid) return;
             var nextDronePosition = _owner.CalculatePositionInFront(Position);
             Vector velocity = Utility.CalculateTravelVelocity(_drone.AbsOrigin, nextDronePosition, 0.5f);
             _drone.Teleport(null, _owner.PlayerPawn.Value.V_angle, velocity);
 
-            ////Ensure drone is not stuck
+            //Ensure drone is not stuck
             float droneDistanceToPlayer = (_owner.PlayerPawn.Value.AbsOrigin - _drone.AbsOrigin).Length();
             if (droneDistanceToPlayer > 500) _drone.Teleport(_owner.CalculatePositionInFront(Position), _owner.PlayerPawn.Value.V_angle, new Vector(nint.Zero));
 
