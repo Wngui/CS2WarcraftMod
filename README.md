@@ -145,3 +145,8 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 ## Author Notes
 
 By releasing this mod, I sincerely hope it will aid the community in developing RPG mods and support aspiring plugin authors. This project involved significant effort and the discovery of new techniques. Please consider contributing back to the community. Special thanks to the knowledgeable members on Discord for their invaluable assistance.
+
+## Credits
+
+Roflmuffin - CounterStrikeSharp & Base plugin</br>
+csportalsk - Testing and bug reporting
