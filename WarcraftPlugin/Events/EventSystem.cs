@@ -187,7 +187,7 @@ namespace WarcraftPlugin.Events
             var attacker = @event.Attacker;
 
             if (victim != null && (!victim.IsValid || !victim.PawnIsAlive)) return HookResult.Continue;
-            if (attacker != null && (!attacker.IsValid || !attacker.PawnIsAlive)) return HookResult.Continue;
+            if (attacker != null && (!attacker.IsValid || !attacker.PawnIsAlive || attacker.ControllingBot)) return HookResult.Continue;
 
             //Zombie attack logic
             if (attacker != null && attacker.IsBot && attacker.OwnerEntity.Value != null && (bool)attacker?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))

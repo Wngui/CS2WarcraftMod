@@ -198,8 +198,11 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            Target.PlayerPawn.Value.SetColor(Color.White);
-            Utilities.SetStateChanged(Target.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");
+            if (Target != null && Target.IsValid && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
+            {
+                Target.PlayerPawn.Value.SetColor(Color.White);
+                Utilities.SetStateChanged(Target.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");
+            }
         }
     }
 }

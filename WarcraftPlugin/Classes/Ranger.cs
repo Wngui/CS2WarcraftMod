@@ -361,12 +361,7 @@ namespace WarcraftPlugin.Classes
                 Schema.SetSchemaValue(arrow.Handle, "CBaseGrenade", "m_hThrower", Owner.PlayerPawn.Raw); //Fixes killfeed
 
                 //Cleanup
-                Timer timer = null;
-                timer = WarcraftPlugin.Instance.AddTimer(0.6f, () =>
-                {
-                    arrow?.Remove();
-                    timer.Kill();
-                }, TimerFlags.REPEAT);
+                WarcraftPlugin.Instance.AddTimer(0.6f, () => { arrow?.RemoveIfValid(); });
             }
 
             public override void OnFinish()

@@ -310,7 +310,6 @@ namespace WarcraftPlugin
             WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
 
             Console.WriteLine("Player just connected: " + WarcraftPlayers[player.Handle]);
-            AddTimer(30, () => { WarcraftPlayers[player.Handle].GetPlayer()?.ExecuteClientCommandFromServer("rpg_help"); });
         }
 
         public void ChangeClass(CCSPlayerController player, string classInternalName)
