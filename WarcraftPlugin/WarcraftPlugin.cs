@@ -76,7 +76,7 @@ namespace WarcraftPlugin
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                if (player.IsValid && !player.IsBot)
+                if (player.IsValid && !player.IsBot && !player.ControllingBot)
                 {
                     WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
                 }
@@ -324,10 +324,7 @@ namespace WarcraftPlugin
 
             _database.SaveCurrentClass(player);
             _database.LoadPlayerFromDatabase(player, XpSystem);
-            if (player.PawnIsAlive)
-            {
-                player.PlayerPawn.Value.CommitSuicide(false, false);
-            }
+
             RefreshPlayerName(player.GetWarcraftPlayer());
         }
 

@@ -168,6 +168,8 @@ namespace WarcraftPlugin.Classes
 
         public override void OnTick()
         {
+            if (!Owner.IsValid || !Owner.PawnIsAlive) return;
+
             //Refill ammo
             Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
 
@@ -187,6 +189,8 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
+            if (!Owner.IsValid || !Owner.PawnIsAlive) return;
+
             Owner.PlayerPawn.Value.SetColor(Color.White);
             Owner.PlayerPawn.Value.VelocityModifier = 1f;
             Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 1f;

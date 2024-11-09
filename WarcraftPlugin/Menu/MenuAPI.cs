@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -57,6 +58,10 @@ public static class MenuAPI
                 player.ScrollDown();
             }
             else if ((player.Buttons & PlayerButtons.Jump) == 0 && (player.player.Buttons & PlayerButtons.Jump) != 0)
+            {
+                player.Choose();
+            }
+            else if ((player.Buttons & PlayerButtons.Use) == 0 && (player.player.Buttons & PlayerButtons.Use) != 0)
             {
                 player.Choose();
             }

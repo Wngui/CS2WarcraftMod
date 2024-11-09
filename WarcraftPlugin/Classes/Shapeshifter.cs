@@ -179,7 +179,6 @@ namespace WarcraftPlugin.Classes
 
         private void BreakTransformation()
         {
-
             if (_isShapeshifted)
             {
                 UnShapeshift();
@@ -201,7 +200,7 @@ namespace WarcraftPlugin.Classes
 
         private void UnShapeshift()
         {
-            _playerShapeshiftProp?.Remove();
+            _playerShapeshiftProp?.RemoveIfValid();
 
             SetDefaultAppearance();
 
@@ -220,7 +219,7 @@ namespace WarcraftPlugin.Classes
             Player.PlayerPawn.Value.CameraServices.ViewEntity.Raw = uint.MaxValue;
             Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBasePlayerPawn", "m_pCameraServices");
 
-            if (_cameraProp != null && _cameraProp.IsValid) _cameraProp?.Remove();
+            _cameraProp?.RemoveIfValid();
             _cameraProp = null;
         }
 
@@ -380,18 +379,15 @@ namespace WarcraftPlugin.Classes
                 _cloneDebrisHead?.AcceptInput("Break");
             }
 
-            if (!_cloneDebrisHead.IsValid && _clone.IsValid)
+            if (!_cloneDebrisHead.IsValid)
             {
-                _clone?.Remove();
+                _clone?.RemoveIfValid();
             }
         }
 
         public override void OnFinish()
         {
-            if (_clone.IsValid)
-            {
-                _clone?.Remove();
-            }
+            _clone?.RemoveIfValid();
 
             if (_cloneDebrisHead.IsValid)
             {

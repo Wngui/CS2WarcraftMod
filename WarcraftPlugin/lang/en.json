@@ -3,5 +3,5 @@
   "menu.selection.right": "<font color='red' class='fontSize-s'> ◀</font>",
   "menu.title.prefix": "",
   "menu.more.options.below": "<center><img src='https://raw.githubusercontent.com/Wngui/CS2WarcraftMod/refs/heads/master/WarcraftPlugin/Resources/arrow-down.gif'></center><br>",
-  "menu.bottom.text": "<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-s'> W↑ S↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>Space</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>"
+  "menu.bottom.text": "<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-s'> W↑ S↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>E</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>"
 }

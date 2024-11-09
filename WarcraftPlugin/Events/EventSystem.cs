@@ -118,6 +118,11 @@ namespace WarcraftPlugin.Events
                         return;
                     }
 
+                    if (warcraftPlayer.DesiredClass != null && warcraftPlayer.DesiredClass != warcraftClass.InternalName)
+                    {
+                        WarcraftPlugin.Instance.ChangeClass(player, warcraftPlayer.DesiredClass);
+                    }
+
                     if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
                     {
                         SkillsMenu.Show(warcraftPlayer);

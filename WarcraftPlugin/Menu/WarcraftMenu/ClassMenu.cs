@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -65,9 +66,23 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     {
                         p.PlayLocalSound("sounds/buttons/button9.vsnd");
                         MenuManager.CloseMenu(player);
-                        plugin.ChangeClass(player, classInternalName);
+
+                        if (player.IsValid)
+                        {
+                            if (!player.PawnIsAlive)
+                            {
+                                plugin.ChangeClass(player, classInternalName);
+                            }
+                            else
+                            {
+                                player.GetWarcraftPlayer().DesiredClass = classInternalName;
+                                player.PrintToChat($" {ChatColors.Green} You will spawn as {ChatColors.Orange}{warClassInformation.DisplayName}{ChatColors.Green} next round!");
+                            }
+                        }
+
                     }
-                    else {
+                    else
+                    {
                         p.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
                     }
                 });

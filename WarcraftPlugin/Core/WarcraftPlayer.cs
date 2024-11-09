@@ -14,6 +14,8 @@ namespace WarcraftPlugin.Core
 
         public CCSPlayerController Player { get; init; }
 
+        public string DesiredClass { get; set; }
+
         public int currentXp;
         public int currentLevel;
         public int amountToLevel;

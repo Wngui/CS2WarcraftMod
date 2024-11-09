@@ -29,9 +29,9 @@ namespace WarcraftPlugin.Adverts
         }
 
         private static readonly List<string> _adverts = [
-            "Want to try a new class? Type !class to change",
-            "Unspent skill points? Type !skills to level up abilities",
-            "Want to try new abilities? Type !reset to reassign",
+            $"Want to try a new class? Type {ChatColors.Gold}!class{ChatColors.Green} to change",
+            $"Unspent skill points? Type {ChatColors.Gold}!skills{ChatColors.Green} to level up abilities",
+            $"Want to try new abilities? Type {ChatColors.Gold}!reset{ChatColors.Green} to reassign",
             $"Want to use your ultimate? Type 'bind <key> ultimate' in console. Example: {ChatColors.Grey}bind x ultimate"
         ];
     }
