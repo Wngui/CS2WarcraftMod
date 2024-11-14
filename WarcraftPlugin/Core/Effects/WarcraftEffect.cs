@@ -1,6 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 
-namespace WarcraftPlugin.Effects
+namespace WarcraftPlugin.Core.Effects
 {
     public abstract class WarcraftEffect
     {

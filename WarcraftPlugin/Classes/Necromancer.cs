@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using WarcraftPlugin.Effects;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
@@ -9,7 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using g3;
 using WarcraftPlugin.Models;
-using WarcraftPlugin.Core;
+using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Classes.Summons;
+using WarcraftPlugin.Events;
+using CounterStrikeSharp.API.Modules.Timers;
 
 namespace WarcraftPlugin.Classes
 {
@@ -24,9 +26,10 @@ namespace WarcraftPlugin.Classes
         };
         public override Color DefaultColor => Color.Black;
 
-        private readonly List<CCSPlayerController> _zombies = new();
-        private const int _maxZombies = 3;
+        private readonly List<Zombie> _zombies = new();
+        private const int _maxZombies = 1;
         private bool _hasCheatedDeath = true;
+        private Timer _zombieUpdateTimer;
 
         public override void Register()
         {
@@ -40,7 +43,7 @@ namespace WarcraftPlugin.Classes
                 i => $"Chance to cheat death with a fraction of vitality."));
 
             AddAbility(new WarcraftCooldownAbility("raise_dead", "Raise Dead",
-                i => $"Resurrect powerful undead minions to fight alongside you.",
+                i => $"Resurrect powerful undead minions to fight for you.",
                 50f));
 
             HookEvent<EventPlayerSpawn>("round_end", PlayerSpawn);
@@ -50,6 +53,7 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
             HookEvent<EventGrenadeThrown>("grenade_thrown", GrenadeThrown);
             HookEvent<EventSmokegrenadeDetonate>("smoke_grenade_detonate", SmokegrenadeDetonate);
+            HookEvent<EventSpottedPlayer>("spotted_player", SpottedPlayer);
             HookAbility(3, Ultimate);
         }
 
@@ -132,12 +136,14 @@ namespace WarcraftPlugin.Classes
 
         private void RoundEnd(EventRoundEnd end)
         {
+            _zombieUpdateTimer?.Kill();
+
             foreach (var zombie in _zombies)
             {
-                Server.ExecuteCommand($"kickid {zombie.UserId}");
+                zombie.Kill();
             }
+
             _zombies.Clear();
-            Server.ExecuteCommand($"bot_quota {WarcraftPlugin.Instance.BotQuota}");
         }
 
         private void Ultimate()
@@ -145,49 +151,29 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
 
             RaiseDead();
-            StartCooldown(3);
+            //StartCooldown(3);
         }
 
         private void RaiseDead()
         {
-            var team = Player.Team == CsTeam.CounterTerrorist ? "ct" : "t";
+            Player.PlayLocalSound("sounds/ui/armsrace_become_leader_team.vsnd");
 
             for (int i = 0; i < _maxZombies; i++)
             {
-                Server.ExecuteCommand($"bot_add {team} expert");
+                _zombies.Add(new Zombie(Player));
             }
 
-            //Delay before bot references can be grabbed
-            WarcraftPlugin.Instance.AddTimer(0.1f, () =>
+            _zombieUpdateTimer?.Kill();
+
+            _zombieUpdateTimer = WarcraftPlugin.Instance.AddTimer(0.1f, () =>
             {
-                Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 20), "particles/explosions_fx/explosion_child_water_splash03b.vpcf");
-                Player.PlayLocalSound("sounds/ui/armsrace_become_leader_team.vsnd");
-                var zombies = Utilities.GetPlayers().Where(x => x.IsBot).OrderByDescending(x => x.CreateTime).Take(_maxZombies).ToList();
+                foreach (var zombie in _zombies) zombie.Update();
+            }, TimerFlags.REPEAT);
+        }
 
-                foreach (var zombie in zombies)
-                {
-                    zombie.Respawn();
-                    if (WarcraftPlugin.Instance.Config.NecromancerUseZombieModel)
-                    {
-                        zombie.PlayerPawn.Value.SetModel("characters/models/nozb1/skeletons_player_model/skeleton_player_model_2/skeleton_nozb2_pm.vmdl");
-                    }
-                    zombie.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), new QAngle(), new Vector());
-                    zombie.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
-                    zombie.RemoveWeapons();
-                    zombie.GiveNamedItem("weapon_knife");
-                    zombie.OwnerEntity.Raw = Player.PlayerPawn.Raw;
-                    zombie.PlayerPawn.Value.WeaponServices!.PreventWeaponPickup = true;
-                    zombie.Pawn.Value.GravityScale = 0.8f;
-
-                    var zombieBot = zombie.PlayerPawn.Value.Bot;
-                    zombieBot.Leader.Raw = Player.PlayerPawn.Raw;
-                    zombieBot.FollowTimestamp = float.MaxValue; //Eternal servant
-                    zombieBot.IsFollowing = true;
-                    zombieBot.LookForWeaponsOnGroundTimer.Duration = float.MaxValue;
-
-                    _zombies.Add(zombie);
-                }
-            });
+        private void SpottedPlayer(EventSpottedPlayer enemy)
+        {
+            foreach (var zombie in _zombies) zombie.SetEnemy(enemy.UserId);
         }
 
         public class PoisonCloud : WarcraftEffect

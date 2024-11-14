@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using CounterStrikeSharp.API.Core;
-using WarcraftPlugin.Effects;
 using CounterStrikeSharp.API.Modules.Events;
 using System.Drawing;
 using WarcraftPlugin.Helpers;
-using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Utils;
+using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Core;
 
-namespace WarcraftPlugin.Core
+namespace WarcraftPlugin.Models
 {
     public interface IWarcraftAbility
     {
@@ -150,12 +150,12 @@ namespace WarcraftPlugin.Core
 
         public bool IsAbilityReady(int abilityIndex)
         {
-            return Cooldowns.CooldownManager.IsAvailable(WarcraftPlayer, abilityIndex);
+            return CooldownManager.IsAvailable(WarcraftPlayer, abilityIndex);
         }
 
         public float AbilityCooldownRemaining(int abilityIndex)
         {
-            return Cooldowns.CooldownManager.Remaining(WarcraftPlayer, abilityIndex);
+            return CooldownManager.Remaining(WarcraftPlayer, abilityIndex);
         }
 
         public void StartCooldown(int abilityIndex)
@@ -163,7 +163,7 @@ namespace WarcraftPlugin.Core
             var ability = _abilities[abilityIndex];
 
             if (ability is WarcraftCooldownAbility cooldownAbility)
-                Cooldowns.CooldownManager.StartCooldown(WarcraftPlayer, abilityIndex, cooldownAbility.Cooldown);
+                CooldownManager.StartCooldown(WarcraftPlayer, abilityIndex, cooldownAbility.Cooldown);
         }
 
         public void InvokeAbility(int abilityIndex)
@@ -181,7 +181,7 @@ namespace WarcraftPlugin.Core
 
         internal void ResetCooldowns()
         {
-            Cooldowns.CooldownManager.ResetCooldowns(WarcraftPlayer);
+            CooldownManager.ResetCooldowns(WarcraftPlayer);
         }
     }
 }

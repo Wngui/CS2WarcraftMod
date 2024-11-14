@@ -22,9 +22,6 @@ jobs:
     - name: Publish build artifacts
       run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish
 
-    - name: Copy overrides
-      run: cp -r ./overrides ./publish
-
     - name: executing remote ssh commands
       uses: easingthemes/ssh-deploy@main
       with:

@@ -1,8 +1,8 @@
 ﻿using CounterStrikeSharp.API.Modules.Timers;
-using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
 
-namespace WarcraftPlugin.Cooldowns
+namespace WarcraftPlugin.Core
 {
     public class CooldownManager
     {

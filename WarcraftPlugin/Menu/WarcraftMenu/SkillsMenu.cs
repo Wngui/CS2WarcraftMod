@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu
 {

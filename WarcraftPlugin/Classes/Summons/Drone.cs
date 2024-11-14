@@ -7,8 +7,9 @@ using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Timers;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
+using CounterStrikeSharp.API.Modules.Entities;
 
-namespace WarcraftPlugin.Models
+namespace WarcraftPlugin.Classes.Summons
 {
     public class Drone
     {
@@ -119,11 +120,11 @@ namespace WarcraftPlugin.Models
             }
         }
 
-        private void TryShootTarget(CCSPlayerController player, bool isRocket = false)
+        private void TryShootTarget(CCSPlayerController target, bool isRocket = false)
         {
             if (_turret != null && _turret.IsValid)
             {
-                var playerCollison = player.PlayerPawn.Value.Collision.ToBox3d(player.PlayerPawn.Value.AbsOrigin);
+                var playerCollison = target.PlayerPawn.Value.Collision.ToBox3d(target.PlayerPawn.Value.AbsOrigin);
                 //Geometry.DrawVertices(playerCollison.ComputeVertices()); //debug
 
                 //check if we have a clear line of sight to target
@@ -151,11 +152,8 @@ namespace WarcraftPlugin.Models
                     }
                     else
                     {
-                        Shoot(turretMuzzle);
+                        Shoot(turretMuzzle, target);
                     }
-
-                    //dodamage to target
-                    player.TakeDamage(_owner.GetWarcraftPlayer().GetAbilityLevel(0) * 1, _owner);
                 }
                 else
                 {
@@ -164,11 +162,14 @@ namespace WarcraftPlugin.Models
             }
         }
 
-        private void Shoot(Vector muzzle)
+        private void Shoot(Vector muzzle, CCSPlayerController target)
         {
             //particle effect from turret
             Utility.SpawnParticle(muzzle, "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", 1);
             _turret.EmitSound("Weapon_M4A1.Silenced");
+
+            //dodamage to target
+            target.TakeDamage(_owner.GetWarcraftPlayer().GetAbilityLevel(0) * 1, _owner);
         }
 
         private void FireRocket(Vector muzzle, Vector endPos)

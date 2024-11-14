@@ -65,15 +65,8 @@ namespace WarcraftPlugin.Events
 
                         if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsValid && spottedByPlayer.PawnIsAlive)
                         {
-                            if (!spottedPlayer.IsBot)
-                            {
-                                spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_by_player", new EventSpottedPlayer() { UserId = spottedByPlayer });
-                            }
-
-                            if (!spottedByPlayer.IsBot)
-                            {
-                                spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_player", new EventSpottedPlayer() { UserId = spottedPlayer });
-                            }
+                            spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_by_enemy", new EventSpottedPlayer() { UserId = spottedByPlayer });
+                            spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_enemy", new EventSpottedPlayer() { UserId = spottedPlayer });
                         }
 
                         mask &= mask - 1;

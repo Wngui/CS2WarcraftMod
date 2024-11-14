@@ -4,11 +4,10 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API.Modules.Memory;
-using WarcraftPlugin.Effects;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Drawing;
-using WarcraftPlugin.Core;
+using WarcraftPlugin.Core.Effects;
 
 namespace WarcraftPlugin.Classes
 {

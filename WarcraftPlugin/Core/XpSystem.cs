@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {

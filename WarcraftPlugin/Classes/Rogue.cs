@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Drawing;
-using WarcraftPlugin.Effects;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API;
-using WarcraftPlugin.Core;
+using WarcraftPlugin.Core.Effects;
 
 namespace WarcraftPlugin.Classes
 {

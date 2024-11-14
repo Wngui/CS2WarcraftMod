@@ -105,6 +105,14 @@ namespace WarcraftPlugin.Helpers
             return vector;
         }
 
+        public static Vector Multiply(this Vector vector, float x = 1, float y = 1, float z = 1)
+        {
+            vector.X *= x;
+            vector.Y *= y;
+            vector.Z *= z;
+            return vector;
+        }
+
         public static bool IsEqual(this Vector vector1, Vector vector2, bool floor = false)
         {
             if (floor)

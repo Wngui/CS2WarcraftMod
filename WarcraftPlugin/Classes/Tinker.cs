@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using WarcraftPlugin.Core;
-using WarcraftPlugin.Effects;
+using WarcraftPlugin.Classes.Summons;
+using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
@@ -53,7 +53,7 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventWeaponFire>("player_shoot", PlayerShoot);
             HookEvent<EventDecoyStarted>("decoy_start", DecoyStart);
 
-            HookEvent<EventSpottedPlayer>("spotted_player", SpottedPlayer);
+            HookEvent<EventSpottedPlayer>("spotted_enemy", SpottedPlayer);
 
             HookAbility(3, Ultimate);
         }

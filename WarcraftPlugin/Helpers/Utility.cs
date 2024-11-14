@@ -7,7 +7,6 @@ using System;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API.Modules.Memory;
 using System.Runtime.InteropServices;
-using CounterStrikeSharp.API.Modules.Timers;
 using System.Linq;
 
 namespace WarcraftPlugin.Helpers

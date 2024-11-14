@@ -3,7 +3,6 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
-using WarcraftPlugin.Effects;
 using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Drawing;
@@ -12,7 +11,7 @@ using CounterStrikeSharp.API.Modules.Memory;
 using g3;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
-using WarcraftPlugin.Core;
+using WarcraftPlugin.Core.Effects;
 
 namespace WarcraftPlugin.Classes
 {

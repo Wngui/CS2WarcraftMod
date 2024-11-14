@@ -1,9 +1,10 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Collections.Generic;
+using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
 
-namespace WarcraftPlugin.Core
+namespace WarcraftPlugin.Models
 {
     public class WarcraftPlayer
     {

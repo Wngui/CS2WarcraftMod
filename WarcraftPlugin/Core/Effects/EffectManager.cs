@@ -2,7 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 
-namespace WarcraftPlugin.Effects
+namespace WarcraftPlugin.Core.Effects
 {
     public class EffectManager
     {

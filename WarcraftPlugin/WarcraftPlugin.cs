@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WarcraftPlugin.Cooldowns;
-using WarcraftPlugin.Effects;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
@@ -13,13 +11,14 @@ using System.Text.RegularExpressions;
 using WarcraftPlugin.Resources;
 using CounterStrikeSharp.API.Modules.Admin;
 using WarcraftPlugin.Adverts;
-using CounterStrikeSharp.API.Modules.Cvars;
 using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Classes;
 using WarcraftPlugin.Menu;
 using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Core;
+using WarcraftPlugin.Models;
+using WarcraftPlugin.Core.Effects;
 
 namespace WarcraftPlugin
 {
@@ -65,25 +64,18 @@ namespace WarcraftPlugin
         public float XpHeadshotModifier = 0.15f;
         public float XpKnifeModifier = 0.25f;
 
-        public int BotQuota = 10;
-
         public List<WarcraftPlayer> Players => WarcraftPlayers.Values.ToList();
 
         public Config Config { get; set; } = null!;
 
         public WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
+            if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
+
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                if (player.IsValid && !player.IsBot && !player.ControllingBot)
-                {
-                    WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
-                }
-                else
-                {
-                    return null;
-                }
+                WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
             }
 
             return WarcraftPlayers[player.Handle];
@@ -271,7 +263,6 @@ namespace WarcraftPlugin
             AddTimer(60f, StatusUpdate, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
             AddTimer(60.0f, _database.SaveClients, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
-            BotQuota = ConVar.Find("bot_quota").GetPrimitiveValue<int>();
             Server.PrintToConsole("Map Load Warcraft\n");
         }
 
