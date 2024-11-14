@@ -50,13 +50,13 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventGrenadeThrown>("grenade_thrown", GrenadeThrown);
 
             HookAbility(3, Ultimate);
-            base.Register();
         }
 
         private void PlayerPing(EventPlayerPing ping)
         {
             if (WarcraftPlayer.GetAbilityLevel(3) > 0 && IsAbilityReady(3))
             {
+                StartCooldown(3);
                 Player.DropWeaponByDesignerName("weapon_c4");
 
                 //To avoid getting stuck we offset towards the players original pos
@@ -117,7 +117,6 @@ namespace WarcraftPlugin.Classes
 
             // Hack to get players aim point in the world, see player ping event
             Player.ExecuteClientCommandFromServer("player_ping");
-            StartCooldown(3);
         }
 
         private void PlayerHurtOther(EventPlayerHurt @event)
