@@ -99,7 +99,7 @@ namespace WarcraftPlugin.Classes
 
         private void RegenManaShield()
         {
-            if (Player == null || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
+            if (Player == null || !Player.IsValid || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
             {
                 _manaShieldTimer?.Kill();
                 return;
