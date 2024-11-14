@@ -260,8 +260,8 @@ namespace WarcraftPlugin
         {
             var player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
             // No bots, invalid clients or non-existent clients.
-            if (!player.IsValid || player.IsBot) return;
-
+            // TODO: If player controls a bot while disconnecting, progress is not saved
+            if (!player.IsValid || player.IsBot || player.ControllingBot) return;
             SetWcPlayer(player, null);
             _database.SavePlayerToDatabase(player);
         }
