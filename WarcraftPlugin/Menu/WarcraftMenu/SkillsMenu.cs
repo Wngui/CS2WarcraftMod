@@ -19,9 +19,15 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 var abilityLevel = wcPlayer.GetAbilityLevel(i);
                 var maxAbilityLevel = WarcraftPlayer.GetMaxAbilityLevel(i);
 
-                var color = (abilityLevel == maxAbilityLevel || XpSystem.GetFreeSkillPoints(wcPlayer) == 0)
-                            ? Color.Gray
-                            : Color.White;
+                var isUltimate = i == 3;
+                var isDisabled = false;
+
+                if (abilityLevel == maxAbilityLevel || XpSystem.GetFreeSkillPoints(wcPlayer) == 0)
+                {
+                    isDisabled = true;
+                }
+
+                var color = isDisabled ? Color.Gray : Color.White;
 
                 var abilityLevelColor = abilityLevel > 0 ? "#90EE90" : "white";
 
@@ -33,8 +39,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
                 var displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} {abilityProgressString}</font>";
 
-
-                if (i == 3 && abilityLevel != maxAbilityLevel) //Ultimate ability
+                if (isUltimate && abilityLevel != maxAbilityLevel) //Ultimate ability
                 {
                     if (wcPlayer.IsMaxLevel)
                     {
@@ -43,6 +48,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     }
                     else
                     {
+                        isDisabled = true;
                         color = Color.Gray;
                         displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} (level 16)</font>";
                     }
@@ -53,7 +59,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 var abilityIndex = i;
                 skillsMenu.Add(displayString, subDisplayString, (p, opt) =>
                 {
-                    if (XpSystem.GetFreeSkillPoints(wcPlayer) > 0 && abilityLevel < WarcraftPlayer.GetMaxAbilityLevel(i))
+                    if (!isDisabled)
                     {
                         wcPlayer.GrantAbilityLevel(abilityIndex);
                     }
