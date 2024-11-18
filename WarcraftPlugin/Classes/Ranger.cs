@@ -328,16 +328,15 @@ namespace WarcraftPlugin.Classes
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
+                var playersInHurtZone = players.Where(x => x.IsValid && x.PlayerPawn.IsValid && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d())).ToList();
                 //Set movement speed + small hurt
-                if (playersInHurtZone.Any())
+                foreach (var player in playersInHurtZone)
                 {
-                    foreach (var player in playersInHurtZone)
-                    {
-                        player.TakeDamage(1, Owner);
-                        player.PlayerPawn.Value.VelocityModifier = 0;
-                        Utility.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
-                    }
+                    if (!player.IsValid || !player.PlayerPawn.IsValid) continue;
+
+                    player.TakeDamage(2, Owner);
+                    player.PlayerPawn.Value.VelocityModifier = 0;
+                    Utility.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                 }
             }
 

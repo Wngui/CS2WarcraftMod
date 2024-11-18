@@ -295,6 +295,7 @@ namespace WarcraftPlugin.Helpers
 
             damageInfo.Damage = damage;
 
+            if (!player.IsValid || !player.PlayerPawn.IsValid || !player.Pawn.IsValid) return;
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(player.Pawn.Value, damageInfo);
             Marshal.FreeHGlobal(ptr);
         }
