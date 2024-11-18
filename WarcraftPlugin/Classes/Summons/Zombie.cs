@@ -47,7 +47,7 @@ namespace WarcraftPlugin.Classes.Summons
         public void Update()
         {
             if (Entity == null || !Entity.IsValid) return;
-            if (Owner == null || !Owner.PlayerPawn.IsValid || !Owner.PawnIsAlive) Kill();
+            if (Owner == null || !Owner.IsValid || !Owner.PlayerPawn.IsValid || !Owner.PawnIsAlive) Kill();
 
             Vector velocity = Utility.CalculateTravelVelocity(Entity.AbsOrigin, Owner.PlayerPawn.Value.AbsOrigin, 1);
 

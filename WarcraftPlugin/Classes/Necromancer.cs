@@ -167,7 +167,21 @@ namespace WarcraftPlugin.Classes
 
             _zombieUpdateTimer = WarcraftPlugin.Instance.AddTimer(0.1f, () =>
             {
-                foreach (var zombie in _zombies) zombie.Update();
+                var hasValidZombies = false;
+                foreach (var zombie in _zombies)
+                {
+                    zombie.Update();
+                    if (zombie.Entity.IsValid)
+                    {
+                        hasValidZombies = true;
+                    }
+                }
+
+                if (!hasValidZombies)
+                {
+                    _zombieUpdateTimer?.Kill();
+                    _zombies.Clear();
+                }
             }, TimerFlags.REPEAT);
         }
 
