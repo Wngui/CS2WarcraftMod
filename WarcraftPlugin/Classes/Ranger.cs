@@ -228,7 +228,7 @@ namespace WarcraftPlugin.Classes
 
             public override void OnStart()
             {
-                InitialPos = _trigger?.AbsOrigin.With();
+                if (_trigger.IsValid) InitialPos = _trigger?.AbsOrigin.With();
             }
 
             public override void OnTick()

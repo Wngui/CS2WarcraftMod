@@ -135,6 +135,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnTick()
         {
+            if (!_axe.IsValid) return;
             var hasHitPlayer = _axe?.HasEverHitPlayer ?? false;
             if (hasHitPlayer)
             {
@@ -148,8 +149,11 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            _axe.DetonateTime = 0;
-            WarcraftPlugin.Instance.AddTimer(1, () => _axe?.Remove());
+            if (_axe.IsValid)
+            {
+                _axe.DetonateTime = 0;
+                WarcraftPlugin.Instance.AddTimer(1, () => _axe?.RemoveIfValid());
+            }
         }
     }
 
