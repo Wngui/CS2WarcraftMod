@@ -3,9 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: "Type of release: patch, minor, major"
+        description: "Type of release"
         required: true
         default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   build:
