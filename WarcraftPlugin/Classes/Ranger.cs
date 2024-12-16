@@ -250,7 +250,7 @@ namespace WarcraftPlugin.Classes
                 //Create 3D box around trap
                 var dangerzone = Geometry.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
                 //Find players within area
-                var players = Utilities.GetPlayers();
+                var players = Utilities.GetPlayers().Where(x => x.PlayerPawn.IsValid && x.PawnIsAlive);
                 var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
                 //Set movement speed + small hurt
                 if (playersInTrap.Any())

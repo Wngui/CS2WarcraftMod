@@ -1,9 +1,11 @@
 name: Release Warcraft plugin
-on: 
+on:
   workflow_dispatch:
-  push:
-    branches:
-    - main
+    inputs:
+      release_type:
+        description: "Type of release: patch, minor, major"
+        required: true
+        default: patch
 
 jobs:
   build:
@@ -11,26 +13,68 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-    - name: Generate build number
-      id: buildnumber
-      uses: onyxmueller/build-tag-number@v1
-      with:
-        token: ${{ secrets.github_token }}
-
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Read Current Version
+      id: read_version
+      run: |
+        current_version=$(cat version.txt)
+        echo "current_version=$current_version" >> $GITHUB_ENV
+
+    - name: Calculate New Version
+      id: calculate_version
+      run: |
+        current_version=${{ env.current_version }}
+        release_type=${{ github.event.inputs.release_type }}
+        
+        # Parse current version into major, minor, and patch
+        major=$(echo $current_version | cut -d. -f1)
+        minor=$(echo $current_version | cut -d. -f2)
+        patch=$(echo $current_version | cut -d. -f3)
+
+        # Increment based on release type
+        if [ "$release_type" = "major" ]; then
+          major=$((major + 1))
+          minor=0
+          patch=0
+        elif [ "$release_type" = "minor" ]; then
+          minor=$((minor + 1))
+          patch=0
+        else
+          patch=$((patch + 1))
+        fi
+
+        # Create new version string
+        new_version="$major.$minor.$patch"
+        echo "new_version=$new_version" >> $GITHUB_ENV
+
+    - name: Update Version File
+      run: echo "${{ env.new_version }}" > version.txt
+
+    - name: Commit Updated Version
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add version.txt
+        git commit -m "Release version ${{ env.new_version }}"
+        git push
 
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.x.x' # Use the version of .NET you need
 
+    - name: Update C# Version
+      run: |
+        sed -i "s/public override string ModuleVersion => \".*\";/public override string ModuleVersion => \"${{ env.new_version }}\";/g" WarcraftPlugin/WarcraftPlugin.cs
+
     - name: Publish build artifacts
       run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish/WarcraftPlugin
 
     - name: Copy overrides
       run: cp -r ./overrides ./publish
-      
+     
     - name: Create zip of publish directory contents
       run: |
         cd publish
@@ -40,10 +84,10 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       with:
-        tag_name: ${{ steps.buildnumber.outputs.build_number }}
-        release_name: Release ${{ steps.buildnumber.outputs.build_number }}
+        tag_name: ${{ env.new_version }}
+        release_name: Release ${{ env.new_version }}
         draft: false
-        prerelease: false
+        prerelease: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -52,7 +96,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./warcraft-plugin.zip
-        asset_name: warcraft-plugin-${{ steps.buildnumber.outputs.build_number }}.zip
+        asset_name: warcraft-plugin-${{ env.new_version }}.zip
         asset_content_type: application/zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

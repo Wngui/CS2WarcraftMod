@@ -46,7 +46,7 @@ namespace WarcraftPlugin
         public static WarcraftPlugin Instance => _instance;
 
         public override string ModuleName => "Warcraft";
-        public override string ModuleVersion => "2.0.0";
+        public override string ModuleVersion => "DEVELOPMENT";
 
         public const int MaxLevel = 16;
         public const int MaxSkillLevel = 5;
