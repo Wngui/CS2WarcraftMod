@@ -76,9 +76,6 @@ jobs:
 
     - name: Publish build artifacts
       run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish/WarcraftPlugin
-
-    - name: Copy overrides
-      run: cp -r ./overrides ./publish
      
     - name: Create zip of publish directory contents
       run: |
