@@ -9,7 +9,7 @@ using CounterStrikeSharp.API.Modules.Timers;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API.Modules.Entities;
 
-namespace WarcraftPlugin.Classes.Summons
+namespace WarcraftPlugin.Summons
 {
     public class Drone
     {

@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using WarcraftPlugin.Classes.Summons;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
+using WarcraftPlugin.Summons;
 using static CounterStrikeSharp.API.Core.Listeners;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 

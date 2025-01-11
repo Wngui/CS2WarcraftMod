@@ -9,9 +9,9 @@ using System.Linq;
 using g3;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Classes.Summons;
 using WarcraftPlugin.Events;
 using CounterStrikeSharp.API.Modules.Timers;
+using WarcraftPlugin.Summons;
 
 namespace WarcraftPlugin.Classes
 {
@@ -27,7 +27,7 @@ namespace WarcraftPlugin.Classes
         public override Color DefaultColor => Color.Black;
 
         private readonly List<Zombie> _zombies = new();
-        private const int _maxZombies = 1;
+        private const int _maxZombies = 10;
         private bool _hasCheatedDeath = true;
         private Timer _zombieUpdateTimer;
 
@@ -43,7 +43,7 @@ namespace WarcraftPlugin.Classes
                 i => $"Chance to cheat death with a fraction of vitality."));
 
             AddAbility(new WarcraftCooldownAbility("raise_dead", "Raise Dead",
-                i => $"Resurrect powerful undead minions to fight for you.",
+                i => $"Summon a horde of undead chicken to fight for you.",
                 50f));
 
             HookEvent<EventPlayerSpawn>("round_end", PlayerSpawn);
@@ -53,7 +53,7 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
             HookEvent<EventGrenadeThrown>("grenade_thrown", GrenadeThrown);
             HookEvent<EventSmokegrenadeDetonate>("smoke_grenade_detonate", SmokegrenadeDetonate);
-            HookEvent<EventSpottedPlayer>("spotted_player", SpottedPlayer);
+            HookEvent<EventSpottedPlayer>("spotted_enemy", SpottedPlayer);
             HookAbility(3, Ultimate);
         }
 
@@ -151,7 +151,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
 
             RaiseDead();
-            //StartCooldown(3);
+            StartCooldown(3);
         }
 
         private void RaiseDead()
@@ -168,11 +168,15 @@ namespace WarcraftPlugin.Classes
             _zombieUpdateTimer = WarcraftPlugin.Instance.AddTimer(0.1f, () =>
             {
                 var hasValidZombies = false;
+                var zombieCount = _zombies.Count;
+                var zombieIndex = 0;
                 foreach (var zombie in _zombies)
                 {
-                    zombie.Update();
                     if (zombie.Entity.IsValid)
                     {
+                        zombieIndex++;
+                        zombie.FavouritePosition = (zombieIndex * 100) / zombieCount;
+                        zombie.Update();
                         hasValidZombies = true;
                     }
                 }
@@ -187,7 +191,11 @@ namespace WarcraftPlugin.Classes
 
         private void SpottedPlayer(EventSpottedPlayer enemy)
         {
-            foreach (var zombie in _zombies) zombie.SetEnemy(enemy.UserId);
+            foreach (var zombie in _zombies)
+            {
+                if (zombie.Entity.IsValid)
+                    zombie.SetEnemy(enemy.UserId);
+            }
         }
 
         public class PoisonCloud : WarcraftEffect
