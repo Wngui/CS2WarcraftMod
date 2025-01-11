@@ -133,7 +133,7 @@ Ultimate can be activated by binding it in the console, example
 
 ## Configuration example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
-```json
+```jsonc
 {
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands

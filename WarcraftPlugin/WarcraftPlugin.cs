@@ -45,7 +45,7 @@ namespace WarcraftPlugin
         public static WarcraftPlugin Instance => _instance;
 
         public override string ModuleName => "Warcraft";
-        public override string ModuleVersion => "2.0.0";
+        public override string ModuleVersion => "DEVELOPMENT";
 
         public const int MaxLevel = 16;
         public const int MaxSkillLevel = 5;
@@ -252,8 +252,8 @@ namespace WarcraftPlugin
         {
             var player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
             // No bots, invalid clients or non-existent clients.
-            if (!player.IsValid || player.IsBot) return;
-
+            // TODO: If player controls a bot while disconnecting, progress is not saved
+            if (!player.IsValid || player.IsBot || player.ControllingBot) return;
             SetWcPlayer(player, null);
             _database.SavePlayerToDatabase(player);
         }
