@@ -102,10 +102,3 @@ jobs:
         asset_content_type: application/zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Update Latest Tag
-      run: |
-        git tag -f latest ${{ env.new_version }}
-        git push origin --force latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

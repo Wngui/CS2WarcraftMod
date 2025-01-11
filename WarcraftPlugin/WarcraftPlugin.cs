@@ -28,7 +28,6 @@ namespace WarcraftPlugin
 
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = false;
-        [JsonPropertyName("NecromancerUseZombieModel")] public bool NecromancerUseZombieModel { get; set; } = true;
     }
 
     public static class WarcraftPlayerExtensions
