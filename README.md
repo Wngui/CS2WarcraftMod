@@ -108,36 +108,12 @@ Ultimate can be activated by binding it in the console, example
 **Install the Plugin**
    - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`.
 
-<details>
-<summary><b>Necromancer's Ultimate Setup</b> - <i>Optional</i></summary>
-
-   *These steps are not stricly nessesary to get the plugin working, but the necromancers ult may not work correctly without them.*
-   - Download [MultiAddonManager](https://github.com/Source2ZE/MultiAddonManager/releases).
-   - Add the following to `multiaddonmanager.cfg`:
-     ```
-     3168265293 //skeleton pack
-     ```
-   - Ensure your server configuration includes:
-     ```
-     mp_autoteambalance 0
-     mp_limitteams 0
-     bot_difficulty 4 // 4 or less to avoid spawning 'zombie' bots
-     ```
-   - Rename Zombie Bots
-     - Copy `botprofile.vpk` to `\game\csgo\overrides`.
-     - Add the following line in `gameinfo.gi` under the metamod line:
-       ```
-       Game csgo/overrides/botprofile.vpk
-       ```
-</details>
-
 ## Configuration example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
 ```jsonc
 {
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
-  "NecromancerUseZombieModel": false, //Disable Necromancer custom zombie model (disabling need for multiaddon manager)
   "ConfigVersion": 2
 }
 ```
