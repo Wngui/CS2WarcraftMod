@@ -3,17 +3,17 @@ using CounterStrikeSharp.API.Modules.Events;
 
 namespace WarcraftPlugin.Events
 {
-    internal class EventSpottedPlayer : GameEvent
+    internal class EventSpottedByEnemy : GameEvent
     {
-        public EventSpottedPlayer() : base(0)
+        public EventSpottedByEnemy() : base(0)
         {
         }
 
-        public EventSpottedPlayer(nint pointer) : base(pointer)
+        public EventSpottedByEnemy(nint pointer) : base(pointer)
         {
         }
 
-        public EventSpottedPlayer(string name, bool force) : base(name, force)
+        public EventSpottedByEnemy(string name, bool force) : base(name, force)
         {
         }
 

@@ -7,6 +7,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API;
 using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Events;
 
 namespace WarcraftPlugin.Classes
 {
@@ -38,10 +39,10 @@ namespace WarcraftPlugin.Classes
                 i => $"When nearing death, you will automatically drop a smokebomb, letting you cheat death.",
                 50f));
 
-            HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
-            HookEvent<EventPlayerHurt>("player_hurt", PlayerHurt);
-            HookEvent<EventPlayerDeath>("player_killed_other", PlayerKilledOther);
-            HookEvent<EventItemEquip>("player_item_equip", PlayerItemEquip);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookEvent<EventPlayerHurt>(PlayerHurt);
+            HookEvent<EventPlayerKilledOther>(PlayerKilledOther);
+            HookEvent<EventItemEquip>(PlayerItemEquip);
         }
 
         private void PlayerHurt(GameEvent @event)

@@ -6,7 +6,6 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
-using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Menu.WarcraftMenu;
 
 namespace WarcraftPlugin.Events
@@ -65,8 +64,8 @@ namespace WarcraftPlugin.Events
 
                         if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsValid && spottedByPlayer.PawnIsAlive)
                         {
-                            spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_by_enemy", new EventSpottedPlayer() { UserId = spottedByPlayer });
-                            spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("spotted_enemy", new EventSpottedPlayer() { UserId = spottedPlayer });
+                            spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventSpottedByEnemy() { UserId = spottedByPlayer });
+                            spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventSpottedEnemy() { UserId = spottedPlayer });
                         }
 
                         mask &= mask - 1;
@@ -77,19 +76,19 @@ namespace WarcraftPlugin.Events
 
         private HookResult SmokeGrenadeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
         {
-            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("smoke_grenade_detonate", @event);
+            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             return HookResult.Continue;
         }
 
         private HookResult GrenadeThrown(EventGrenadeThrown @event, GameEventInfo info)
         {
-            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("grenade_thrown", @event);
+            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             return HookResult.Continue;
         }
 
         private HookResult RoundEnd(EventRoundEnd @event, GameEventInfo info)
         {
-            Utilities.GetPlayers().ForEach(p => { p.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("round_end", @event); });
+            Utilities.GetPlayers().ForEach(p => { p.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event); });
             return HookResult.Continue;
         }
 
@@ -99,7 +98,7 @@ namespace WarcraftPlugin.Events
             {
                 var warcraftPlayer = player.GetWarcraftPlayer();
                 var warcraftClass = warcraftPlayer?.GetClass();
-                warcraftPlayer?.GetClass()?.InvokeEvent("round_start", @event);
+                warcraftPlayer?.GetClass()?.InvokeEvent(@event);
 
                 if (warcraftClass != null)
                 {
@@ -141,19 +140,19 @@ namespace WarcraftPlugin.Events
 
         private HookResult PlayerPing(EventPlayerPing @event, GameEventInfo info)
         {
-            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_ping", @event);
+            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             return HookResult.Continue;
         }
 
         private HookResult DecoyStart(EventDecoyStarted @event, GameEventInfo info)
         {
-            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("decoy_start", @event);
+            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             return HookResult.Continue;
         }
 
         private HookResult PlayerJump(EventPlayerJump @event, GameEventInfo info)
         {
-            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_jump", @event);
+            @event.Userid?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             return HookResult.Continue;
         }
 
@@ -166,7 +165,7 @@ namespace WarcraftPlugin.Events
         private HookResult PlayerShoot(EventWeaponFire @event, GameEventInfo info)
         {
             var shooter = @event.Userid;
-            shooter?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_shoot", @event);
+            shooter?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
 
             return HookResult.Continue;
         }
@@ -174,7 +173,7 @@ namespace WarcraftPlugin.Events
         private HookResult PlayerItemEquip(EventItemEquip @event, GameEventInfo info)
         {
             var equipper = @event.Userid;
-            equipper?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_item_equip", @event);
+            equipper?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
 
             return HookResult.Continue;
         }
@@ -187,24 +186,15 @@ namespace WarcraftPlugin.Events
             if (victim != null && (!victim.IsValid || !victim.PawnIsAlive)) return HookResult.Continue;
             if (attacker != null && (!attacker.IsValid || !attacker.PawnIsAlive || attacker.ControllingBot)) return HookResult.Continue;
 
-            //Zombie attack logic
-            if (attacker != null && attacker.IsBot && attacker.OwnerEntity.Value != null && (bool)attacker?.PlayerName?.Contains("zombie", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var owner = new CCSPlayerPawn(attacker.OwnerEntity.Value.Handle);
-                var controller = new CCSPlayerController(owner.Controller.Value.Handle);
-                victim.SetHp(victim.PlayerPawn.Value.Health + @event.DmgHealth);
-                victim.TakeDamage(@event.DmgHealth, controller, attacker);
-            }
-
             //Prevent shotguns, etc from triggering multiple hurt other events
             var attackingClass = attacker?.GetWarcraftPlayer()?.GetClass();
             if (attackingClass != null && attackingClass?.LastHurtOther != Server.CurrentTime)
             {
                 attackingClass.LastHurtOther = Server.CurrentTime;
-                attackingClass.InvokeEvent("player_hurt_other", @event);
+                attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle));
             }
 
-            victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_hurt", @event);
+            victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
 
             return HookResult.Continue;
         }
@@ -218,12 +208,11 @@ namespace WarcraftPlugin.Events
 
             if (warcraftClass != null)
             {
-                var name = @event.EventName;
                 Server.NextFrame(() =>
                 {
                     WarcraftPlugin.Instance.EffectManager.ClearEffects(player);
                     warcraftClass.SetDefaultAppearance();
-                    warcraftClass.InvokeEvent(name, @event);
+                    warcraftClass.InvokeEvent(@event);
                 });
             }
 
@@ -240,7 +229,7 @@ namespace WarcraftPlugin.Events
 
             if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot && attacker.PlayerPawn.IsValid && attacker.PawnIsAlive && !attacker.ControllingBot)
             {
-                attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_killed_other", @event);
+                attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventPlayerKilledOther(@event.Handle));
                 var weaponName = attacker.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.DesignerName;
 
                 int xpToAdd = 0;
@@ -278,7 +267,7 @@ namespace WarcraftPlugin.Events
 
             if (victim.IsValid && attacker.IsValid && attacker != victim)
             {
-                victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_death", @event);
+                victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             }
 
             WarcraftPlugin.Instance.EffectManager.ClearEffects(victim);
@@ -293,7 +282,7 @@ namespace WarcraftPlugin.Events
             {
                 var mockDeathEvent = new EventPlayerDeath(0);
                 mockDeathEvent.Userid = @event.Userid;
-                player?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("player_death", mockDeathEvent);
+                player?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(mockDeathEvent);
             }
             return HookResult.Continue;
         }
@@ -301,7 +290,7 @@ namespace WarcraftPlugin.Events
         private HookResult PlayerMolotovDetonateHandler(EventMolotovDetonate @event, GameEventInfo _)
         {
             var attacker = @event.Userid;
-            attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent("molotov_detonate", @event);
+            attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
 
             return HookResult.Continue;
         }

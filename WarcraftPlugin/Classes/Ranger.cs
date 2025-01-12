@@ -12,6 +12,7 @@ using g3;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Events;
 
 namespace WarcraftPlugin.Classes
 {
@@ -46,11 +47,11 @@ namespace WarcraftPlugin.Classes
                 i => $"Call down a deadly volley of arrows using the ultimate key",
                 50f));
 
-            HookEvent<EventPlayerJump>("player_jump", PlayerJump);
-            HookEvent<EventDecoyStarted>("decoy_start", DecoyStart);
-            HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
-            HookEvent<EventPlayerPing>("player_ping", PlayerPing);
-            HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
+            HookEvent<EventPlayerJump>(PlayerJump);
+            HookEvent<EventDecoyStarted>(DecoyStart);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookEvent<EventPlayerPing>(PlayerPing);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
 
             HookAbility(3, Ultimate);
         }

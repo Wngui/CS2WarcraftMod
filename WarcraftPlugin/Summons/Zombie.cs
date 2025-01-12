@@ -11,9 +11,10 @@ namespace WarcraftPlugin.Summons
     {
         private const int _interestMax = 6;
         private int InterestScore = _interestMax;
-        private int _radius = 50;
-        private readonly double LeapCooldown = 1;
-        private readonly int Damage = 5;
+        private readonly int _radius = 50;
+        private readonly double _leapCooldown = 1;
+        private readonly int _damage = 10;
+        private readonly int _maxHealth = 100;
 
         public int FavouritePosition { get; set; } = 1;
         public CChicken Entity { get; set; }
@@ -32,6 +33,7 @@ namespace WarcraftPlugin.Summons
             Entity.DispatchSpawn();
             Entity.SetColor(Color.GreenYellow);
             Entity.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 2f;
+            Entity.Health = _maxHealth;
 
             Utility.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
 
@@ -51,7 +53,7 @@ namespace WarcraftPlugin.Summons
 
             if (Target != null && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
             {
-                if (LastLeapTick == 0 || LastLeapTick + LeapCooldown + Random.Shared.NextDouble() < Server.TickedTime)
+                if (LastLeapTick == 0 || LastLeapTick + _leapCooldown + Random.Shared.NextDouble() < Server.TickedTime)
                 {
                     AttackLeap();
                 }
@@ -117,7 +119,7 @@ namespace WarcraftPlugin.Summons
             if (playerCollison.Contains(Entity.AbsOrigin.ToVector3d()))
             {
                 //dodamage to target
-                Target.TakeDamage(Damage, Owner);
+                Target.TakeDamage(_damage, Owner);
                 InterestScore = _interestMax;
             }
             else

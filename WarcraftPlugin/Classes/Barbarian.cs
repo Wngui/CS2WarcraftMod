@@ -8,6 +8,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Drawing;
 using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Events;
 
 namespace WarcraftPlugin.Classes
 {
@@ -40,9 +41,9 @@ namespace WarcraftPlugin.Classes
                 i => $"Grants infinite ammo, movement speed & health regeneration.",
                 50f));
 
-            HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
-            HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
-            HookEvent<EventWeaponFire>("player_shoot", PlayerShoot);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventWeaponFire>(PlayerShoot);
 
             HookAbility(3, Ultimate);
         }

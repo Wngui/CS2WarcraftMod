@@ -48,17 +48,17 @@ namespace WarcraftPlugin.Classes
                 i => $"Summon a swarm of attack drones that damage all nearby enemies.",
                 50f));
 
-            HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
-            HookEvent<EventPlayerDeath>("player_death", PlayerDeath);
-            HookEvent<EventWeaponFire>("player_shoot", PlayerShoot);
-            HookEvent<EventDecoyStarted>("decoy_start", DecoyStart);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventPlayerDeath>(PlayerDeath);
+            HookEvent<EventWeaponFire>(PlayerShoot);
+            HookEvent<EventDecoyStarted>(DecoyStart);
 
-            HookEvent<EventSpottedPlayer>("spotted_enemy", SpottedPlayer);
+            HookEvent<EventSpottedEnemy>(SpottedPlayer);
 
             HookAbility(3, Ultimate);
         }
 
-        private void SpottedPlayer(EventSpottedPlayer spotEvent)
+        private void SpottedPlayer(EventSpottedEnemy spotEvent)
         {
             if (_drones.Count != 0)
             {

@@ -7,6 +7,7 @@ using CounterStrikeSharp.API;
 using System.Linq;
 using WarcraftPlugin.Models;
 using System.Drawing;
+using WarcraftPlugin.Events;
 
 namespace WarcraftPlugin.Classes
 {
@@ -38,10 +39,10 @@ namespace WarcraftPlugin.Classes
             AddAbility(new WarcraftAbility("divine_resurrection", "Divine Resurrection",
                 i => $"Instantly revive a random fallen ally."));
 
-            HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
-            HookEvent<EventPlayerDeath>("player_death", PlayerDeath);
-            HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
-            HookEvent<EventRoundStart>("round_start", RoundStart);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventPlayerDeath>(PlayerDeath);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookEvent<EventRoundStart>(RoundStart);
 
             HookAbility(3, Ultimate);
         }

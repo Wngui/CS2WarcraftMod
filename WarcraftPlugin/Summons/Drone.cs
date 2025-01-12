@@ -7,7 +7,6 @@ using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Timers;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
-using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin.Summons
 {

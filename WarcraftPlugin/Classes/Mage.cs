@@ -9,6 +9,7 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Events;
 
 namespace WarcraftPlugin.Classes
 {
@@ -41,12 +42,12 @@ namespace WarcraftPlugin.Classes
                 i => $"When you press your ultimate key, you will teleport to the spot you're aiming.",
                 20f));
 
-            HookEvent<EventPlayerDeath>("player_death", PlayerDeath);
-            HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
-            HookEvent<EventMolotovDetonate>("molotov_detonate", MolotovDetonate);
-            HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
-            HookEvent<EventPlayerPing>("player_ping", PlayerPing);
-            HookEvent<EventGrenadeThrown>("grenade_thrown", GrenadeThrown);
+            HookEvent<EventPlayerDeath>(PlayerDeath);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookEvent<EventMolotovDetonate>(MolotovDetonate);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventPlayerPing>(PlayerPing);
+            HookEvent<EventGrenadeThrown>(GrenadeThrown);
 
             HookAbility(3, Ultimate);
         }

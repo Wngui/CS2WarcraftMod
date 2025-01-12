@@ -46,14 +46,14 @@ namespace WarcraftPlugin.Classes
                 i => $"Summon a horde of undead chicken to fight for you.",
                 50f));
 
-            HookEvent<EventPlayerSpawn>("round_end", PlayerSpawn);
-            HookEvent<EventRoundEnd>("round_end", RoundEnd);
-            HookEvent<EventRoundStart>("round_start", RoundStart);
-            HookEvent<EventPlayerDeath>("player_death", PlayerDeath);
-            HookEvent<EventPlayerHurt>("player_hurt_other", PlayerHurtOther);
-            HookEvent<EventGrenadeThrown>("grenade_thrown", GrenadeThrown);
-            HookEvent<EventSmokegrenadeDetonate>("smoke_grenade_detonate", SmokegrenadeDetonate);
-            HookEvent<EventSpottedPlayer>("spotted_enemy", SpottedPlayer);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventRoundEnd>(RoundEnd);
+            HookEvent<EventRoundStart>(RoundStart);
+            HookEvent<EventPlayerDeath>(PlayerDeath);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookEvent<EventGrenadeThrown>(GrenadeThrown);
+            HookEvent<EventSmokegrenadeDetonate>(SmokegrenadeDetonate);
+            HookEvent<EventSpottedEnemy>(SpottedPlayer);
             HookAbility(3, Ultimate);
         }
 
@@ -189,7 +189,7 @@ namespace WarcraftPlugin.Classes
             }, TimerFlags.REPEAT);
         }
 
-        private void SpottedPlayer(EventSpottedPlayer enemy)
+        private void SpottedPlayer(EventSpottedEnemy enemy)
         {
             foreach (var zombie in _zombies)
             {

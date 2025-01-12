@@ -114,9 +114,9 @@ namespace WarcraftPlugin.Models
             _abilities.Add(ability);
         }
 
-        protected void HookEvent<T>(string eventName, Action<T> handler) where T : GameEvent
+        protected void HookEvent<T>(Action<T> handler) where T : GameEvent
         {
-            _eventHandlers[eventName] = (evt) =>
+            _eventHandlers[typeof(T).Name] = (evt) =>
             {
                 if (evt is T typedEvent)
                 {
@@ -125,7 +125,7 @@ namespace WarcraftPlugin.Models
                 else
                 {
                     handler((T)evt);
-                    Console.WriteLine($"Handler for event {eventName} expects an event of type {typeof(T).Name}.");
+                    Console.WriteLine($"Handler for event expects an event of type {typeof(T).Name}.");
                 }
             };
         }
@@ -135,9 +135,9 @@ namespace WarcraftPlugin.Models
             _abilityHandlers[abilityIndex] = handler;
         }
 
-        public void InvokeEvent(string eventName, GameEvent @event)
+        public void InvokeEvent(GameEvent @event)
         {
-            if (_eventHandlers.TryGetValue(eventName, out Action<GameEvent> value))
+            if (_eventHandlers.TryGetValue(@event.GetType().Name, out Action<GameEvent> value))
             {
                 value.Invoke(@event);
             }

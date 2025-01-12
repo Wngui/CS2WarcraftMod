@@ -51,12 +51,12 @@ namespace WarcraftPlugin.Classes
 
             HookAbility(3, Ultimate);
 
-            HookEvent<EventWeaponFire>("player_shoot", PlayerShoot);
-            HookEvent<EventPlayerHurt>("player_hurt", PlayerHurt);
-            HookEvent<EventPlayerDeath>("player_death", PlayerDeath);
-            HookEvent<EventRoundEnd>("round_end", RoundEnd);
-            HookEvent<EventPlayerSpawn>("player_spawn", PlayerSpawn);
-            HookEvent<EventDecoyStarted>("decoy_start", DecoyStart);
+            HookEvent<EventWeaponFire>(PlayerShoot);
+            HookEvent<EventPlayerHurt>(PlayerHurt);
+            HookEvent<EventPlayerDeath>(PlayerDeath);
+            HookEvent<EventRoundEnd>(RoundEnd);
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventDecoyStarted>(DecoyStart);
         }
 
         private void DecoyStart(EventDecoyStarted decoy)
