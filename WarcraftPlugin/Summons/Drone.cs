@@ -39,7 +39,7 @@ namespace WarcraftPlugin.Summons
             Deactivate();
 
             //Spawn animation
-            var droneSpawnAnimation = Utility.SpawnParticle(_owner.CalculatePositionInFront(Position), "particles/ui/ui_electric_gold.vpcf");
+            var droneSpawnAnimation = Warcraft.SpawnParticle(_owner.CalculatePositionInFront(Position), "particles/ui/ui_electric_gold.vpcf");
             droneSpawnAnimation.SetParent(_owner.PlayerPawn.Value);
 
             //Create drone physics object
@@ -86,7 +86,7 @@ namespace WarcraftPlugin.Summons
         {
             if (!_owner.IsValid || !_drone.IsValid) return;
             var nextDronePosition = _owner.CalculatePositionInFront(Position);
-            Vector velocity = Utility.CalculateTravelVelocity(_drone.AbsOrigin, nextDronePosition, 0.5f);
+            Vector velocity = Warcraft.CalculateTravelVelocity(_drone.AbsOrigin, nextDronePosition, 0.5f);
             _drone.Teleport(null, _owner.PlayerPawn.Value.V_angle, velocity);
 
             //Ensure drone is not stuck
@@ -96,7 +96,7 @@ namespace WarcraftPlugin.Summons
             //Update laser to point at target
             if (_target != null)
             {
-                _lazerDot = Utility.DrawLaserBetween(_turret.CalculatePositionInFront(new Vector(0, 30, 2)), _target, Color.FromArgb(15, 255, 0, 0), 0.2f, 0.2f);
+                _lazerDot = Warcraft.DrawLaserBetween(_turret.CalculatePositionInFront(new Vector(0, 30, 2)), _target, Color.FromArgb(15, 255, 0, 0), 0.2f, 0.2f);
             }
         }
 
@@ -164,7 +164,7 @@ namespace WarcraftPlugin.Summons
         private void Shoot(Vector muzzle, CCSPlayerController target)
         {
             //particle effect from turret
-            Utility.SpawnParticle(muzzle, "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", 1);
+            Warcraft.SpawnParticle(muzzle, "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", 1);
             _turret.EmitSound("Weapon_M4A1.Silenced");
 
             //dodamage to target
@@ -175,14 +175,14 @@ namespace WarcraftPlugin.Summons
         {
             var rocket = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
 
-            Vector velocity = Utility.CalculateTravelVelocity(_turret.AbsOrigin, endPos, 1);
+            Vector velocity = Warcraft.CalculateTravelVelocity(_turret.AbsOrigin, endPos, 1);
 
             rocket.Teleport(muzzle, rocket.AbsRotation, velocity);
             rocket.DispatchSpawn();
             Schema.SetSchemaValue(rocket.Handle, "CBaseGrenade", "m_hThrower", _owner.PlayerPawn.Raw); //Fixes killfeed
 
             //Rocket popping out the tube
-            Utility.SpawnParticle(rocket.AbsOrigin, "particles/explosions_fx/explosion_hegrenade_smoketrails.vpcf", 1);
+            Warcraft.SpawnParticle(rocket.AbsOrigin, "particles/explosions_fx/explosion_hegrenade_smoketrails.vpcf", 1);
             rocket.EmitSound("Weapon_Nova.Pump");
 
             rocket.AcceptInput("InitializeSpawnFromWorld");

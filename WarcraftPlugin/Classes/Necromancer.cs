@@ -17,13 +17,7 @@ namespace WarcraftPlugin.Classes
 {
     public class Necromancer : WarcraftClass
     {
-        public override string InternalName => "necromancer";
         public override string DisplayName => "Necromancer";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_professional/tm_professional_vari.vmdl",
-            //CTModel = "characters/models/ctm_sas/ctm_sas_variantg.vmdl"
-        };
         public override Color DefaultColor => Color.Black;
 
         private readonly List<Zombie> _zombies = new();
@@ -84,7 +78,7 @@ namespace WarcraftPlugin.Classes
                         Player.PrintToChat(" " + $"{ChatColors.DarkRed}You have cheated death, for now...{ChatColors.Default}");
                         Player.Respawn();
                         Player.SetHp(1);
-                        Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
+                        Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
                         Player.PlayLocalSound("sounds/ambient/atmosphere/cs_cable_rattle02.vsnd");
                     });
                 }
@@ -122,7 +116,7 @@ namespace WarcraftPlugin.Classes
 
             if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
             {
-                Utility.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 10);
+                Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 10);
                 var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / 5 * 0.3f);
                 var playerCalculatedHealth = Player.PlayerPawn.Value.Health + healthDrained;
                 Player.SetHp((int)Math.Min(playerCalculatedHealth, Player.PlayerPawn.Value.MaxHealth));

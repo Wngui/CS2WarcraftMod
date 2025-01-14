@@ -14,7 +14,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
             var skillsMenu = MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeM}'>{warcraftClass.DisplayName}</font><font color='gold' class='{FontSizes.FontSizeSm}'> - Level {wcPlayer.GetLevel()}</font><br>
                 <font color='#90EE90' class='{FontSizes.FontSizeS}'>Level up skills ({XpSystem.GetFreeSkillPoints(wcPlayer)} available)</font>");
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < warcraftClass.Abilities.Count; i++)
             {
                 var ability = warcraftClass.GetAbility(i);
                 var abilityLevel = wcPlayer.GetAbilityLevel(i);

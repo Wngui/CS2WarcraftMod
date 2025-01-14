@@ -16,13 +16,7 @@ namespace WarcraftPlugin.Classes
         private Timer _healingAuraTimer;
         private bool _hasUsedDivineResurrection = false;
 
-        public override string InternalName => "paladin";
         public override string DisplayName => "Paladin";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_phoenix_heavy/tm_phoenix_heavy.vmdl",
-            //CTModel = "characters/models/ctm_heavy/ctm_heavy.vmdl"
-        };
         public override Color DefaultColor => Color.Yellow;
 
         public override void Register()
@@ -92,7 +86,7 @@ namespace WarcraftPlugin.Classes
                         {
                             var healthAfterHeal = player.PlayerPawn.Value.Health + WarcraftPlayer.GetAbilityLevel(0);
                             player.SetHp(healthAfterHeal > player.PlayerPawn.Value.MaxHealth ? player.PlayerPawn.Value.MaxHealth : healthAfterHeal);
-                            Utility.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
+                            Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
                         }
                     }
                 }
@@ -164,7 +158,7 @@ namespace WarcraftPlugin.Classes
                 if (victim.PlayerPawn.Value.ArmorValue > 0)
                 {
                     victim.SetArmor(victim.PlayerPawn.Value.ArmorValue - WarcraftPlayer.GetAbilityLevel(2) * 5);
-                    Utility.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
+                    Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
                     Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
                 }
             }

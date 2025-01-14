@@ -15,13 +15,7 @@ namespace WarcraftPlugin.Classes
     {
         private bool _isSmokebomb;
 
-        public override string InternalName => "rogue";
         public override string DisplayName => "Rogue";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_balkan/tm_balkan_variantf.vmdl",
-            //CTModel = "characters/models/ctm_swat/ctm_swat_variantk.vmdl"
-        };
         public override Color DefaultColor => Color.DarkViolet;
 
         public override void Register()
@@ -62,7 +56,7 @@ namespace WarcraftPlugin.Classes
                 Player.SetHp(1);
 
                 //spawn smoke
-                Utility.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
+                Warcraft.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
 
                 //spawn molly - hack to trigger smoke faster
                 var molo = Utilities.CreateEntityByName<CMolotovProjectile>("molotov_projectile");
@@ -72,7 +66,7 @@ namespace WarcraftPlugin.Classes
 
                 Player.ExecuteClientCommand("slot3"); //pull out knife
 
-                var smokeEffect = Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 90), "particles/maps/de_house/house_fireplace.vpcf");
+                var smokeEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 90), "particles/maps/de_house/house_fireplace.vpcf");
                 smokeEffect.SetParent(Player.PlayerPawn.Value);
 
                 StartCooldown(3);
@@ -145,7 +139,7 @@ namespace WarcraftPlugin.Classes
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
                 eventPlayerHurt.Userid.TakeDamage(damageBonus, Player);
                 Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}", 1);
-                Utility.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
+                Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }
         }
 

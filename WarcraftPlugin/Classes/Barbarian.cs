@@ -14,7 +14,6 @@ namespace WarcraftPlugin.Classes
 {
     public class Barbarian : WarcraftClass
     {
-        public override string InternalName => "barbarian";
         public override string DisplayName => "Barbarian";
         public override DefaultClassModel DefaultModel => new()
         {
@@ -116,7 +115,7 @@ namespace WarcraftPlugin.Classes
             {
                 var victim = @event.Userid;
                 victim.TakeDamage(carnageLevel * 5f, Player);
-                Utility.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
+                Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 Player.PlayLocalSound("sounds/physics/body/body_medium_break3.vsnd");
             }
         }

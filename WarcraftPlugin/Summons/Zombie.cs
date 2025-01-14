@@ -35,7 +35,7 @@ namespace WarcraftPlugin.Summons
             Entity.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 2f;
             Entity.Health = _maxHealth;
 
-            Utility.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+            Warcraft.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
 
             Entity.OwnerEntity.Raw = Owner.PlayerPawn.Raw;
             FollowLeader();
@@ -68,7 +68,7 @@ namespace WarcraftPlugin.Summons
                     Entity.AbsOrigin.X = chickenResetPoint.X;
                     Entity.AbsOrigin.Y = chickenResetPoint.Y;
                     Entity.AbsOrigin.Z = Owner.PlayerPawn.Value.AbsOrigin.Z+5;
-                    Utility.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+                    Warcraft.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
                     return;
                 }
                 Vector velocity = CircularGetVelocityToPosition(Owner.PlayerPawn.Value.AbsOrigin, Entity.AbsOrigin);
@@ -94,7 +94,7 @@ namespace WarcraftPlugin.Summons
                 .Add(x: offsetX, y: offsetY);
 
             // Calculate the travel velocity
-            Vector velocity = Utility.CalculateTravelVelocity(zombie, targetPosition, 1);
+            Vector velocity = Warcraft.CalculateTravelVelocity(zombie, targetPosition, 1);
             return velocity;
         }
 
@@ -104,7 +104,7 @@ namespace WarcraftPlugin.Summons
             Attack();
 
             //Leap logic
-            Vector velocity = Utility.CalculateTravelVelocity(Entity.AbsOrigin, Target.PlayerPawn.Value.AbsOrigin, 1);
+            Vector velocity = Warcraft.CalculateTravelVelocity(Entity.AbsOrigin, Target.PlayerPawn.Value.AbsOrigin, 1);
 
             Entity.AbsVelocity.Z = 400;
             Entity.AbsVelocity.X = Math.Clamp(velocity.X, -1000, 1000);
@@ -131,7 +131,7 @@ namespace WarcraftPlugin.Summons
         public void Kill()
         {
             if (Entity == null || !Entity.IsValid) return;
-            Entity.AcceptInput("Explode");
+            Entity.RemoveIfValid();
         }
 
         public void SetEnemy(CCSPlayerController enemy)

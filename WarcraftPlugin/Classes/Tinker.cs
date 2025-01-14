@@ -24,13 +24,7 @@ namespace WarcraftPlugin.Classes
         private Timer _ultimateTimer;
         private const int _ultimateTime = 20;
 
-        public override string InternalName => "tinker";
         public override string DisplayName => "Tinker";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_phoenix/tm_phoenix_varianti.vmdl",
-            //CTModel = "characters/models/ctm_swat/ctm_swat_variantj.vmdl"
-        };
         public override Color DefaultColor => Color.Teal;
 
         public override void Register()
@@ -208,7 +202,7 @@ namespace WarcraftPlugin.Classes
 
             private void TriggerTrap()
             {
-                Utility.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
+                Warcraft.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
                 //Show trap
                 _trap.SetColor(Color.FromArgb(255, 255, 255, 255));
 
@@ -245,7 +239,7 @@ namespace WarcraftPlugin.Classes
         private void Ultimate()
         {
             //Ultimate effect
-            var ultEffect = Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z:40), "particles/ui/ui_experience_award_innerpoint.vpcf");
+            var ultEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z:40), "particles/ui/ui_experience_award_innerpoint.vpcf");
             ultEffect.SetParent(Player.PlayerPawn.Value);
 
             ActivateDrones(_droneUltimateAmount);

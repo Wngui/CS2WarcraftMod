@@ -70,9 +70,9 @@ namespace WarcraftPlugin.Helpers
             foreach (var face in convexHull.Result.Faces)
             {
                 var facecolor = color ?? Color.FromArgb(255, (int)(Math.Sin(frequency * i + 0) * 127 + 128), (int)(Math.Sin(frequency * i + 2) * 127 + 128), (int)(Math.Sin(frequency * i + 4) * 127 + 128));
-                Utility.DrawLaserBetween(new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), facecolor, duration, width);
-                Utility.DrawLaserBetween(new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), facecolor, duration, width);
-                Utility.DrawLaserBetween(new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), facecolor, duration, width);
+                Warcraft.DrawLaserBetween(new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), facecolor, duration, width);
+                Warcraft.DrawLaserBetween(new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), facecolor, duration, width);
+                Warcraft.DrawLaserBetween(new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), facecolor, duration, width);
 
                 i++;
             }

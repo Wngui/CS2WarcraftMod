@@ -23,13 +23,7 @@ namespace WarcraftPlugin.Classes
         private bool _jumpedLastTick = false;
         private bool _dashOnCooldown = false;
 
-        public override string InternalName => "ranger";
         public override string DisplayName => "Ranger";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "",
-            //CTModel = ""
-        };
         public override Color DefaultColor => Color.Green;
 
         public override void Register()
@@ -75,8 +69,8 @@ namespace WarcraftPlugin.Classes
             {
                 var victim = @event.Userid;
                 victim.TakeDamage(markmansLevel * 2, Player);
-                Utility.SpawnParticle(Player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
-                Utility.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
+                Warcraft.SpawnParticle(Player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
+                Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
             }
         }
 
@@ -244,7 +238,7 @@ namespace WarcraftPlugin.Classes
 
             private void TriggerTrap()
             {
-                Utility.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
+                Warcraft.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
                 //Show trap
                 _trap.SetColor(Color.FromArgb(255, 255, 255, 255));
                 //Create 3D box around trap
@@ -260,7 +254,7 @@ namespace WarcraftPlugin.Classes
                         player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Owner);
                         player.PlayerPawn.Value.VelocityModifier = 0;
                         player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
-                        Utility.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
+                        Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                     }
                 }
                 //Clean-up
@@ -314,7 +308,7 @@ namespace WarcraftPlugin.Classes
 
             public override void OnTick()
             {
-                Utility.SpawnParticle(_spawnBox.Center.ToVector().Add(z: 20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
+                Warcraft.SpawnParticle(_spawnBox.Center.ToVector().Add(z: 20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
 
                 HurtPlayersInside();
 
@@ -336,7 +330,7 @@ namespace WarcraftPlugin.Classes
 
                     player.TakeDamage(2, Owner);
                     player.PlayerPawn.Value.VelocityModifier = 0;
-                    Utility.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
+                    Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                 }
             }
 

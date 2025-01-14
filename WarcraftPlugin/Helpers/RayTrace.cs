@@ -86,7 +86,7 @@ public class RayTrace
                 color = Color.FromName("Red");
             }
 
-            Utility.DrawLaserBetween(_origin, endPos, color, 5);
+            Warcraft.DrawLaserBetween(_origin, endPos, color, 5);
         }
 
         if (result)

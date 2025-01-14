@@ -108,7 +108,7 @@ namespace WarcraftPlugin
 
             _database = new Database();
             classManager = new ClassManager();
-            classManager.Initialize();
+            classManager.Initialize(ModuleDirectory);
 
             EffectManager = new EffectManager();
             EffectManager.Initialize();
@@ -173,9 +173,10 @@ namespace WarcraftPlugin
 
                 //sounds/music/survival_review_victory.vsnd_c // cool track
 
-                foreach (var prop in Shapeshifter.Props)
+                //preload class specific resources
+                foreach (var resources in classManager.GetAllClasses().SelectMany(x => x.PreloadResources).ToList())
                 {
-                    manifest.AddResource(prop);
+                    manifest.AddResource(resources);
                 }
 
                 foreach (var p in Particles.Paths)

@@ -51,14 +51,14 @@ namespace WarcraftPlugin.Models
 
     public abstract class WarcraftClass
     {
-        public abstract string InternalName { get; }
+        public string InternalName => DisplayName.ToLowerInvariant();
         public abstract string DisplayName { get; }
-        public abstract DefaultClassModel DefaultModel { get; }
+        public virtual DefaultClassModel DefaultModel { get; }
         public abstract Color DefaultColor { get; }
         public WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
 
-        private readonly List<IWarcraftAbility> _abilities = [];
+        public readonly List<IWarcraftAbility> Abilities = [];
         private readonly Dictionary<string, Action<GameEvent>> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
 
@@ -66,11 +66,13 @@ namespace WarcraftPlugin.Models
 
         public virtual void Register() { }
 
+        public virtual List<string> PreloadResources { get; } = [];
+
         public void SetDefaultAppearance()
         {
             Player.PlayerPawn.Value.SetColor(GenerateShade(DefaultColor, Player.GetWarcraftPlayer().currentLevel));
 
-            var model = Player.Team == CsTeam.CounterTerrorist ? DefaultModel.CTModel : DefaultModel.TModel;
+            var model = Player.Team == CsTeam.CounterTerrorist ? DefaultModel?.CTModel : DefaultModel?.TModel;
 
             if (model != null && model != string.Empty)
             {
@@ -106,12 +108,12 @@ namespace WarcraftPlugin.Models
 
         public IWarcraftAbility GetAbility(int index)
         {
-            return _abilities[index];
+            return Abilities[index];
         }
 
         protected void AddAbility(IWarcraftAbility ability)
         {
-            _abilities.Add(ability);
+            Abilities.Add(ability);
         }
 
         protected void HookEvent<T>(Action<T> handler) where T : GameEvent
@@ -160,7 +162,7 @@ namespace WarcraftPlugin.Models
 
         public void StartCooldown(int abilityIndex)
         {
-            var ability = _abilities[abilityIndex];
+            var ability = Abilities[abilityIndex];
 
             if (ability is WarcraftCooldownAbility cooldownAbility)
                 CooldownManager.StartCooldown(WarcraftPlayer, abilityIndex, cooldownAbility.Cooldown);

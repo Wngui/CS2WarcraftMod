@@ -2,7 +2,6 @@
 using CounterStrikeSharp.API;
 using System.Drawing;
 using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API.Modules.Memory;
@@ -11,7 +10,7 @@ using System.Linq;
 
 namespace WarcraftPlugin.Helpers
 {
-    public static class Utility
+    public static class Warcraft
     {
         static public CBeam DrawLaserBetween(Vector startPos, Vector endPos, Color? color = null, float duration = 1, float width = 2)
         {
@@ -67,8 +66,7 @@ namespace WarcraftPlugin.Helpers
 
         public static CSmokeGrenadeProjectile SpawnSmoke(Vector pos, CCSPlayerPawn attacker, Color color)
         {
-            //var smokeProjectile = Utilities.CreateEntityByName<CSmokeGrenadeProjectile>("smokegrenade_projectile");
-            var smokeProjectile = CSmokeGrenadeProjectile_CreateFunc.Invoke(
+            var smokeProjectile = Memory.CSmokeGrenadeProjectile_CreateFunc.Invoke(
                         pos.Handle,
                         new Vector(0,0,0).Handle,
                         new Vector(0, 0, 0).Handle,
@@ -82,35 +80,19 @@ namespace WarcraftPlugin.Helpers
             smokeProjectile.SmokeColor.Z = color.B;
 
             return smokeProjectile;
-
-            /*var smokeEffect = Utilities.CreateEntityByName<CParticleSystem>("particle_smokegrenade");
-            smokeEffect.Teleport(pos, new QAngle(), new Vector(0, 0, 0));
-            smokeEffect.DispatchSpawn();*/
         }
-
-        public static MemoryFunctionVoid<CBaseEntity, string, int, float, float> CBaseEntity_EmitSoundParamsFunc = new(
-            Environment.OSVersion.Platform == PlatformID.Unix
-            ? @"\x48\xB8\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x55\x48\x89\xE5\x41\x55\x41\x54\x49\x89\xFC\x53\x48\x89\xF3"
-            : @"\x48\x8B\xC4\x48\x89\x58\x10\x48\x89\x70\x18\x55\x57\x41\x56\x48\x8D\xA8\x08\xFF\xFF\xFF"
-            );
 
         public static void EmitSound(this CBaseEntity entity, string soundpath, int pitch = 1, float volume = 1, float delay = 0)
         {
-            CBaseEntity_EmitSoundParamsFunc?.Invoke(entity, soundpath, pitch, volume, delay);
+            Memory.CBaseEntity_EmitSoundParamsFunc?.Invoke(entity, soundpath, pitch, volume, delay);
         }
-
-        public static MemoryFunctionVoid<CBaseEntity, CBaseEntity, CUtlStringToken, matrix3x4_t> CBaseEntity_SetParent = new(
-        Environment.OSVersion.Platform == PlatformID.Unix
-            ? @"\x48\x85\xF6\x74\x2A\x48\x8B\x47\x10\xF6\x40\x31\x02\x75\x2A\x48\x8B\x46\x10\xF6\x40\x31\x02\x75\x2A\xB8\x2A\x2A\x2A\x2A"
-            : @"\x4D\x8B\xD9\x48\x85\xD2\x74\x2A"
-        );
 
         public static void SetParent(this CBaseEntity childEntity, CBaseEntity parentEntity)
         {
             if (!childEntity.IsValid || !parentEntity.IsValid) return;
 
             var origin = new Vector(childEntity.AbsOrigin!.X, childEntity.AbsOrigin!.Y, childEntity.AbsOrigin!.Z);
-            CBaseEntity_SetParent.Invoke(childEntity, parentEntity, null, null);
+            Memory.CBaseEntity_SetParent.Invoke(childEntity, parentEntity, null, null);
             // If not teleported, the childrenEntity will not follow the parentEntity correctly.
             childEntity.Teleport(origin, new QAngle(IntPtr.Zero), new Vector(IntPtr.Zero));
         }
@@ -124,18 +106,6 @@ namespace WarcraftPlugin.Helpers
 
             childEntity.Teleport(offset, rotation, new Vector(IntPtr.Zero));
             childEntity.SetParent(parentEntity);
-        }
-
-        public static MemoryFunctionWithReturn<nint, nint, nint, nint, nint, nint, int, CSmokeGrenadeProjectile> CSmokeGrenadeProjectile_CreateFunc = new(
-                Environment.OSVersion.Platform == PlatformID.Unix
-                    ? @"\x55\x4C\x89\xC1\x48\x89\xE5\x41\x57\x41\x56\x49\x89\xD6"
-                    : @"\x48\x89\x5C\x24\x2A\x48\x89\x6C\x24\x2A\x48\x89\x74\x24\x2A\x57\x41\x56\x41\x57\x48\x83\xEC\x50\x4C\x8B\xB4\x24"
-        );
-
-        public static void DoDamage(this CCSPlayerController player, int damage) //TODO: Merge with TakeDamage
-        {
-            var victimHealth = player.PlayerPawn.Value.Health - damage;
-            player.SetHp(victimHealth);
         }
 
         public static void SetHp(this CCSPlayerController controller, int health = 100)
@@ -244,38 +214,6 @@ namespace WarcraftPlugin.Helpers
             return velocityVector;
         }
 
-        [StructLayout(LayoutKind.Explicit)]
-        public struct CAttackerInfo
-        {
-            public CAttackerInfo(CEntityInstance attacker)
-            {
-                NeedInit = false;
-                IsWorld = true;
-                Attacker = attacker.EntityHandle.Raw;
-                if (attacker.DesignerName != "cs_player_controller") return;
-
-                var controller = attacker.As<CCSPlayerController>();
-                IsWorld = false;
-                IsPawn = true;
-                AttackerUserId = (ushort)(controller.UserId ?? 0xFFFF);
-                TeamNum = controller.TeamNum;
-                TeamChecked = controller.TeamNum;
-            }
-
-            [FieldOffset(0x0)] public bool NeedInit = true;
-            [FieldOffset(0x1)] public bool IsPawn = false;
-            [FieldOffset(0x2)] public bool IsWorld = false;
-
-            [FieldOffset(0x4)]
-            public UInt32 Attacker;
-
-            [FieldOffset(0x8)]
-            public ushort AttackerUserId;
-
-            [FieldOffset(0x0C)] public int TeamChecked = -1;
-            [FieldOffset(0x10)] public int TeamNum = -1;
-        }
-
         public static void TakeDamage(this CCSPlayerController player, float damage, CCSPlayerController attacker, CCSPlayerController inflictor = null)
         {
             var size = Schema.GetClassSize("CTakeDamageInfo");
@@ -285,7 +223,7 @@ namespace WarcraftPlugin.Helpers
                 Marshal.WriteByte(ptr, i, 0);
 
             var damageInfo = new CTakeDamageInfo(ptr);
-            var attackerInfo = new CAttackerInfo(player);
+            var attackerInfo = new Struct.CAttackerInfo(player);
 
             Marshal.StructureToPtr(attackerInfo, new IntPtr(ptr.ToInt64() + 0x80), false);
 
@@ -301,7 +239,7 @@ namespace WarcraftPlugin.Helpers
 
         public static void DropWeaponByDesignerName(this CCSPlayerController player, string weaponName)
         {
-            var matchedWeapon = player.PlayerPawn.Value.WeaponServices.MyWeapons
+            var matchedWeapon = player.PlayerPawn.Value.WeaponServices.MyWeapons.ToList()
                 .Where(x => x.Value.DesignerName == weaponName).FirstOrDefault();
 
             if (matchedWeapon != null && matchedWeapon.IsValid)
@@ -309,15 +247,6 @@ namespace WarcraftPlugin.Helpers
                 player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Raw = matchedWeapon.Raw;
                 player.DropActiveWeapon();
             }
-        }
-
-        public static bool IsPlayerInSpottedByMask(Span<uint> spottedByMask, int playerId)
-        {
-            int maskIndex = playerId >> 5; // Bitwise shift instead of division by 32
-            int bitPosition = playerId & 31; // Bitwise AND instead of modulo 32
-
-            // Combined single check with bitwise operation
-            return (maskIndex < spottedByMask.Length) && ((spottedByMask[maskIndex] & (1u << bitPosition)) != 0);
         }
 
         public static void RemoveIfValid(this CBaseEntity obj)
@@ -345,7 +274,6 @@ namespace WarcraftPlugin.Helpers
 
             return Color.FromArgb(color.A, r, g, b);
         }
-
 
         public static string ToHex(this Color color)
         {

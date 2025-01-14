@@ -17,14 +17,9 @@ namespace WarcraftPlugin.Classes
 {
     public class Shapeshifter : WarcraftClass
     {
-        public override string InternalName => "shapeshifter";
         public override string DisplayName => "Shapeshifter";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_phoenix/tm_phoenix_varianti.vmdl",
-            //CTModel = "characters/models/ctm_swat/ctm_swat_variantj.vmdl"
-        };
         public override Color DefaultColor => Color.Pink;
+        public override List<string> PreloadResources => Props;
 
         private bool _isShapeshifted = false;
         private bool _isDisguised = false;
@@ -311,7 +306,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public static readonly List<string> Props =
+        private static readonly List<string> Props =
         [
             "models/props/de_dust/dust_aid_crate_56.vmdl",
             "models/props/de_dust/dust_food_crates_56.vmdl",
