@@ -14,28 +14,36 @@ namespace WarcraftPlugin.Models
     {
         public string InternalName { get; }
         public string DisplayName { get; }
-        public string Description { get; }
+
+        public string GetDescription(int abilityLevel);
     }
 
     public class WarcraftAbility : IWarcraftAbility
     {
-        public WarcraftAbility(string displayName, string description)
+        private readonly Func<int, string> _descriptionGetter;
+
+        public WarcraftAbility(string internalName, string displayName, Func<int, string> descriptionGetter)
         {
+            InternalName = internalName;
             DisplayName = displayName;
-            Description = description;
+            _descriptionGetter = descriptionGetter;
         }
 
-        public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
+        public string InternalName { get; }
         public string DisplayName { get; }
-        public string Description { get; }
+
+        public string GetDescription(int abilityLevel)
+        {
+            return _descriptionGetter.Invoke(abilityLevel);
+        }
     }
 
     public class WarcraftCooldownAbility : WarcraftAbility
     {
         public float Cooldown { get; set; } = 0f;
 
-        public WarcraftCooldownAbility(string displayName, string description,
-            float cooldown) : base(displayName, description)
+        public WarcraftCooldownAbility(string internalName, string displayName, Func<int, string> descriptionGetter,
+            float cooldown) : base(internalName, displayName, descriptionGetter)
         {
             Cooldown = cooldown;
         }
@@ -43,20 +51,20 @@ namespace WarcraftPlugin.Models
 
     public abstract class WarcraftClass
     {
-        public string InternalName => DisplayName.Replace(' ','_').ToLowerInvariant();
+        public string InternalName => DisplayName.ToLowerInvariant();
         public abstract string DisplayName { get; }
         public virtual DefaultClassModel DefaultModel { get; }
         public abstract Color DefaultColor { get; }
         public WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
 
-        public abstract List<IWarcraftAbility> Abilities { get; }
+        public readonly List<IWarcraftAbility> Abilities = [];
         private readonly Dictionary<string, Action<GameEvent>> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
 
         public float LastHurtOther { get; set; } = 0;
 
-        public abstract void Register();
+        public virtual void Register() { }
 
         public virtual List<string> PreloadResources { get; } = [];
 
@@ -101,6 +109,11 @@ namespace WarcraftPlugin.Models
         public IWarcraftAbility GetAbility(int index)
         {
             return Abilities[index];
+        }
+
+        protected void AddAbility(IWarcraftAbility ability)
+        {
+            Abilities.Add(ability);
         }
 
         protected void HookEvent<T>(Action<T> handler) where T : GameEvent
@@ -168,7 +181,7 @@ namespace WarcraftPlugin.Models
             WarcraftPlugin.Instance.EffectManager.AddEffect(effect);
         }
 
-        public void ResetCooldowns()
+        internal void ResetCooldowns()
         {
             CooldownManager.ResetCooldowns(WarcraftPlayer);
         }

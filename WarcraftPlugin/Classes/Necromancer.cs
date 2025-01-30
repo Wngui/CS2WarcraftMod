@@ -20,6 +20,14 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Necromancer";
         public override Color DefaultColor => Color.Black;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Life Drain", "Harness dark magic to siphon health from foes and restore your own vitality."),
+            new WarcraftAbility("Poison Cloud", "Infuses smoke grenades with potent toxins, damaging enemies over time."),
+            new WarcraftAbility("Splintered Soul", "Chance to cheat death with a fraction of vitality."),
+            new WarcraftCooldownAbility("Raise Dead", "Summon a horde of undead chicken to fight for you.", 50f)
+        ];
+
         private readonly List<Zombie> _zombies = new();
         private const int _maxZombies = 10;
         private bool _hasCheatedDeath = true;
@@ -27,19 +35,6 @@ namespace WarcraftPlugin.Classes
 
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("life_drain", "Life Drain",
-                i => $"Harness dark magic to siphon health from foes and restore your own vitality."));
-
-            AddAbility(new WarcraftAbility("poison_cloud", "Poison Cloud",
-                i => $"Infuses smoke grenades with potent toxins, damaging enemies over time."));
-
-            AddAbility(new WarcraftAbility("splintered_soul", "Splintered Soul",
-                i => $"Chance to cheat death with a fraction of vitality."));
-
-            AddAbility(new WarcraftCooldownAbility("raise_dead", "Raise Dead",
-                i => $"Summon a horde of undead chicken to fight for you.",
-                50f));
-
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
             HookEvent<EventRoundEnd>(RoundEnd);
             HookEvent<EventRoundStart>(RoundStart);

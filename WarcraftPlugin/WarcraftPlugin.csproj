@@ -5,6 +5,15 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>WarcraftPlugin</RootNamespace>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Warcraft CounterstrikeSharp Plugin</Title>
+    <Authors>WnGui</Authors>
+    <Description>An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system</Description>
+    <RepositoryUrl>https://github.com/Wngui/CS2WarcraftMod</RepositoryUrl>
+    <PackageIcon>wc-icon.png</PackageIcon>
+    <PackageTags>warcraft;cs2;counterstrike;sharp</PackageTags>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -14,12 +23,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CounterStrikeSharp.API" Version="1.0.247" />
-    <PackageReference Include="Dapper" Version="2.0.78" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="geometry3Sharp" Version="1.0.324" />
     <PackageReference Include="MIConvexHull" Version="1.1.19.1019" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +37,14 @@
   <ItemGroup>
     <None Update="lang\en.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\nuget\Readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="Resources\nuget\wc-icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 	<Import Project=".\PostBuild.targets" Condition="Exists('.\PostBuild.targets')" />

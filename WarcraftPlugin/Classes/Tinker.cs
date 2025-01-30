@@ -27,21 +27,16 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Tinker";
         public override Color DefaultColor => Color.Teal;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Attack Drone", "Deploy a gun drone that attacks nearby enemies."),
+            new WarcraftAbility("Spare Parts", "Chance to not lose ammo when firing"),
+            new WarcraftAbility("Spring Trap", "Deploy a trap which launches players into the air."),
+            new WarcraftCooldownAbility("Drone Swarm", "Summon a swarm of attack drones that damage all nearby enemies.", 50f)
+        ];
+
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("attack_drone", "Attack Drone",
-                i => $"Deploy a gun drone that attacks nearby enemies."));
-
-            AddAbility(new WarcraftAbility("spare_parts", "Spare Parts",
-                i => $"Chance to not lose ammo when firing "));
-
-            AddAbility(new WarcraftAbility("spring_trap", "Spring Trap",
-                i => $"Deploy a trap which launches players into the air."));
-
-            AddAbility(new WarcraftCooldownAbility("drone_swarm", "Drone Swarm",
-                i => $"Summon a swarm of attack drones that damage all nearby enemies.",
-                50f));
-
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
             HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventWeaponFire>(PlayerShoot);
@@ -239,13 +234,13 @@ namespace WarcraftPlugin.Classes
         private void Ultimate()
         {
             //Ultimate effect
-            var ultEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z:40), "particles/ui/ui_experience_award_innerpoint.vpcf");
+            var ultEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/ui/ui_experience_award_innerpoint.vpcf");
             ultEffect.SetParent(Player.PlayerPawn.Value);
 
             ActivateDrones(_droneUltimateAmount);
 
             // Define the offset for each drone's angle based on its index
-            float angleOffsetPerDrone = (2*(float)Math.PI) / _drones.Count;
+            float angleOffsetPerDrone = (2 * (float)Math.PI) / _drones.Count;
 
             // Initialize the starting angle for each drone
             for (int i = 0; i < _drones.Count; i++)
@@ -278,7 +273,8 @@ namespace WarcraftPlugin.Classes
             }, TimerFlags.REPEAT);
 
             // End ultimate
-            WarcraftPlugin.Instance.AddTimer(_ultimateTime, () => {
+            WarcraftPlugin.Instance.AddTimer(_ultimateTime, () =>
+            {
                 _ultimateTimer?.Kill();
                 ActivateDrones(1);
             });

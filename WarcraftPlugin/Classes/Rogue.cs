@@ -8,6 +8,7 @@ using WarcraftPlugin.Models;
 using CounterStrikeSharp.API;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events;
+using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
@@ -18,21 +19,16 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Rogue";
         public override Color DefaultColor => Color.DarkViolet;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Stealth", "Become partially invisible for 1/2/3/4/5 seconds, when killing someone."),
+            new WarcraftAbility("Sneak Attack", "When you hit an enemy in the back, you do an aditional 5/10/15/20/25 damage."),
+            new WarcraftAbility("Blade Dance", "Increases movement speed and damage with knives."),
+            new WarcraftCooldownAbility("Smokebomb", "When nearing death, you will automatically drop a smokebomb, letting you cheat death.", 50f)
+        ];
+
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("stealth", "Stealth",
-                i => $"Become partially invisible for 1/2/3/4/5 seconds, when killing someone."));
-
-            AddAbility(new WarcraftAbility("sneak_attack", "Sneak Attack",
-                i => $"When you hit an enemy in the back, you do an aditional 5/10/15/20/25 damage."));
-
-            AddAbility(new WarcraftAbility("blade_dance", "Blade Dance",
-                i => $"Increases movement speed and damage with knives."));
-
-            AddAbility(new WarcraftCooldownAbility("smokebomb", "Smokebomb",
-                i => $"When nearing death, you will automatically drop a smokebomb, letting you cheat death.",
-                50f));
-
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
             HookEvent<EventPlayerHurt>(PlayerHurt);
             HookEvent<EventPlayerKilledOther>(PlayerKilledOther);

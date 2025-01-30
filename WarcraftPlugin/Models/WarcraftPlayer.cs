@@ -45,7 +45,7 @@ namespace WarcraftPlugin.Models
             _abilityLevels[2] = dbRace.Ability3Level;
             _abilityLevels[3] = dbRace.Ability4Level;
 
-            _class = WarcraftPlugin.Instance.classManager.InstantiateClass(className);
+            _class = WarcraftPlugin.Instance.classManager.InstantiateClassByName(className);
             _class.WarcraftPlayer = this;
             _class.Player = Player;
         }

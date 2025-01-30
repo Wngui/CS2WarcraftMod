@@ -9,6 +9,7 @@ using WarcraftPlugin.Models;
 using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events;
+using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
@@ -22,24 +23,19 @@ namespace WarcraftPlugin.Classes
         };
         public override Color DefaultColor => Color.Brown;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Carnage", "Increase damage dealt with shotguns."),
+            new WarcraftAbility("Battle-Hardened", "Increase your health by 20/40/60/80/100."),
+            new WarcraftAbility("Throwing Axe", "Chance to hurl an exploding throwing axe when firing."),
+            new WarcraftCooldownAbility("Bloodlust", "Grants infinite ammo, movement speed & health regeneration.", 50f)
+        ];
+
         private readonly int _battleHardenedHealthMultiplier = 20;
         private readonly float _bloodlustLength = 10;
 
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("carnage", "Carnage",
-                i => $"Increase damage dealt with shotguns."));
-
-            AddAbility(new WarcraftAbility("battle_hardened", "Battle-Hardened",
-                i => $"Increase your health by 20/40/60/80/100."));
-
-            AddAbility(new WarcraftAbility("throwing_axe", "Throwing Axe",
-                i => $"Chance to hurl an exploding throwing axe when firing."));
-
-            AddAbility(new WarcraftCooldownAbility("bloodlust", "Bloodlust",
-                i => $"Grants infinite ammo, movement speed & health regeneration.",
-                50f));
-
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
             HookEvent<EventWeaponFire>(PlayerShoot);

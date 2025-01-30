@@ -2,7 +2,7 @@
 
 namespace WarcraftPlugin.Events
 {
-    internal class EventPlayerHurtOther : EventPlayerHurt
+    public class EventPlayerHurtOther : EventPlayerHurt
     {
         public EventPlayerHurtOther(nint pointer) : base(pointer)
         {

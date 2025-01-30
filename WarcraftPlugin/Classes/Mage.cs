@@ -10,6 +10,7 @@ using WarcraftPlugin.Models;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events;
+using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
@@ -18,24 +19,18 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Mage";
         public override Color DefaultColor => Color.Blue;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Fireball", "Infuses molotovs with fire magic, causing a huge explosion on impact."),
+            new WarcraftAbility("Ice Beam", "Chance to freeze enemies in place."),
+            new WarcraftAbility("Mana Shield", "Passive magical shield, which regenerates armor over time."),
+            new WarcraftCooldownAbility("Teleport", "When you press your ultimate key, you will teleport to the spot you're aiming.", 20f)
+        ];
+
         private Timer _manaShieldTimer = null;
 
         public override void Register()
         {
-
-            AddAbility(new WarcraftAbility("fireball", "Fireball",
-                i => $"Infuses molotovs with fire magic, causing a huge explosion on impact."));
-
-            AddAbility(new WarcraftAbility("ice_beam", "Ice beam",
-                i => $"Chance to freeze enemies in place."));
-
-            AddAbility(new WarcraftAbility("mana_shield", "Mana Shield",
-                i => $"Passive magical shield, which regenerates armor over time."));
-
-            AddAbility(new WarcraftCooldownAbility("teleport", "Teleport",
-                i => $"When you press your ultimate key, you will teleport to the spot you're aiming.",
-                20f));
-
             HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
             HookEvent<EventMolotovDetonate>(MolotovDetonate);

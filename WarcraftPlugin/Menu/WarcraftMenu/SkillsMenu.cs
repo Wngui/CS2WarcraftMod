@@ -55,7 +55,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     }
                 }
 
-                var subDisplayString = $"<font color='#D3D3D3' class='{FontSizes.FontSizeS}'>{ability.GetDescription(i)}</font>";
+                var subDisplayString = $"<font color='#D3D3D3' class='{FontSizes.FontSizeS}'>{ability.Description}</font>";
 
                 var abilityIndex = i;
                 skillsMenu.Add(displayString, subDisplayString, (p, opt) =>

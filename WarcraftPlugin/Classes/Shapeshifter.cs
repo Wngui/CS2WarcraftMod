@@ -29,21 +29,16 @@ namespace WarcraftPlugin.Classes
         private string _initialPlayerModel;
         private readonly List<string> _weaponList = [];
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Adaptive Disguise", "Chance to spawn with an enemy disguise, revealed upon attacking."),
+            new WarcraftAbility("Doppelganger", "Create a temporary inanimate clone of yourself, using a decoy grenade."),
+            new WarcraftAbility("Imposter syndrom", "Chance to be notified when revealed by enemies on radar."),
+            new WarcraftCooldownAbility("Morphling", "Transform into an unassuming object.", 20f)
+        ];
+
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("adaptive_disguise", "Adaptive Disguise",
-                i => $"Chance to spawn with an enemy disguise, revealed upon attacking."));
-
-            AddAbility(new WarcraftAbility("doppelganger", "Doppelganger",
-                i => $"Create a temporary inanimate clone of yourself, using a decoy grenade."));
-
-            AddAbility(new WarcraftAbility("imposter_syndrom", "Imposter syndrom",
-                i => $"Chance to be notified when revealed by enemies on radar."));
-
-            AddAbility(new WarcraftCooldownAbility("morphling", "Morphling",
-                i => $"Transform into an unassuming object.",
-                20f));
-
             HookAbility(3, Ultimate);
 
             HookEvent<EventWeaponFire>(PlayerShoot);

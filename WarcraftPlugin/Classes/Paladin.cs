@@ -8,6 +8,7 @@ using System.Linq;
 using WarcraftPlugin.Models;
 using System.Drawing;
 using WarcraftPlugin.Events;
+using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
@@ -19,20 +20,16 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Paladin";
         public override Color DefaultColor => Color.Yellow;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Healing Aura", "Emit an aura that gradually heals nearby allies over time."),
+            new WarcraftAbility("Holy Shield", "Surround yourself with a protective barrier that absorbs incoming damage."),
+            new WarcraftAbility("Smite", "Infuse your attacks with divine energy, potentially stripping enemy armor."),
+            new WarcraftAbility("Divine Resurrection", "Instantly revive a random fallen ally.")
+        ];
+
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("healing_aura", "Healing Aura",
-                i => $"Emit an aura that gradually heals nearby allies over time."));
-
-            AddAbility(new WarcraftAbility("holy_shield", "Holy Shield",
-                i => $"Surround yourself with a protective barrier that absorbs incoming damage.")); //could be reworked to negate some damage instead (fits more with smite&undead)
-
-            AddAbility(new WarcraftAbility("smite", "Smite",
-                i => $"Infuse your attacks with divine energy, potentially stripping enemy armor."));
-
-            AddAbility(new WarcraftAbility("divine_resurrection", "Divine Resurrection",
-                i => $"Instantly revive a random fallen ally."));
-
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
             HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);

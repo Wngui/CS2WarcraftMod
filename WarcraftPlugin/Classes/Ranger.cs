@@ -13,6 +13,7 @@ using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events;
+using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
@@ -26,21 +27,16 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Ranger";
         public override Color DefaultColor => Color.Green;
 
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Light footed", "Nimbly perform a dash in midair, by pressing jump"),
+            new WarcraftAbility("Ensnare trap", "Place a trap by throwing a decoy"),
+            new WarcraftAbility("Marksman", "Additional damage with scoped weapons"),
+            new WarcraftCooldownAbility("Arrowstorm", "Call down a deadly volley of arrows using the ultimate key", 50f)
+        ];
+
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("light_footed", "Light footed",
-                i => $"Nimbly perform a dash in midair, by pressing jump"));
-
-            AddAbility(new WarcraftAbility("ensnare_trap", "Ensnare trap",
-                i => $"Place a trap by throwing a decoy"));
-
-            AddAbility(new WarcraftAbility("marksman", "Marksman",
-                i => $"Additional damage with scoped weapons"));
-
-            AddAbility(new WarcraftCooldownAbility("arrowstorm", "Arrowstorm",
-                i => $"Call down a deadly volley of arrows using the ultimate key",
-                50f));
-
             HookEvent<EventPlayerJump>(PlayerJump);
             HookEvent<EventDecoyStarted>(DecoyStart);
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);

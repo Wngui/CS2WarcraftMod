@@ -2,7 +2,7 @@
 
 namespace WarcraftPlugin.Events
 {
-    internal class EventPlayerKilledOther : EventPlayerDeath
+    public class EventPlayerKilledOther : EventPlayerDeath
     {
         public EventPlayerKilledOther(nint pointer) : base(pointer)
         {

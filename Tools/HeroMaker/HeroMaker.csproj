@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WarcraftPlugin" Version="1.0.0" />
+  </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Debug'">
+		<Exec Command="xcopy &quot;$(ProjectDir)*.cs&quot; &quot;C:\cs2-server\cs2-ds\game\csgo\addons\counterstrikesharp\plugins\WarcraftPlugin\CustomHeroes&quot; /Y" />
+	</Target>
+
+</Project>
