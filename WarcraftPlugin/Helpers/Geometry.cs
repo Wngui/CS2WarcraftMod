@@ -78,8 +78,9 @@ namespace WarcraftPlugin.Helpers
             }
         }
 
-        public static Vector GetRandomPoint(this Box3d box, Random random)
+        public static Vector GetRandomPoint(this Box3d box)
         {
+            var random = Random.Shared;
             // Generate random coordinates within the range [-1, 1]
             double x = (2 * random.NextDouble() - 1) * box.Extent.x;
             double y = (2 * random.NextDouble() - 1) * box.Extent.y;
@@ -91,7 +92,7 @@ namespace WarcraftPlugin.Helpers
             return randomPoint.ToVector();
         }
 
-        public static Box3d ToBox3d(this CCollisionProperty collision, Vector worldPosition)
+        public static Box3d ToBox(this CCollisionProperty collision, Vector worldPosition)
         {
             Vector worldCenter = worldPosition.With().Add(z: collision.Mins.Z + (collision.Maxs.Z - collision.Mins.Z) / 2);
             return CreateBoxAroundPoint(worldCenter, collision.Maxs.X * 2, collision.Maxs.Y * 2, collision.Maxs.Z);

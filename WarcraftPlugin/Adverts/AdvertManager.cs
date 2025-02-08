@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Adverts
 {
-    public class AdvertManager
+    internal class AdvertManager
     {
         private readonly float _interval = 180f;
         private int _advertIndex = 0;
 
-        public void Initialize()
+        internal void Initialize()
         {
             WarcraftPlugin.Instance.AddTimer(_interval, AdvertTick, TimerFlags.REPEAT);
         }

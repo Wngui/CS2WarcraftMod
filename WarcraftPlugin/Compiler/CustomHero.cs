@@ -11,9 +11,9 @@ using System.Runtime.Loader;
 
 namespace WarcraftPlugin.Compiler
 {
-    public class CustomHero
+    internal class CustomHero
     {
-        public static Assembly CompileAndLoadAssemblies(string[] heroFiles)
+        internal static Assembly CompileAndLoadAssemblies(string[] heroFiles)
         {
             // Parse the C# code into syntax trees
             var syntaxTrees = new List<SyntaxTree>();
@@ -111,7 +111,7 @@ namespace WarcraftPlugin.Compiler
             return assembly;
         }
 
-        public static void UnloadAssembly()
+        internal static void UnloadAssembly()
         {
             var previousAssembly = AppDomain.CurrentDomain.GetAssemblies()
                 .FirstOrDefault(a => a.GetName().Name.Contains("W3CustomHeroes"));
@@ -119,9 +119,9 @@ namespace WarcraftPlugin.Compiler
             AssemblyLoadContext.GetLoadContext(previousAssembly)?.Unload();
         }
 
-        public class CustomLoadContext : AssemblyLoadContext
+        internal class CustomLoadContext : AssemblyLoadContext
         {
-            public CustomLoadContext() : base(isCollectible: true) { }
+            internal CustomLoadContext() : base(isCollectible: true) { }
 
             protected override Assembly Load(AssemblyName assemblyName)
             {

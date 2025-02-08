@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Barbarian : WarcraftClass
+    internal class Barbarian : WarcraftClass
     {
         public override string DisplayName => "Barbarian";
         public override DefaultClassModel DefaultModel => new()
@@ -117,11 +117,11 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    public class ThrowingAxeEffect : WarcraftEffect
+    internal class ThrowingAxeEffect : WarcraftEffect
     {
         private readonly CHEGrenadeProjectile _axe;
 
-        public ThrowingAxeEffect(CCSPlayerController owner, CHEGrenadeProjectile axe, float duration) : base(owner, duration) { _axe = axe; }
+        internal ThrowingAxeEffect(CCSPlayerController owner, CHEGrenadeProjectile axe, float duration) : base(owner, duration) { _axe = axe; }
 
         public override void OnStart()
         {
@@ -152,9 +152,9 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    public class BloodlustEffect : WarcraftEffect
+    internal class BloodlustEffect : WarcraftEffect
     {
-        public BloodlustEffect(CCSPlayerController owner, float duration) : base(owner, duration) { }
+        internal BloodlustEffect(CCSPlayerController owner, float duration) : base(owner, duration) { }
 
         private const float _maxSize = 1.1f;
 

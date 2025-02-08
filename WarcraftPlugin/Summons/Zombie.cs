@@ -7,7 +7,7 @@ using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Summons
 {
-    public class Zombie : IDisposable
+    internal class Zombie : IDisposable
     {
         private const int _interestMax = 6;
         private int InterestScore = _interestMax;
@@ -16,15 +16,15 @@ namespace WarcraftPlugin.Summons
         private readonly int _damage = 10;
         private readonly int _maxHealth = 100;
 
-        public int FavouritePosition { get; set; } = 1;
-        public CChicken Entity { get; set; }
-        public CCSPlayerController Owner { get; }
-        public bool IsFollowingLeader { get; private set; }
-        public CCSPlayerController Target { get; set; }
-        public double LastLeapTick { get; private set; } = 0;
-        public double LastAttackTick { get; private set; } = 0;
+        internal int FavouritePosition { get; set; } = 1;
+        internal CChicken Entity { get; set; }
+        internal CCSPlayerController Owner { get; }
+        internal bool IsFollowingLeader { get; private set; }
+        internal CCSPlayerController Target { get; set; }
+        internal double LastLeapTick { get; private set; } = 0;
+        internal double LastAttackTick { get; private set; } = 0;
 
-        public Zombie(CCSPlayerController owner)
+        internal Zombie(CCSPlayerController owner)
         {
             Owner = owner;
             Entity = Utilities.CreateEntityByName<CChicken>("chicken");
@@ -41,7 +41,7 @@ namespace WarcraftPlugin.Summons
             FollowLeader();
         }
 
-        public void Update()
+        internal void Update()
         {
             if (Entity == null || !Entity.IsValid) return;
             if (Owner == null || !Owner.IsValid || !Owner.PlayerPawn.IsValid || !Owner.PawnIsAlive) Kill();
@@ -113,7 +113,7 @@ namespace WarcraftPlugin.Summons
 
         private void Attack()
         {
-            var playerCollison = Target.PlayerPawn.Value.Collision.ToBox3d(Target.PlayerPawn.Value.AbsOrigin.With().Add(z: -60));
+            var playerCollison = Target.PlayerPawn.Value.Collision.ToBox(Target.PlayerPawn.Value.AbsOrigin.With().Add(z: -60));
 
             //Check if zombie is inside targets collision box
             if (playerCollison.Contains(Entity.AbsOrigin.ToVector3d()))
@@ -128,13 +128,13 @@ namespace WarcraftPlugin.Summons
             }
         }
 
-        public void Kill()
+        internal void Kill()
         {
             if (Entity == null || !Entity.IsValid) return;
             Entity.RemoveIfValid();
         }
 
-        public void SetEnemy(CCSPlayerController enemy)
+        internal void SetEnemy(CCSPlayerController enemy)
         {
             if (!enemy.PlayerPawn.IsValid || !enemy.PawnIsAlive) return;
 

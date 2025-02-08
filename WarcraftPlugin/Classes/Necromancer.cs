@@ -15,7 +15,7 @@ using WarcraftPlugin.Summons;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Necromancer : WarcraftClass
+    internal class Necromancer : WarcraftClass
     {
         public override string DisplayName => "Necromancer";
         public override Color DefaultColor => Color.Black;
@@ -187,14 +187,14 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public class PoisonCloud : WarcraftEffect
+        internal class PoisonCloud : WarcraftEffect
         {
             private readonly Box3d _hurtBox;
 
             readonly int _cloudHeight = 100;
             readonly int _cloudWidth = 260;
 
-            public PoisonCloud(CCSPlayerController owner, Vector cloudPos, float duration)
+            internal PoisonCloud(CCSPlayerController owner, Vector cloudPos, float duration)
             : base(owner, duration)
             {
                 var hurtBoxPoint = cloudPos.With(z: cloudPos.Z + _cloudHeight / 2);

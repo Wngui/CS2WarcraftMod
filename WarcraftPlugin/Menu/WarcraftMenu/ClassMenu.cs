@@ -9,9 +9,9 @@ using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu
 {
-    public static class ClassMenu
+    internal static class ClassMenu
     {
-        public static void Show(CCSPlayerController? player, List<DatabaseClassInformation> classInformations)
+        internal static void Show(CCSPlayerController? player, List<DatabaseClassInformation> classInformations)
         {
             var plugin = WarcraftPlugin.Instance;
 
@@ -90,7 +90,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
             MenuManager.OpenMainMenu(player, classMenu);
         }
 
-        public static Color TransitionToGold(float t)
+        internal static Color TransitionToGold(float t)
         {
             // Ensure t is clamped between 0 and 1
             t = Math.Clamp(t, 0.1f, 1.0f);
@@ -111,11 +111,11 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
     internal class WarcraftClassInformation
     {
-        public string DisplayName { get; set; }
-        public string InternalName { get; set; }
-        public int CurrentLevel { get; set; }
-        public float CurrentXp { get; set; }
-        public Color DefaultColor { get; internal set; }
+        internal string DisplayName { get; set; }
+        internal string InternalName { get; set; }
+        internal int CurrentLevel { get; set; }
+        internal float CurrentXp { get; set; }
+        internal Color DefaultColor { get; set; }
     }
 
 }

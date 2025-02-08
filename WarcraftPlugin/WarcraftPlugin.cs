@@ -18,7 +18,6 @@ using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
-using System.Runtime.Loader;
 
 namespace WarcraftPlugin
 {
@@ -26,13 +25,13 @@ namespace WarcraftPlugin
     {
         [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 2;
 
-        [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
-        [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = false;
+        [JsonPropertyName("DeactivatedClasses")] internal string[] DeactivatedClasses { get; set; } = [];
+        [JsonPropertyName("ShowCommandAdverts")] internal bool ShowCommandAdverts { get; set; } = false;
     }
 
-    public static class WarcraftPlayerExtensions
+    internal static class WarcraftPlayerExtensions
     {
-        public static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
+        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
         {
             return WarcraftPlugin.Instance.GetWcPlayer(player);
         }
@@ -52,22 +51,22 @@ namespace WarcraftPlugin
 
         private readonly Dictionary<IntPtr, WarcraftPlayer> WarcraftPlayers = [];
         private EventSystem _eventSystem;
-        public XpSystem XpSystem;
-        public ClassManager classManager;
-        public EffectManager EffectManager;
-        public CooldownManager CooldownManager;
-        public AdvertManager AdvertManager;
+        internal XpSystem XpSystem;
+        internal ClassManager classManager;
+        internal EffectManager EffectManager;
+        internal CooldownManager CooldownManager;
+        internal AdvertManager AdvertManager;
         private Database _database;
 
-        public int XpPerKill = 40;
-        public float XpHeadshotModifier = 0.15f;
-        public float XpKnifeModifier = 0.25f;
+        internal int XpPerKill = 40;
+        internal float XpHeadshotModifier = 0.15f;
+        internal float XpKnifeModifier = 0.25f;
 
-        public List<WarcraftPlayer> Players => WarcraftPlayers.Values.ToList();
+        internal List<WarcraftPlayer> Players => WarcraftPlayers.Values.ToList();
 
         public Config Config { get; set; } = null!;
 
-        public WarcraftPlayer GetWcPlayer(CCSPlayerController player)
+        internal WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
             if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
 
@@ -80,16 +79,16 @@ namespace WarcraftPlugin
             return WarcraftPlayers[player.Handle];
         }
 
-        public void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
+        internal void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
         {
             WarcraftPlayers[player.Handle] = wcPlayer;
         }
 
-        public static void RefreshPlayerName(WarcraftPlayer wcPlayer)
+        internal static void RefreshPlayerName(WarcraftPlayer wcPlayer)
         {
             if (wcPlayer == null || !wcPlayer.Player.IsValid) return;
 
-            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"\d+ \[\w+\] ", "");
+            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"^\d+ [[^]]+] ", "");
             wcPlayer.Player.PlayerName = $"{wcPlayer.currentLevel} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
             wcPlayer.Player.Clan = "";
             Utilities.SetStateChanged(wcPlayer.Player, "CBasePlayerController", "m_iszPlayerName");
@@ -151,9 +150,6 @@ namespace WarcraftPlugin
 
             RegisterListener<Listeners.OnServerPrecacheResources>((manifest) =>
             {
-                //Characters
-                manifest.AddResource("characters/models/nozb1/skeletons_player_model/skeleton_player_model_2/skeleton_nozb2_pm.vmdl");
-
                 //Models
                 manifest.AddResource("models/weapons/w_eq_beartrap_dropped.vmdl");
                 manifest.AddResource("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
@@ -303,7 +299,7 @@ namespace WarcraftPlugin
             Console.WriteLine("Player just connected: " + WarcraftPlayers[player.Handle]);
         }
 
-        public void ChangeClass(CCSPlayerController player, string classInternalName)
+        internal void ChangeClass(CCSPlayerController player, string classInternalName)
         {
             _database.SavePlayerToDatabase(player);
 

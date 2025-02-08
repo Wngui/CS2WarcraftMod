@@ -11,7 +11,7 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    public class ClassManager
+    internal class ClassManager
     {
         private  Dictionary<string, Type> _classes = [];
         private  Dictionary<string, WarcraftClass> _classObjects = [];
@@ -20,7 +20,7 @@ namespace WarcraftPlugin.Core
         private long _customHeroesFilesTimestamp;
         private bool _checkingCustomHeroFiles;
 
-        public void Initialize(string moduleDirectory)
+        internal void Initialize(string moduleDirectory)
         {
             RegisterDefaultClasses();
 
@@ -72,7 +72,7 @@ namespace WarcraftPlugin.Core
             _classObjects[heroClass.InternalName] = heroClass;
         }
 
-        public WarcraftClass InstantiateClassByName(string name)
+        internal WarcraftClass InstantiateClassByName(string name)
         {
             if (!_classes.ContainsKey(name)) throw new Exception("Race not found: " + name);
 
@@ -82,7 +82,7 @@ namespace WarcraftPlugin.Core
             return heroClass;
         }
 
-        public static WarcraftClass InstantiateClass(Type type)
+        internal static WarcraftClass InstantiateClass(Type type)
         {
             WarcraftClass heroClass;
             heroClass = (WarcraftClass)Activator.CreateInstance(type);
@@ -118,7 +118,7 @@ namespace WarcraftPlugin.Core
             }, TimerFlags.REPEAT);
         }
 
-        public WarcraftClass[] GetAllClasses()
+        internal WarcraftClass[] GetAllClasses()
         {
             return _classObjects.Values.ToArray();
         }

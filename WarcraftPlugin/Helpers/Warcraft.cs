@@ -7,11 +7,27 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API.Modules.Memory;
 using System.Runtime.InteropServices;
 using System.Linq;
+using g3;
+using System.Collections.Generic;
 
 namespace WarcraftPlugin.Helpers
 {
+    /// <summary>
+    /// The Warcraft class provides various utility methods for interacting with the game environment,
+    /// including drawing laser beams, spawning particles and explosions, manipulating player attributes,
+    /// and performing geometric calculations.
+    /// </summary>
     public static class Warcraft
     {
+        /// <summary>
+        /// Draws a laser beam between two points with specified color, duration, and width.
+        /// </summary>
+        /// <param name="startPos">The starting position of the laser beam.</param>
+        /// <param name="endPos">The ending position of the laser beam.</param>
+        /// <param name="color">The color of the laser beam. Defaults to red if not specified.</param>
+        /// <param name="duration">The duration for which the laser beam will be visible.</param>
+        /// <param name="width">The width of the laser beam.</param>
+        /// <returns>Returns the created CBeam object or null if creation failed.</returns>
         static public CBeam DrawLaserBetween(Vector startPos, Vector endPos, Color? color = null, float duration = 1, float width = 2)
         {
             CBeam beam = Utilities.CreateEntityByName<CBeam>("beam");
@@ -29,17 +45,29 @@ namespace WarcraftPlugin.Helpers
             return beam;
         }
 
+        /// <summary>
+        /// Gets the center origin of the player.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <returns>Returns a Vector representing the center origin of the player.</returns>
         public static Vector ToCenterOrigin(this CCSPlayerController player)
         {
             var pawnOrigin = player.PlayerPawn.Value.AbsOrigin;
             return new Vector(pawnOrigin.X, pawnOrigin.Y, pawnOrigin.Z + 44);
         }
 
-        public static CParticleSystem SpawnParticle(Vector pos, string effectName, float duration = 5)
+        /// <summary>
+        /// Spawns a particle system at the specified position with a given particle effect name and duration.
+        /// </summary>
+        /// <param name="pos">The position to spawn the particle system.</param>
+        /// <param name="particleName">The name of the particle effect.</param>
+        /// <param name="duration">The duration for which the particle system will be active.</param>
+        /// <returns>Returns the created CParticleSystem object or null if creation failed.</returns>
+        public static CParticleSystem SpawnParticle(Vector pos, string particleName, float duration = 5)
         {
             CParticleSystem particle = Utilities.CreateEntityByName<CParticleSystem>("info_particle_system");
             if (!particle.IsValid) return null;
-            particle.EffectName = effectName;
+            particle.EffectName = particleName;
             particle?.Teleport(pos, new QAngle(), new Vector());
             particle.StartActive = true;
             particle?.DispatchSpawn();
@@ -49,6 +77,13 @@ namespace WarcraftPlugin.Helpers
             return particle;
         }
 
+        /// <summary>
+        /// Spawns an explosion at the specified position with given damage and radius.
+        /// </summary>
+        /// <param name="pos">The position to spawn the explosion.</param>
+        /// <param name="damage">The damage caused by the explosion.</param>
+        /// <param name="radius">The radius of the explosion.</param>
+        /// <param name="attacker">The player controller who caused the explosion.</param>
         public static void SpawnExplosion(Vector pos, float damage, float radius, CCSPlayerController attacker = null)
         {
             var heProjectile = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
@@ -64,11 +99,18 @@ namespace WarcraftPlugin.Helpers
             heProjectile.DetonateTime = 0;
         }
 
+        /// <summary>
+        /// Spawns a smoke grenade at the specified position with given color.
+        /// </summary>
+        /// <param name="pos">The position to spawn the smoke grenade.</param>
+        /// <param name="attacker">The player pawn who caused the smoke grenade.</param>
+        /// <param name="color">The color of the smoke.</param>
+        /// <returns>Returns the created CSmokeGrenadeProjectile object.</returns>
         public static CSmokeGrenadeProjectile SpawnSmoke(Vector pos, CCSPlayerPawn attacker, Color color)
         {
             var smokeProjectile = Memory.CSmokeGrenadeProjectile_CreateFunc.Invoke(
                         pos.Handle,
-                        new Vector(0,0,0).Handle,
+                        new Vector(0, 0, 0).Handle,
                         new Vector(0, 0, 0).Handle,
                         new Vector(0, 0, 0).Handle,
                         nint.Zero,
@@ -82,11 +124,24 @@ namespace WarcraftPlugin.Helpers
             return smokeProjectile;
         }
 
+        /// <summary>
+        /// Emits a sound from the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity emitting the sound.</param>
+        /// <param name="soundpath">The path to the sound file.</param>
+        /// <param name="pitch">The pitch of the sound.</param>
+        /// <param name="volume">The volume of the sound.</param>
+        /// <param name="delay">The delay before the sound is played.</param>
         public static void EmitSound(this CBaseEntity entity, string soundpath, int pitch = 1, float volume = 1, float delay = 0)
         {
             Memory.CBaseEntity_EmitSoundParamsFunc?.Invoke(entity, soundpath, pitch, volume, delay);
         }
 
+        /// <summary>
+        /// Attaches a child entity to a specified parent entity.
+        /// </summary>
+        /// <param name="childEntity">The child entity.</param>
+        /// <param name="parentEntity">The parent entity.</param>
         public static void SetParent(this CBaseEntity childEntity, CBaseEntity parentEntity)
         {
             if (!childEntity.IsValid || !parentEntity.IsValid) return;
@@ -97,6 +152,13 @@ namespace WarcraftPlugin.Helpers
             childEntity.Teleport(origin, new QAngle(IntPtr.Zero), new Vector(IntPtr.Zero));
         }
 
+        /// <summary>
+        /// Attaches a child entity to a specified parent entity with an optional offset and rotation.
+        /// </summary>
+        /// <param name="childEntity">The child entity to set the parent for.</param>
+        /// <param name="parentEntity">The parent entity to set.</param>
+        /// <param name="offset">Optional offset from the parent's origin.</param>
+        /// <param name="rotation">Optional rotation relative to the parent's rotation.</param>
         public static void SetParent(this CBaseEntity childEntity, CBaseEntity parentEntity, Vector offset = null, QAngle rotation = null)
         {
             if (!childEntity.IsValid || !parentEntity.IsValid) return;
@@ -108,6 +170,11 @@ namespace WarcraftPlugin.Helpers
             childEntity.SetParent(parentEntity);
         }
 
+        /// <summary>
+        /// Sets the health of the player controller's pawn.
+        /// </summary>
+        /// <param name="controller">The player controller.</param>
+        /// <param name="health">The health value to set. Defaults to 100.</param>
         public static void SetHp(this CCSPlayerController controller, int health = 100)
         {
             var pawn = controller.PlayerPawn.Value;
@@ -118,6 +185,11 @@ namespace WarcraftPlugin.Helpers
             Utilities.SetStateChanged(pawn, "CBaseEntity", "m_iHealth");
         }
 
+        /// <summary>
+        /// Sets the armor value of the player controller's pawn.
+        /// </summary>
+        /// <param name="controller">The player controller.</param>
+        /// <param name="armor">The armor value to set. Defaults to 100.</param>
         public static void SetArmor(this CCSPlayerController controller, int armor = 100)
         {
             if (armor < 0 || !controller.PawnIsAlive || controller.PlayerPawn.Value == null) return;
@@ -127,6 +199,11 @@ namespace WarcraftPlugin.Helpers
             Utilities.SetStateChanged(controller.PlayerPawn.Value, "CCSPlayerPawn", "m_ArmorValue");
         }
 
+        /// <summary>
+        /// Sets the color of the entity.
+        /// </summary>
+        /// <param name="entity">The entity to set the color for.</param>
+        /// <param name="color">The color to set.</param>
         public static void SetColor(this CBaseModelEntity entity, Color color)
         {
             if (entity == null) return;
@@ -135,6 +212,11 @@ namespace WarcraftPlugin.Helpers
             Utilities.SetStateChanged(entity, "CBaseModelEntity", "m_clrRender");
         }
 
+        /// <summary>
+        /// Plays a local sound for the player.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="soundPath">The path to the sound file.</param>
         public static void PlayLocalSound(this CCSPlayerController player, string soundPath)
         {
             if (player == null || !player.IsValid) return;
@@ -142,6 +224,12 @@ namespace WarcraftPlugin.Helpers
             player.ExecuteClientCommand($"play {soundPath}");
         }
 
+        /// <summary>
+        /// Calculates the velocity vector away from the player based on the given speed.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="speed">The speed of the velocity.</param>
+        /// <returns>Returns a Vector representing the velocity away from the player.</returns>
         public static Vector CalculateVelocityAwayFromPlayer(this CCSPlayerController player, int speed)
         {
             var pawn = player.PlayerPawn.Value;
@@ -156,6 +244,12 @@ namespace WarcraftPlugin.Helpers
             return velocity;
         }
 
+        /// <summary>
+        /// Calculates the position in front of the player based on the given offset.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="offset">The offset vector.</param>
+        /// <returns>Returns a Vector representing the position in front of the player.</returns>
         public static Vector CalculatePositionInFront(this CCSPlayerController player, Vector offset)
         {
             var pawn = player.PlayerPawn.Value ?? throw new InvalidOperationException("PlayerPawn is not set.");
@@ -163,17 +257,21 @@ namespace WarcraftPlugin.Helpers
             return player.PlayerPawn.Value.CalculatePositionInFront(offset, yawAngle);
         }
 
+        /// <summary>
+        /// Calculates the position in front of the entity based on the given offset and yaw angle.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="offset">The offset vector.</param>
+        /// <param name="yawAngle">The yaw angle. If null, the entity's current yaw angle is used.</param>
+        /// <returns>Returns a Vector representing the position in front of the entity.</returns>
         public static Vector CalculatePositionInFront(this CBaseModelEntity entity, Vector offset, float? yawAngle = null)
         {
             yawAngle ??= entity.AbsRotation.Y;
-            // Extract yaw angle from player's rotation QAngle and convert to radians
             float yawAngleRadians = (float)(yawAngle * Math.PI / 180.0);
 
-            // Calculate offsets in x and y directions
             float offsetX = offset.X * MathF.Cos(yawAngleRadians) - offset.Y * MathF.Sin(yawAngleRadians);
             float offsetY = offset.X * MathF.Sin(yawAngleRadians) + offset.Y * MathF.Cos(yawAngleRadians);
 
-            // Calculate the new position in front of the player
             var positionInFront = new Vector
             {
                 X = entity.AbsOrigin.X + offsetX,
@@ -184,36 +282,42 @@ namespace WarcraftPlugin.Helpers
             return positionInFront;
         }
 
+        /// <summary>
+        /// Calculates the travel velocity vector from position A to position B over the given time duration.
+        /// </summary>
+        /// <param name="positionA">The starting position.</param>
+        /// <param name="positionB">The ending position.</param>
+        /// <param name="timeDuration">The time duration for the travel.</param>
+        /// <returns>Returns a Vector representing the travel velocity.</returns>
         public static Vector CalculateTravelVelocity(Vector positionA, Vector positionB, float timeDuration)
         {
-            // Step 1: Determine direction from A to B
             Vector directionVector = positionB - positionA;
-
-            // Step 2: Calculate distance between A and B
             float distance = directionVector.Length();
 
-            // Step 3: Choose a desired time duration for the movement
-            // Ensure that timeDuration is not zero to avoid division by zero
             if (timeDuration == 0)
             {
                 timeDuration = 1;
             }
 
-            // Step 4: Calculate velocity magnitude based on distance and time
             float velocityMagnitude = distance / timeDuration;
 
-            // Step 5: Normalize direction vector
             if (distance != 0)
             {
                 directionVector /= distance;
             }
 
-            // Step 6: Scale direction vector by velocity magnitude to get velocity vector
             Vector velocityVector = directionVector * velocityMagnitude;
 
             return velocityVector;
         }
 
+        /// <summary>
+        /// Inflicts damage to the player from an attacker, with an optional inflictor.
+        /// </summary>
+        /// <param name="player">The player receiving the damage.</param>
+        /// <param name="damage">The amount of damage to inflict.</param>
+        /// <param name="attacker">The player causing the damage.</param>
+        /// <param name="inflictor">The entity causing the damage, if different from the attacker.</param>
         public static void TakeDamage(this CCSPlayerController player, float damage, CCSPlayerController attacker, CCSPlayerController inflictor = null)
         {
             var size = Schema.GetClassSize("CTakeDamageInfo");
@@ -237,6 +341,11 @@ namespace WarcraftPlugin.Helpers
             Marshal.FreeHGlobal(ptr);
         }
 
+        /// <summary>
+        /// Drops the weapon with the specified designer name from the player's inventory.
+        /// </summary>
+        /// <param name="player">The player dropping the weapon.</param>
+        /// <param name="weaponName">The designer name of the weapon to drop.</param>
         public static void DropWeaponByDesignerName(this CCSPlayerController player, string weaponName)
         {
             var matchedWeapon = player.PlayerPawn.Value.WeaponServices.MyWeapons.ToList()
@@ -249,6 +358,10 @@ namespace WarcraftPlugin.Helpers
             }
         }
 
+        /// <summary>
+        /// Removes the entity if it is valid.
+        /// </summary>
+        /// <param name="obj">The entity to remove.</param>
         public static void RemoveIfValid(this CBaseEntity obj)
         {
             if (obj != null && obj.IsValid)
@@ -257,6 +370,12 @@ namespace WarcraftPlugin.Helpers
             }
         }
 
+        /// <summary>
+        /// Adjusts the brightness of the color by a specified factor.
+        /// </summary>
+        /// <param name="color">The original color.</param>
+        /// <param name="factor">The factor by which to adjust the brightness. 1 is the original color, less than 1 darkens the color, and greater than 1 brightens the color. Max factor is 2.</param>
+        /// <returns>Returns the adjusted color.</returns>
         public static Color AdjustBrightness(this Color color, float factor)
         {
             // Ensure the factor is between 0 (black) and 1 (original color) or higher
@@ -275,10 +394,132 @@ namespace WarcraftPlugin.Helpers
             return Color.FromArgb(color.A, r, g, b);
         }
 
+        /// <summary>
+        /// Converts a Color object to its hexadecimal string representation.
+        /// </summary>
+        /// <param name="color">The Color object to convert.</param>
+        /// <returns>A string representing the hexadecimal value of the color.</returns>
         public static string ToHex(this Color color)
         {
             // Format the color into hex (including alpha if needed)
             return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        /// <summary>
+        /// Rolls a dice to determine success based on a given chance.
+        /// </summary>
+        /// <param name="chanceOfSuccess">The chance of success (0-100).</param>
+        /// <returns>True if the roll is successful, otherwise false.</returns>
+        public static bool RollDice(int chanceOfSuccess)
+        {
+            var roll = Random.Shared.NextInt64(100);
+            return roll >= 100 - chanceOfSuccess;
+        }
+
+        /// <summary>
+        /// Rolls a dice to determine success based on ability level. The higher the level, the higher the chance of success.
+        /// </summary>
+        /// <param name="abilityLevel">The level of the ability.</param>
+        /// <param name="maxLevelChance">Chance of success at maximum level (default is 100).</param>
+        /// <returns>True if the roll is successful, otherwise false.</returns>
+        public static bool RollDice(int abilityLevel, int maxLevelChance = 100)
+        {
+            var chanceInterval = maxLevelChance / WarcraftPlugin.MaxSkillLevel;
+            return RollDice(chanceInterval * abilityLevel);
+        }
+
+        /// <summary>
+        /// Creates a box around a specified point with given dimensions.
+        /// </summary>
+        /// <param name="point">The center point of the box.</param>
+        /// <param name="sizeX">The size of the box along the X-axis.</param>
+        /// <param name="sizeY">The size of the box along the Y-axis.</param>
+        /// <param name="heightZ">The height of the box along the Z-axis.</param>
+        /// <returns>A Box3d object representing the created box.</returns>
+        public static Box3d CreateBoxAroundPoint(Vector point, double sizeX, double sizeY, double heightZ)
+        {
+            return Geometry.CreateBoxAroundPoint(point, sizeX, sizeY, heightZ);
+        }
+
+        /// <summary>
+        /// Creates a sphere around a specified point with given radius and segment counts.
+        /// </summary>
+        /// <param name="point">The center point of the sphere.</param>
+        /// <param name="radius">The radius of the sphere.</param>
+        /// <param name="numLatitudeSegments">The number of latitude segments (default is 10).</param>
+        /// <param name="numLongitudeSegments">The number of longitude segments (default is 10).</param>
+        /// <returns>A list of Vector3d objects representing the points of the sphere.</returns>
+        public static List<Vector3d> CreateSphereAroundPoint(Vector point, double radius, int numLatitudeSegments = 10, int numLongitudeSegments = 10)
+        {
+            return Geometry.CreateSphereAroundPoint(point, radius, numLatitudeSegments, numLongitudeSegments);
+        }
+
+        /// <summary>
+        /// Displays a box with specified color, duration, and width.
+        /// </summary>
+        /// <param name="box">The Box3d object to display.</param>
+        /// <param name="color">The color of the box (default is null).</param>
+        /// <param name="duration">The duration for which the box will be visible (default is 5 seconds).</param>
+        /// <param name="width">The width of the box lines (default is 0.1).</param>
+        public static void Show(this Box3d box, Color? color = null, float duration = 5, float width = 0.1f)
+        {
+            Geometry.DrawVertices(box.ComputeVertices(), color, duration, width);
+        }
+
+        /// <summary>
+        /// Displays a list of points with specified color, duration, and width.
+        /// </summary>
+        /// <param name="points">The list of Vector3d points to display.</param>
+        /// <param name="color">The color of the points (default is null).</param>
+        /// <param name="duration">The duration for which the points will be visible (default is 5 seconds).</param>
+        /// <param name="width">The width of the points lines (default is 0.1).</param>
+        public static void Show(this List<Vector3d> points, Color? color = null, float duration = 5, float width = 0.1f)
+        {
+            Geometry.DrawVertices(points, color, duration, width);
+        }
+
+        /// <summary>
+        /// Gets the collision box of an entity.
+        /// </summary>
+        /// <param name="entity">The entity to get the collision box for.</param>
+        /// <returns>A Box3d object representing the collision box of the entity.</returns>
+        public static Box3d CollisionBox(this CBaseModelEntity entity)
+        {
+            return entity.Collision.ToBox(entity.AbsOrigin);
+        }
+
+        /// <summary>
+        /// Checks if a box contains a specified vector.
+        /// </summary>
+        /// <param name="box">The Box3d object.</param>
+        /// <param name="vector">The vector to check.</param>
+        /// <returns>True if the box contains the vector, otherwise false.</returns>
+        public static bool Contains(this Box3d box, Vector vector)
+        {
+            return box.Contains(vector.ToVector3d());
+        }
+
+        /// <summary>
+        /// Sends out a ray from one point to another, and optionally draws the result.
+        /// </summary>
+        /// <param name="origin">The starting point of the ray.</param>
+        /// <param name="endOrigin">The ending point of the ray.</param>
+        /// <param name="drawResult">Whether to draw the result of the ray trace.</param>
+        /// <returns>Returns a Vector representing the result of the ray trace.</returns>
+        public static Vector RayTrace(Vector origin, Vector endOrigin, bool drawResult = false)
+        {
+            return RayTracer.Trace(origin, endOrigin, drawResult);
+        }
+
+        /// <summary>
+        /// Sends out a ray from the player's position in the direction of their eye angles and optionally draws the result.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="drawResult">Whether to draw the result of the ray trace.</param>
+        /// <returns>Returns a Vector representing the result of the ray trace.</returns>
+        public static Vector RayTrace(this CCSPlayerController player, bool drawResult = false)
+        {
+            return RayTracer.Trace(player.PlayerPawn.Value.AbsOrigin, player.PlayerPawn.Value.EyeAngles, drawResult, true);
         }
     }
 }

@@ -1,45 +1,121 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Menu.WarcraftMenu;
+using WarcraftPlugin.Models;
+using static CounterStrikeSharp.API.Core.BasePlugin;
 
 namespace WarcraftPlugin.Events
 {
-    public class EventSystem
+    internal class EventSystem
     {
         private readonly WarcraftPlugin _plugin;
         private readonly Config _config;
+        private readonly List<GameAction> _gameActions = [];
 
-        public EventSystem(WarcraftPlugin plugin, Config config)
+        internal EventSystem(WarcraftPlugin plugin, Config config)
         {
             _plugin = plugin;
             _config = config;
         }
 
-        public void Initialize()
+        internal void Initialize()
         {
-            _plugin.RegisterEventHandler<EventPlayerDeath>(PlayerDeathHandler);
-            _plugin.RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
-            _plugin.RegisterEventHandler<EventPlayerSpawn>(PlayerSpawnHandler);
-            _plugin.RegisterEventHandler<EventPlayerHurt>(PlayerHurtHandler, HookMode.Pre);
-            _plugin.RegisterEventHandler<EventItemEquip>(PlayerItemEquip);
-            _plugin.RegisterEventHandler<EventMolotovDetonate>(PlayerMolotovDetonateHandler);
-            _plugin.RegisterEventHandler<EventWeaponFire>(PlayerShoot);
-            _plugin.RegisterEventHandler<EventPlayerJump>(PlayerJump);
-            _plugin.RegisterEventHandler<EventDecoyStarted>(DecoyStart);
-            _plugin.RegisterEventHandler<EventPlayerPing>(PlayerPing);
-            _plugin.RegisterEventHandler<EventRoundStart>(RoundStart);
-            _plugin.RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre);
-            _plugin.RegisterEventHandler<EventGrenadeThrown>(GrenadeThrown);
-            _plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(SmokeGrenadeDetonate);
+            // middleware
+            RegisterEventHandler<EventPlayerDeath>(PlayerDeathHandler);
+            RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
+            RegisterEventHandler<EventPlayerSpawn>(PlayerSpawnHandler);
+            RegisterEventHandler<EventPlayerHurt>(PlayerHurtHandler, HookMode.Pre);
+            RegisterEventHandler<EventRoundStart>(RoundStart);
+            //RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre); // no logic, todo remove?
+
+            // no logic, todo remove
+            //RegisterEventHandler<EventItemEquip>(PlayerItemEquip); //
+            //RegisterEventHandler<EventMolotovDetonate>(PlayerMolotovDetonateHandler); //
+            //RegisterEventHandler<EventWeaponFire>(PlayerShoot); //
+            //RegisterEventHandler<EventPlayerJump>(PlayerJump); //
+            //RegisterEventHandler<EventDecoyStarted>(DecoyStart); //
+            //RegisterEventHandler<EventPlayerPing>(PlayerPing); //
+            //RegisterEventHandler<EventGrenadeThrown>(GrenadeThrown); //
+            //RegisterEventHandler<EventSmokegrenadeDetonate>(SmokeGrenadeDetonate); //
 
             //Custom events
             _plugin.AddTimer(1, PlayerSpottedOnRadar, TimerFlags.REPEAT);
+
+            //Register event handlers dynamically from classes
+            RegisterDynamicEventHandlers();
+        }
+
+        private void RegisterEventHandler<T>(GameEventHandler<T> handler, HookMode hookMode = HookMode.Post) where T : GameEvent
+        {
+            if (CanAddGameAction(typeof(T), hookMode))
+                _plugin.RegisterEventHandler(handler, hookMode);
+        }
+
+        private bool CanAddGameAction(Type gameEventType, HookMode hookMode)
+        {
+            if (!_gameActions.Any(x => x.EventType == gameEventType && x.HookMode == hookMode))
+            {
+                _gameActions.Add(new GameAction { EventType = gameEventType, HookMode = hookMode });
+                return true;
+            }
+
+            //Event+Hookmode already registered
+            return false;
+        }
+
+        private void RegisterDynamicEventHandlers()
+        {
+            foreach (var warcraftClass in _plugin.classManager.GetAllClasses())
+            {
+                foreach (var gameAction in warcraftClass.GetEventListeners())
+                {
+                    if (!CanAddGameAction(gameAction.EventType, gameAction.HookMode)) continue;
+
+                    var handlerMethod = typeof(EventSystem).GetMethod(
+                        gameAction.HookMode == HookMode.Pre ? nameof(HandleDynamicPreEvent) : nameof(HandleDynamicPostEvent),
+                        BindingFlags.Static | BindingFlags.NonPublic
+                    ).MakeGenericMethod(gameAction.EventType);
+                    var handlerDelegate = Delegate.CreateDelegate(typeof(GameEventHandler<>).MakeGenericType(gameAction.EventType), handlerMethod);
+                    var registerMethod = typeof(WarcraftPlugin).GetMethod(nameof(WarcraftPlugin.RegisterEventHandler))
+                                                            .MakeGenericMethod(gameAction.EventType);
+                    registerMethod.Invoke(_plugin, [handlerDelegate, HookMode.Post]);
+                }
+            }
+        }
+
+        private static HookResult HandleDynamicPreEvent<T>(T @event, GameEventInfo info) where T : GameEvent
+        {
+            return HandleDynamicEvent(@event, info, HookMode.Pre);
+        }
+
+        private static HookResult HandleDynamicPostEvent<T>(T @event, GameEventInfo info) where T : GameEvent
+        {
+            return HandleDynamicEvent(@event, info, HookMode.Post);
+        }
+
+        private static HookResult HandleDynamicEvent<T>(T @event, GameEventInfo info, HookMode hookMode) where T : GameEvent
+        {
+            var userid = @event.GetType().GetProperty("Userid")?.GetValue(@event) as CCSPlayerController;
+            if (userid != null)
+            {
+                // Invoke player specific events directly on the affected player
+                userid.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event, hookMode);
+            }
+            else
+            {
+                // Else Invoke global events on all players
+                Utilities.GetPlayers().ForEach(p => { p.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event, hookMode); });
+            }
+            return HookResult.Continue;
         }
 
         private void PlayerSpottedOnRadar()
@@ -212,6 +288,7 @@ namespace WarcraftPlugin.Events
                 {
                     WarcraftPlugin.Instance.EffectManager.ClearEffects(player);
                     warcraftClass.SetDefaultAppearance();
+                    warcraftClass.ClearTimers();
                     warcraftClass.InvokeEvent(@event);
                 });
             }
@@ -282,7 +359,9 @@ namespace WarcraftPlugin.Events
             {
                 var mockDeathEvent = new EventPlayerDeath(0);
                 mockDeathEvent.Userid = @event.Userid;
-                player?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(mockDeathEvent);
+                var warcraftPlayer = player?.GetWarcraftPlayer()?.GetClass();
+                warcraftPlayer?.ClearTimers();
+                warcraftPlayer?.InvokeEvent(mockDeathEvent);
             }
             return HookResult.Continue;
         }

@@ -22,6 +22,9 @@ copy /Y "%SERVER_CFG_PATH%" "%SERVER_BACKUP_PATH%"
 echo Updating CS2...
 "%STEAMCMD_PATH%" +login anonymous +force_install_dir "%BASE_PATH%" +app_update 730 validate +quit
 
+:: Re-add gameinfo entries before lines containing "Game csgo "
+::PowerShell (Get-Content $env:GAMEINFO_FILE) -replace "(?<=Game\tcsgo\s)", "`r`n`t`t`tGame`tcsgo/addons/metamod" | Set-Content $env:GAMEINFO_FILE
+
 :: Create download folder if does not exist
 if not exist "%DOWNLOAD_DIR%" mkdir "%DOWNLOAD_DIR%"
 
@@ -32,14 +35,6 @@ curl -o "%DOWNLOAD_DIR%\%latestDownload%" "https://mms.alliedmods.net/mmsdrop/2.
 echo Installing metamod version %latestDownload%...
 tar -xf "%DOWNLOAD_DIR%\%latestDownload%" -C "%CSGO_PATH%"
 del "%DOWNLOAD_DIR%\%latestDownload%"
-
-:: Remove gameinfo entries
-echo Removing old gameinfo entries...
-powershell -Command "(Get-Content '%GAMEINFO_FILE%') -notmatch '^\t\t\tGame\tcsgo\\addons\\metamod' | Set-Content '%GAMEINFO_FILE%'"
-
-:: Re-add gameinfo entries
-echo Re-adding gameinfo entries...
-powershell -Command "(Get-Content '%GAMEINFO_FILE%') -replace '(Game\tcsgo\s)', '`t`t`tGame\tcsgo\\addons\\metamod`n$1' | Set-Content '%GAMEINFO_FILE%'"
 
 :: Update CounterStrikeSharp
 echo Updating CounterStrikeSharp...

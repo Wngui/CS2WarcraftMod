@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Ranger : WarcraftClass
+    internal class Ranger : WarcraftClass
     {
         private Timer _jumpTimer;
         private Timer _dashCooldownTimer;
@@ -201,7 +201,7 @@ namespace WarcraftPlugin.Classes
             DispatchEffect(new ArrowStormEffect(Player, new Vector(ping.X, ping.Y, ping.Z), 10));
         }
 
-        public class EnsnaringTrapEffect : WarcraftEffect
+        internal class EnsnaringTrapEffect : WarcraftEffect
         {
             private readonly CPhysicsPropMultiplayer _trap;
             private readonly CPhysicsPropMultiplayer _trigger;
@@ -209,7 +209,7 @@ namespace WarcraftPlugin.Classes
             private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
 
-            public EnsnaringTrapEffect(CCSPlayerController owner, CPhysicsPropMultiplayer trap, CPhysicsPropMultiplayer trigger, float duration)
+            internal EnsnaringTrapEffect(CCSPlayerController owner, CPhysicsPropMultiplayer trap, CPhysicsPropMultiplayer trigger, float duration)
                 : base(owner, duration)
             {
                 _trap = trap;
@@ -274,20 +274,17 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public class ArrowStormEffect : WarcraftEffect
+        internal class ArrowStormEffect : WarcraftEffect
         {
             private readonly Box3d _spawnBox;
             private readonly Box3d _hurtBox;
-            private readonly Random _random;
 
             private readonly int _stormHeight = 150;
             private readonly int _stormArea = 280;
 
-            public ArrowStormEffect(CCSPlayerController owner, Vector stormpos, float duration)
+            internal ArrowStormEffect(CCSPlayerController owner, Vector stormpos, float duration)
             : base(owner, duration)
             {
-                _random = Random.Shared;
-
                 var spawnBoxPoint = stormpos.With(z: stormpos.Z + _stormHeight);
                 _spawnBox = Geometry.CreateBoxAroundPoint(spawnBoxPoint, _stormArea, _stormArea, 50);
 
@@ -333,7 +330,7 @@ namespace WarcraftPlugin.Classes
             private void SpawnArrow()
             {
                 //Calculate new arrow pos
-                var arrowSpawn = _spawnBox.GetRandomPoint(_random);
+                var arrowSpawn = _spawnBox.GetRandomPoint();
                 //Spawn arrow
                 var arrow = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
                 if (!arrow.IsValid) return;

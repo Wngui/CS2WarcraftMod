@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Mage : WarcraftClass
+    internal class Mage : WarcraftClass
     {
         public override string DisplayName => "Mage";
         public override Color DefaultColor => Color.Blue;
@@ -163,9 +163,9 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    public class FreezeEffect : WarcraftEffect
+    internal class FreezeEffect : WarcraftEffect
     {
-        public FreezeEffect(CCSPlayerController owner, CCSPlayerController target, float duration) : base(owner, duration, target)
+        internal FreezeEffect(CCSPlayerController owner, CCSPlayerController target, float duration) : base(owner, duration, target)
         {
         }
 

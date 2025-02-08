@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Paladin : WarcraftClass
+    internal class Paladin : WarcraftClass
     {
         private Timer _healingAuraTimer;
         private bool _hasUsedDivineResurrection = false;

@@ -15,7 +15,7 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Shapeshifter : WarcraftClass
+    internal class Shapeshifter : WarcraftClass
     {
         public override string DisplayName => "Shapeshifter";
         public override Color DefaultColor => Color.Pink;

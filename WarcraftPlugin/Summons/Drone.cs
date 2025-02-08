@@ -10,14 +10,14 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Summons
 {
-    public class Drone
+    internal class Drone
     {
         private CPhysicsPropMultiplayer _drone;
         private CDynamicProp _model;
         private CDynamicProp _turret;
-        public Vector Position { get; set; } = new(70, -70, 90);
+        internal Vector Position { get; set; } = new(70, -70, 90);
 
-        public bool IsFireRateCooldown { get; set; } = false;
+        internal bool IsFireRateCooldown { get; set; } = false;
         private readonly float _fireRate = 2f;
         private Timer _fireRateTimer;
         private CBeam _lazerDot;
@@ -25,9 +25,9 @@ namespace WarcraftPlugin.Summons
         private Timer _idleTimer;
         private readonly CCSPlayerController _owner;
 
-        public float Angle { get; set; } = 0f;
+        internal float Angle { get; set; } = 0f;
 
-        public Drone(CCSPlayerController owner, Vector position)
+        internal Drone(CCSPlayerController owner, Vector position)
         {
             _owner = owner;
             Position = position;
@@ -70,7 +70,7 @@ namespace WarcraftPlugin.Summons
             _drone.Teleport(_owner.CalculatePositionInFront(Position), _owner.PlayerPawn.Value.V_angle, new Vector(nint.Zero));
         }
 
-        public void Deactivate()
+        internal void Deactivate()
         {
             _target = null;
 
@@ -82,7 +82,7 @@ namespace WarcraftPlugin.Summons
             IsFireRateCooldown = false;
         }
 
-        public void Update()
+        internal void Update()
         {
             if (!_owner.IsValid || !_drone.IsValid) return;
             var nextDronePosition = _owner.CalculatePositionInFront(Position);
@@ -100,7 +100,7 @@ namespace WarcraftPlugin.Summons
             }
         }
 
-        public void EnemySpotted(CCSPlayerController enemy)
+        internal void EnemySpotted(CCSPlayerController enemy)
         {
             if (!IsFireRateCooldown)
             {
@@ -123,12 +123,12 @@ namespace WarcraftPlugin.Summons
         {
             if (_turret != null && _turret.IsValid)
             {
-                var playerCollison = target.PlayerPawn.Value.Collision.ToBox3d(target.PlayerPawn.Value.AbsOrigin);
+                var playerCollison = target.PlayerPawn.Value.Collision.ToBox(target.PlayerPawn.Value.AbsOrigin);
                 //Geometry.DrawVertices(playerCollison.ComputeVertices()); //debug
 
                 //check if we have a clear line of sight to target
                 var turretMuzzle = _turret.CalculatePositionInFront(new Vector(0, 30, 2));
-                var endPos = RayTrace.TraceShape(turretMuzzle, playerCollison.Center.ToVector(), false);
+                var endPos = RayTracer.Trace(turretMuzzle, playerCollison.Center.ToVector(), false);
 
                 //ensure trace has hit the players hitbox
                 if (endPos != null && playerCollison.Contains(endPos.ToVector3d()))

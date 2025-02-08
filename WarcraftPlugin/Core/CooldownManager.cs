@@ -4,11 +4,11 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    public class CooldownManager
+    internal class CooldownManager
     {
         private readonly float _tickRate = 0.25f;
 
-        public void Initialize()
+        internal void Initialize()
         {
             WarcraftPlugin.Instance.AddTimer(_tickRate, CooldownTick, TimerFlags.REPEAT);
         }
@@ -32,22 +32,22 @@ namespace WarcraftPlugin.Core
             }
         }
 
-        public static bool IsAvailable(WarcraftPlayer player, int abilityIndex)
+        internal static bool IsAvailable(WarcraftPlayer player, int abilityIndex)
         {
             return player.AbilityCooldowns[abilityIndex] <= 0;
         }
 
-        public static float Remaining(WarcraftPlayer player, int abilityIndex)
+        internal static float Remaining(WarcraftPlayer player, int abilityIndex)
         {
             return player.AbilityCooldowns[abilityIndex];
         }
 
-        public static void StartCooldown(WarcraftPlayer player, int abilityIndex, float abilityCooldown)
+        internal static void StartCooldown(WarcraftPlayer player, int abilityIndex, float abilityCooldown)
         {
             player.AbilityCooldowns[abilityIndex] = abilityCooldown;
         }
 
-        public static void ResetCooldowns(WarcraftPlayer player)
+        internal static void ResetCooldowns(WarcraftPlayer player)
         {
             for (int abilityIndex = 0; abilityIndex < player.AbilityCooldowns.Count; abilityIndex++)
             {

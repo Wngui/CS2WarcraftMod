@@ -6,18 +6,18 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    public class XpSystem
+    internal class XpSystem
     {
         private readonly WarcraftPlugin _plugin;
 
-        public XpSystem(WarcraftPlugin plugin)
+        internal XpSystem(WarcraftPlugin plugin)
         {
             _plugin = plugin;
         }
 
         private readonly List<int> _levelXpRequirement = new(new int[256]);
 
-        public void GenerateXpCurve(int initial, float modifier, int maxLevel)
+        internal void GenerateXpCurve(int initial, float modifier, int maxLevel)
         {
             for (int i = 1; i <= maxLevel; i++)
             {
@@ -28,12 +28,12 @@ namespace WarcraftPlugin.Core
             }
         }
 
-        public int GetXpForLevel(int level)
+        internal int GetXpForLevel(int level)
         {
             return _levelXpRequirement[level];
         }
 
-        public void AddXp(CCSPlayerController player, int xpToAdd)
+        internal void AddXp(CCSPlayerController player, int xpToAdd)
         {
             var wcPlayer = _plugin.GetWcPlayer(player);
             if (wcPlayer == null) return;
@@ -51,7 +51,7 @@ namespace WarcraftPlugin.Core
             }
         }
 
-        public void GrantLevel(WarcraftPlayer wcPlayer)
+        internal void GrantLevel(WarcraftPlayer wcPlayer)
         {
             if (wcPlayer.GetLevel() >= WarcraftPlugin.MaxLevel) return;
 
@@ -68,7 +68,7 @@ namespace WarcraftPlugin.Core
             WarcraftPlugin.RefreshPlayerName(wcPlayer);
         }
 
-        public void RecalculateXpForLevel(WarcraftPlayer wcPlayer)
+        internal void RecalculateXpForLevel(WarcraftPlayer wcPlayer)
         {
             if (wcPlayer.currentLevel == WarcraftPlugin.MaxLevel)
             {
@@ -79,7 +79,7 @@ namespace WarcraftPlugin.Core
             wcPlayer.amountToLevel = GetXpForLevel(wcPlayer.currentLevel);
         }
 
-        public static int GetFreeSkillPoints(WarcraftPlayer wcPlayer)
+        internal static int GetFreeSkillPoints(WarcraftPlayer wcPlayer)
         {
             int totalPointsUsed = 0;
 

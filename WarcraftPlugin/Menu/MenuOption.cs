@@ -3,12 +3,12 @@ using System;
 
 namespace WarcraftPlugin.Menu;
 
-public class MenuOption
+internal class MenuOption
 {
-    public Menu Parent { get; set; }
-    public string OptionDisplay { get; set; }
-    public string SubOptionDisplay { get; set; }
-    public Action<CCSPlayerController, MenuOption>? OnChoose { get; set; }
-    public int Index { get; set; }
-    public Action<CCSPlayerController, MenuOption>? OnSelect { get; set; }
+    internal Menu Parent { get; set; }
+    internal string OptionDisplay { get; set; }
+    internal string SubOptionDisplay { get; set; }
+    internal Action<CCSPlayerController, MenuOption>? OnChoose { get; set; }
+    internal int Index { get; set; }
+    internal Action<CCSPlayerController, MenuOption>? OnSelect { get; set; }
 }

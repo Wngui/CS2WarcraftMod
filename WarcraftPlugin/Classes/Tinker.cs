@@ -16,7 +16,7 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Tinker : WarcraftClass
+    internal class Tinker : WarcraftClass
     {
         private readonly List<Drone> _drones = [];
         private static readonly Vector _droneDefaultPosition = new(70, -70, 90);
@@ -164,7 +164,7 @@ namespace WarcraftPlugin.Classes
             });
         }
 
-        public class SpringTrapEffect : WarcraftEffect
+        internal class SpringTrapEffect : WarcraftEffect
         {
             private readonly CDynamicProp _trap;
             private readonly CPhysicsPropMultiplayer _trigger;
@@ -172,7 +172,7 @@ namespace WarcraftPlugin.Classes
             private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
 
-            public SpringTrapEffect(CCSPlayerController owner, CDynamicProp trap, CPhysicsPropMultiplayer trigger, float duration)
+            internal SpringTrapEffect(CCSPlayerController owner, CDynamicProp trap, CPhysicsPropMultiplayer trigger, float duration)
                 : base(owner, duration)
             {
                 _trap = trap;

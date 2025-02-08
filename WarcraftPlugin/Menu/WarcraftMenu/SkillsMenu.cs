@@ -5,9 +5,9 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu
 {
-    public static class SkillsMenu
+    internal static class SkillsMenu
     {
-        public static void Show(WarcraftPlayer wcPlayer, int selectedOptionIndex = 0)
+        internal static void Show(WarcraftPlayer wcPlayer, int selectedOptionIndex = 0)
         {
             var warcraftClass = wcPlayer.GetClass();
 

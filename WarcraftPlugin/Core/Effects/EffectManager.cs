@@ -4,17 +4,17 @@ using CounterStrikeSharp.API.Modules.Timers;
 
 namespace WarcraftPlugin.Core.Effects
 {
-    public class EffectManager
+    internal class EffectManager
     {
         private readonly List<WarcraftEffect> _effects = new();
         private readonly float _tickRate = 0.25f;
 
-        public void Initialize()
+        internal void Initialize()
         {
             WarcraftPlugin.Instance.AddTimer(_tickRate, EffectTick, TimerFlags.REPEAT);
         }
 
-        public void AddEffect(WarcraftEffect effect)
+        internal void AddEffect(WarcraftEffect effect)
         {
             _effects.Add(effect);
             effect.OnStart();
@@ -38,7 +38,7 @@ namespace WarcraftPlugin.Core.Effects
             }
         }
 
-        public void ClearEffects(CCSPlayerController player)
+        internal void ClearEffects(CCSPlayerController player)
         {
             for (int i = _effects.Count - 1; i >= 0; i--)
             {

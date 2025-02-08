@@ -7,6 +7,8 @@ using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core;
+using CounterStrikeSharp.API.Modules.Timers;
+using System.Linq;
 
 namespace WarcraftPlugin.Models
 {
@@ -43,16 +45,17 @@ namespace WarcraftPlugin.Models
 
     public abstract class WarcraftClass
     {
-        public string InternalName => DisplayName.Replace(' ','_').ToLowerInvariant();
+        public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
         public abstract string DisplayName { get; }
         public virtual DefaultClassModel DefaultModel { get; }
         public abstract Color DefaultColor { get; }
-        public WarcraftPlayer WarcraftPlayer { get; set; }
+        internal WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
 
         public abstract List<IWarcraftAbility> Abilities { get; }
-        private readonly Dictionary<string, Action<GameEvent>> _eventHandlers = [];
+        private readonly Dictionary<string, GameAction> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
+        private readonly List<Timer> _timers = [];
 
         public float LastHurtOther { get; set; } = 0;
 
@@ -103,18 +106,22 @@ namespace WarcraftPlugin.Models
             return Abilities[index];
         }
 
-        protected void HookEvent<T>(Action<T> handler) where T : GameEvent
+        protected void HookEvent<T>(Action<T> handler, HookMode hookMode = HookMode.Post) where T : GameEvent
         {
-            _eventHandlers[typeof(T).Name] = (evt) =>
+            _eventHandlers[typeof(T).Name + (hookMode == HookMode.Pre ? "-pre" : "")] = new GameAction
             {
-                if (evt is T typedEvent)
+                EventType = typeof(T),
+                Handler = (evt) =>
                 {
-                    handler(typedEvent);
-                }
-                else
-                {
-                    handler((T)evt);
-                    Console.WriteLine($"Handler for event expects an event of type {typeof(T).Name}.");
+                    if (evt is T typedEvent)
+                    {
+                        handler(typedEvent);
+                    }
+                    else
+                    {
+                        handler((T)evt);
+                        Console.WriteLine($"Handler for event expects an event of type {typeof(T).Name}.");
+                    }
                 }
             };
         }
@@ -124,17 +131,23 @@ namespace WarcraftPlugin.Models
             _abilityHandlers[abilityIndex] = handler;
         }
 
-        public void InvokeEvent(GameEvent @event)
+        public void InvokeEvent(GameEvent @event, HookMode hookMode = HookMode.Post)
         {
-            if (_eventHandlers.TryGetValue(@event.GetType().Name, out Action<GameEvent> value))
+            if (_eventHandlers.TryGetValue(@event.GetType().Name + (hookMode == HookMode.Pre ? "-pre" : ""), out GameAction gameAction))
             {
-                value.Invoke(@event);
+                gameAction.Handler.Invoke(@event);
             }
+        }
+
+        internal List<GameAction> GetEventListeners()
+        {
+            return _eventHandlers.Values.ToList();
         }
 
         public virtual void PlayerChangingToAnotherRace()
         {
             Player.PlayerPawn.Value.SetColor(Color.White);
+            ClearTimers();
         }
 
         public bool IsAbilityReady(int abilityIndex)
@@ -171,6 +184,23 @@ namespace WarcraftPlugin.Models
         public void ResetCooldowns()
         {
             CooldownManager.ResetCooldowns(WarcraftPlayer);
+        }
+
+        public Timer AddTimer(float duration, Action callback, TimerFlags flags = 0)
+        {
+            var timer = WarcraftPlugin.Instance.AddTimer(duration, callback, flags);
+            _timers.Add(timer);
+            return timer;
+        }
+
+        public void ClearTimers()
+        {
+            foreach (var timer in _timers)
+            {
+                timer?.Kill();
+            }
+
+            _timers.Clear();
         }
     }
 }

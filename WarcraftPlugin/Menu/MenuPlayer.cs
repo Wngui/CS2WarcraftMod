@@ -8,18 +8,18 @@ using Microsoft.Extensions.Localization;
 
 namespace WarcraftPlugin.Menu;
 
-public class MenuPlayer
+internal class MenuPlayer
 {
-    public CCSPlayerController player { get; set; }
-    public Menu MainMenu = null;
-    public LinkedListNode<MenuOption>? CurrentChoice = null;
-    public LinkedListNode<MenuOption>? MenuStart = null;
-    public string CenterHtml = "";
-    public int VisibleOptions = 5;
-    public static IStringLocalizer Localizer = null;
-    public PlayerButtons Buttons { get; set; }
+    internal CCSPlayerController player { get; set; }
+    internal Menu MainMenu = null;
+    internal LinkedListNode<MenuOption>? CurrentChoice = null;
+    internal LinkedListNode<MenuOption>? MenuStart = null;
+    internal string CenterHtml = "";
+    internal int VisibleOptions = 5;
+    internal static IStringLocalizer Localizer = null;
+    internal PlayerButtons Buttons { get; set; }
 
-    public void OpenMainMenu(Menu menu, int selectedOptionIndex = 0)
+    internal void OpenMainMenu(Menu menu, int selectedOptionIndex = 0)
     {
         if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
         {
@@ -57,7 +57,7 @@ public class MenuPlayer
         UpdateCenterHtml();
     }
 
-    public void OpenSubMenu(Menu menu)
+    internal void OpenSubMenu(Menu menu)
     {
         if (menu == null)
         {
@@ -72,7 +72,7 @@ public class MenuPlayer
         MenuStart = CurrentChoice;
         UpdateCenterHtml();
     }
-    public void GoBackToPrev(LinkedListNode<MenuOption>? menu)
+    internal void GoBackToPrev(LinkedListNode<MenuOption>? menu)
     {
         if (menu == null)
         {
@@ -97,7 +97,7 @@ public class MenuPlayer
         UpdateCenterHtml();
     }
 
-    public void CloseSubMenu()
+    internal void CloseSubMenu()
     {
         if (CurrentChoice?.Value.Parent?.Prev == null)
         {
@@ -113,17 +113,17 @@ public class MenuPlayer
         GoBackToPrev(CurrentChoice?.Value.Parent.Prev);
     }
 
-    public void CloseAllSubMenus()
+    internal void CloseAllSubMenus()
     {
         OpenSubMenu(null);
     }
 
-    public void Choose()
+    internal void Choose()
     {
         CurrentChoice?.Value.OnChoose?.Invoke(player, CurrentChoice.Value);
     }
 
-    public void ScrollDown()
+    internal void ScrollDown()
     {
         if (CurrentChoice == null || MainMenu == null)
             return;
@@ -135,7 +135,7 @@ public class MenuPlayer
         UpdateCenterHtml();
     }
 
-    public void ScrollUp()
+    internal void ScrollUp()
     {
         if (CurrentChoice == null || MainMenu == null)
             return;

@@ -9,11 +9,11 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    public class Database
+    internal class Database
     {
         private SqliteConnection _connection;
 
-        public void Initialize(string directory)
+        internal void Initialize(string directory)
         {
             _connection =
                 new SqliteConnection(
@@ -41,13 +41,13 @@ namespace WarcraftPlugin.Core
                 ");
         }
 
-        public bool PlayerExistsInDatabase(ulong steamid)
+        internal bool PlayerExistsInDatabase(ulong steamid)
         {
             return _connection.ExecuteScalar<int>("select count(*) from players where steamid = @steamid",
                 new { steamid }) > 0;
         }
 
-        public void AddNewPlayerToDatabase(CCSPlayerController player)
+        internal void AddNewPlayerToDatabase(CCSPlayerController player)
         {
             Console.WriteLine($"Adding client to database {player.SteamID}");
             _connection.Execute(@"
@@ -56,7 +56,7 @@ namespace WarcraftPlugin.Core
                 new { steamid = player.SteamID });
         }
 
-        public WarcraftPlayer LoadPlayerFromDatabase(CCSPlayerController player, XpSystem xpSystem)
+        internal WarcraftPlayer LoadPlayerFromDatabase(CCSPlayerController player, XpSystem xpSystem)
         {
             var dbPlayer = _connection.QueryFirstOrDefault<DatabasePlayer>(@"
             SELECT * FROM `players` WHERE `steamid` = @steamid",
@@ -94,7 +94,7 @@ namespace WarcraftPlugin.Core
             return wcPlayer;
         }
 
-        public List<DatabaseClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
+        internal List<DatabaseClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
         {
             var raceInformation = _connection.Query<DatabaseClassInformation>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid",
@@ -103,7 +103,7 @@ namespace WarcraftPlugin.Core
             return raceInformation.AsList();
         }
 
-        public void SavePlayerToDatabase(CCSPlayerController player)
+        internal void SavePlayerToDatabase(CCSPlayerController player)
         {
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
             Server.PrintToConsole($"Saving {player.PlayerName} to database...");
@@ -143,7 +143,7 @@ namespace WarcraftPlugin.Core
                 });
         }
 
-        public void SaveClients()
+        internal void SaveClients()
         {
             var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
             foreach (var player in playerEntities)
@@ -157,7 +157,7 @@ namespace WarcraftPlugin.Core
             }
         }
 
-        public void SaveCurrentClass(CCSPlayerController player)
+        internal void SaveCurrentClass(CCSPlayerController player)
         {
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
 
@@ -172,23 +172,23 @@ namespace WarcraftPlugin.Core
         }
     }
 
-    public class DatabasePlayer
+    internal class DatabasePlayer
     {
-        public ulong SteamId { get; set; }
-        public string CurrentRace { get; set; }
-        public string Name { get; set; }
+        internal ulong SteamId { get; set; }
+        internal string CurrentRace { get; set; }
+        internal string Name { get; set; }
     }
 
-    public class DatabaseClassInformation
+    internal class DatabaseClassInformation
     {
-        public ulong SteamId { get; set; }
-        public string RaceName { get; set; }
-        public int CurrentXp { get; set; }
-        public int CurrentLevel { get; set; }
-        public int AmountToLevel { get; set; }
-        public int Ability1Level { get; set; }
-        public int Ability2Level { get; set; }
-        public int Ability3Level { get; set; }
-        public int Ability4Level { get; set; }
+        internal ulong SteamId { get; set; }
+        internal string RaceName { get; set; }
+        internal int CurrentXp { get; set; }
+        internal int CurrentLevel { get; set; }
+        internal int AmountToLevel { get; set; }
+        internal int Ability1Level { get; set; }
+        internal int Ability2Level { get; set; }
+        internal int Ability3Level { get; set; }
+        internal int Ability4Level { get; set; }
     }
 }

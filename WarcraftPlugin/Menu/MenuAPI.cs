@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace WarcraftPlugin.Menu;
 
-public static class MenuAPI
+internal static class MenuAPI
 {
 
-    public static readonly Dictionary<int, MenuPlayer> Players = [];
+    internal static readonly Dictionary<int, MenuPlayer> Players = [];
 
-    public static void Load(BasePlugin plugin, bool hotReload)
+    internal static void Load(BasePlugin plugin, bool hotReload)
     {
         MenuPlayer.Localizer = plugin.Localizer;
 
@@ -44,7 +44,7 @@ public static class MenuAPI
             }
     }
 
-    public static void OnTick()
+    internal static void OnTick()
     {
         foreach (var player in Players.Values.Where(p => p.MainMenu != null))
         {

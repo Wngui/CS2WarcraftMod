@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Rogue : WarcraftClass
+    internal class Rogue : WarcraftClass
     {
         private bool _isSmokebomb;
 
@@ -139,9 +139,9 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public class InvisibleEffect : WarcraftEffect
+        internal class InvisibleEffect : WarcraftEffect
         {
-            public InvisibleEffect(CCSPlayerController owner, float duration) : base(owner, duration) { }
+            internal InvisibleEffect(CCSPlayerController owner, float duration) : base(owner, duration) { }
 
             public override void OnStart()
             {
