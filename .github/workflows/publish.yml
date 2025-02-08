@@ -76,7 +76,7 @@ jobs:
 
     - name: Publish build artifacts
       run: dotnet publish WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --output ./publish/WarcraftPlugin
-     
+
     - name: Create zip of publish directory contents
       run: |
         cd publish
@@ -102,3 +102,9 @@ jobs:
         asset_content_type: application/zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pack NuGet package
+      run: dotnet pack --configuration Release --no-build --output nupkgs /p:Version=${{ env.new_version }}
+
+    - name: Publish to NuGet
+      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
