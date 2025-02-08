@@ -22,8 +22,11 @@ copy /Y "%SERVER_CFG_PATH%" "%SERVER_BACKUP_PATH%"
 echo Updating CS2...
 "%STEAMCMD_PATH%" +login anonymous +force_install_dir "%BASE_PATH%" +app_update 730 validate +quit
 
-:: Re-add gameinfo entries before lines containing "Game csgo "
-::PowerShell (Get-Content $env:GAMEINFO_FILE) -replace "(?<=Game\tcsgo\s)", "`r`n`t`t`tGame`tcsgo/addons/metamod" | Set-Content $env:GAMEINFO_FILE
+:: Add metamod line to gameinfo.gi
+powershell -Command "(Get-Content $env:GAMEINFO_FILE) | Where-Object { $_ -notmatch \".*csgo/addons/metamod.*\" } | Set-Content $env:GAMEINFO_FILE"
+powershell -Command "(Get-Content $env:GAMEINFO_FILE) -replace \"(Game_LowViolence.*)\", \"`$1`r`n`t`t`tGame`tcsgo/addons/metamod\" | Set-Content $env:GAMEINFO_FILE"
+
+pause
 
 :: Create download folder if does not exist
 if not exist "%DOWNLOAD_DIR%" mkdir "%DOWNLOAD_DIR%"

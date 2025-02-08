@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using g3;
 using System.Collections.Generic;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -335,6 +336,7 @@ namespace WarcraftPlugin.Helpers
             Schema.SetSchemaValue(damageInfo.Handle, "CTakeDamageInfo", "m_hAttacker", attacker.Pawn.Raw);
 
             damageInfo.Damage = damage;
+            damageInfo.NumObjectsPenetrated = 0;
 
             if (!player.IsValid || !player.PlayerPawn.IsValid || !player.Pawn.IsValid) return;
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(player.Pawn.Value, damageInfo);

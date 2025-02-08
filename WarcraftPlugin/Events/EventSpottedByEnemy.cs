@@ -3,7 +3,7 @@ using CounterStrikeSharp.API.Modules.Events;
 
 namespace WarcraftPlugin.Events
 {
-    public class EventSpottedByEnemy : GameEvent
+    public class EventSpottedByEnemy : GameEvent, ICustomGameEvent
     {
         public EventSpottedByEnemy() : base(0)
         {

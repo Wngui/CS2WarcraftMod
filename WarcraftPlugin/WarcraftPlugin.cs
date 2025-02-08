@@ -88,7 +88,7 @@ namespace WarcraftPlugin
         {
             if (wcPlayer == null || !wcPlayer.Player.IsValid) return;
 
-            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"^\d+ [[^]]+] ", "");
+            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"\d+ \[\w+\] ", "");
             wcPlayer.Player.PlayerName = $"{wcPlayer.currentLevel} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
             wcPlayer.Player.Clan = "";
             Utilities.SetStateChanged(wcPlayer.Player, "CBasePlayerController", "m_iszPlayerName");

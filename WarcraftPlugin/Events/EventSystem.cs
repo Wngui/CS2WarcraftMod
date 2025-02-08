@@ -62,6 +62,7 @@ namespace WarcraftPlugin.Events
 
         private bool CanAddGameAction(Type gameEventType, HookMode hookMode)
         {
+            if (typeof(ICustomGameEvent).IsAssignableFrom(gameEventType)) return false;
             if (!_gameActions.Any(x => x.EventType == gameEventType && x.HookMode == hookMode))
             {
                 _gameActions.Add(new GameAction { EventType = gameEventType, HookMode = hookMode });
