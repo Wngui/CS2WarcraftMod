@@ -9,8 +9,6 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using g3;
 using System.Collections.Generic;
-using CounterStrikeSharp.API.Modules.Entities;
-using static g3.RoundRectGenerator;
 
 namespace WarcraftPlugin.Helpers
 {
