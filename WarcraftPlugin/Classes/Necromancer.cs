@@ -60,12 +60,12 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(2) == 0) return;
 
             var pawn = Player.PlayerPawn.Value;
-            if (!_hasCheatedDeath && pawn.Health < 0)
+            if (!_hasCheatedDeath && pawn.Health <= 0)
             {
                 double rolledValue = Random.Shared.NextDouble();
                 float chanceToRespawn = WarcraftPlayer.GetAbilityLevel(2) / 5 * 0.80f;
 
-                if (rolledValue <= chanceToRespawn)
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 80))
                 {
                     _hasCheatedDeath = true;
                     WarcraftPlugin.Instance.AddTimer(2f, () =>
@@ -107,12 +107,12 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurt hurt)
         {
-            if (!hurt.Userid.IsValid || !hurt.Userid.PawnIsAlive || hurt.Userid.UserId == Player.UserId) return;
+            if (!hurt.Userid.IsValid() || hurt.Userid.UserId == Player.UserId) return;
 
             if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
             {
-                Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 10);
-                var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / 5 * 0.3f);
+                Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 10);
+                var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / WarcraftPlugin.MaxSkillLevel * 0.3f);
                 var playerCalculatedHealth = Player.PlayerPawn.Value.Health + healthDrained;
                 Player.SetHp((int)Math.Min(playerCalculatedHealth, Player.PlayerPawn.Value.MaxHealth));
             }
@@ -154,7 +154,7 @@ namespace WarcraftPlugin.Classes
 
             _zombieUpdateTimer?.Kill();
 
-            _zombieUpdateTimer = WarcraftPlugin.Instance.AddTimer(0.1f, () =>
+            _zombieUpdateTimer = AddTimer(0.1f, () =>
             {
                 var hasValidZombies = false;
                 var zombieCount = _zombies.Count;
@@ -198,12 +198,12 @@ namespace WarcraftPlugin.Classes
             : base(owner, duration)
             {
                 var hurtBoxPoint = cloudPos.With(z: cloudPos.Z + _cloudHeight / 2);
-                _hurtBox = Geometry.CreateBoxAroundPoint(hurtBoxPoint, _cloudWidth, _cloudWidth, _cloudHeight);
+                _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _cloudWidth, _cloudWidth, _cloudHeight);
             }
 
             public override void OnStart()
             {
-                //Geometry.DrawVertices(_hurtBox.ComputeVertices(), duration: Duration); //debug
+                //_hurtBox.Show(duration: Duration); //Debug
             }
 
             public override void OnTick()
@@ -215,7 +215,7 @@ namespace WarcraftPlugin.Classes
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
+                var playersInHurtZone = players.Where(x => x.PawnIsAlive && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
                 //small hurt
                 if (playersInHurtZone.Any())
                 {

@@ -94,7 +94,7 @@ namespace WarcraftPlugin.Helpers
 
         public static Box3d ToBox(this CCollisionProperty collision, Vector worldPosition)
         {
-            Vector worldCenter = worldPosition.With().Add(z: collision.Mins.Z + (collision.Maxs.Z - collision.Mins.Z) / 2);
+            Vector worldCenter = worldPosition.Clone().Add(z: collision.Mins.Z + (collision.Maxs.Z - collision.Mins.Z) / 2);
             return CreateBoxAroundPoint(worldCenter, collision.Maxs.X * 2, collision.Maxs.Y * 2, collision.Maxs.Z);
         }
 
@@ -126,6 +126,14 @@ namespace WarcraftPlugin.Helpers
             {
                 return vector1.X == vector2.X && vector1.Y == vector2.Y && vector1.Z == vector2.Z;
             }
+        }
+
+        /// <summary>
+        /// Returns a copy of the vector with values replaced.
+        /// </summary>
+        public static Vector Clone(this Vector vector)
+        {
+            return vector.Clone();
         }
     }
 }

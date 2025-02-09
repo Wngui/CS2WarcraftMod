@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
@@ -35,7 +34,7 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventItemEquip>(PlayerItemEquip);
         }
 
-        private void PlayerHurt(GameEvent @event)
+        private void PlayerHurt(EventPlayerHurt @event)
         {
             if (_isSmokebomb)
             {
@@ -52,7 +51,7 @@ namespace WarcraftPlugin.Classes
                 Player.SetHp(1);
 
                 //spawn smoke
-                Warcraft.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
+                Warcraft.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
 
                 //spawn molly - hack to trigger smoke faster
                 var molo = Utilities.CreateEntityByName<CMolotovProjectile>("molotov_projectile");
@@ -62,7 +61,7 @@ namespace WarcraftPlugin.Classes
 
                 Player.ExecuteClientCommand("slot3"); //pull out knife
 
-                var smokeEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 90), "particles/maps/de_house/house_fireplace.vpcf");
+                var smokeEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 90), "particles/maps/de_house/house_fireplace.vpcf");
                 smokeEffect.SetParent(Player.PlayerPawn.Value);
 
                 StartCooldown(3);
@@ -76,7 +75,7 @@ namespace WarcraftPlugin.Classes
             _isSmokebomb = false;
         }
 
-        private void PlayerItemEquip(GameEvent @event)
+        private void PlayerItemEquip(EventItemEquip @event)
         {
             var pawn = Player.PlayerPawn.Value;
             var activeWeaponName = pawn.WeaponServices!.ActiveWeapon.Value.DesignerName;
@@ -90,25 +89,25 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerKilledOther(GameEvent @event)
+        private void PlayerKilledOther(EventPlayerKilledOther @event)
         {
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
-                SetInvisible(((EventPlayerDeath)@event).Attacker);
+                SetInvisible();
             }
         }
 
-        private void SetInvisible(CCSPlayerController attacker)
+        private void SetInvisible()
         {
-            if (attacker.PlayerPawn.Value.Render.A != 0)
+            if (Player.PlayerPawn.Value.Render.A != 0)
             {
-                DispatchEffect(new InvisibleEffect(attacker, WarcraftPlayer.GetAbilityLevel(0)));
+                DispatchEffect(new InvisibleEffect(Player, WarcraftPlayer.GetAbilityLevel(0)));
             }
         }
 
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
-            if (!@event.Userid.IsValid || !@event.Userid.PawnIsAlive || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
             if (WarcraftPlayer.GetAbilityLevel(2) > 0) BladeDanceDamage(@event);
             if (WarcraftPlayer.GetAbilityLevel(1) > 0) Backstab(@event);
@@ -121,7 +120,7 @@ namespace WarcraftPlugin.Classes
             if (attackerWeapon == "weapon_knife")
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(2) * 12;
-                @event.Userid.TakeDamage(damageBonus, Player);
+                @event.Userid.PlayerPawn.Value.Health -= damageBonus;
             }
         }
 
@@ -133,9 +132,9 @@ namespace WarcraftPlugin.Classes
             if (Math.Abs(attackerAngle - victimAngle) <= 50)
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
-                eventPlayerHurt.Userid.TakeDamage(damageBonus, Player);
+                eventPlayerHurt.Userid.PlayerPawn.Value.Health -= damageBonus;
                 Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}", 1);
-                Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
+                Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }
         }
 
@@ -148,8 +147,7 @@ namespace WarcraftPlugin.Classes
                 Owner.PrintToCenter($"[Invisible]");
                 Owner.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
 
-                Owner.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + Duration;
-                Utilities.SetStateChanged(Owner.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
+                Owner.AdrenalineSurgeEffect(Duration);
             }
 
             public override void OnTick()

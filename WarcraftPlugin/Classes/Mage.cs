@@ -31,7 +31,6 @@ namespace WarcraftPlugin.Classes
 
         public override void Register()
         {
-            HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
             HookEvent<EventMolotovDetonate>(MolotovDetonate);
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
@@ -60,10 +59,10 @@ namespace WarcraftPlugin.Classes
                 float newZ = ping.Z + deltaZ / distance * offset;
 
                 Player.PlayLocalSound("sounds/weapons/fx/nearmiss/bulletltor06.vsnd");
-                Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 20), "particles/ui/ui_electric_exp_glow.vpcf", 3);
+                Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20), "particles/ui/ui_electric_exp_glow.vpcf", 3);
                 Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_distort.vpcf", 2);
                 Player.PlayerPawn.Value.Teleport(new Vector(newX, newY, newZ), Player.PlayerPawn.Value.AbsRotation, new Vector());
-                Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 20), "particles/ui/ui_electric_exp_glow.vpcf", 3);
+                Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20), "particles/ui/ui_electric_exp_glow.vpcf", 3);
                 Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_distort.vpcf", 2);
             }
         }
@@ -74,11 +73,11 @@ namespace WarcraftPlugin.Classes
             _manaShieldTimer?.Kill();
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
-                _manaShieldTimer = WarcraftPlugin.Instance.AddTimer(5 / WarcraftPlayer.GetAbilityLevel(2),
+                _manaShieldTimer = AddTimer(5 / WarcraftPlayer.GetAbilityLevel(2),
                 RegenManaShield, TimerFlags.REPEAT);
             }
 
-            //Doppelganger
+            //Fireball
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_molotov"));
@@ -88,7 +87,7 @@ namespace WarcraftPlugin.Classes
 
         private void RegenManaShield()
         {
-            if (Player == null || !Player.IsValid || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
+            if (!Player.IsValid())
             {
                 _manaShieldTimer?.Kill();
                 return;
@@ -110,12 +109,9 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
-            if (!@event.Userid.IsValid || !@event.Userid.PawnIsAlive || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
-            double rolledValue = Random.Shared.NextDouble();
-            float chanceToStun = WarcraftPlayer.GetAbilityLevel(1) * 0.05f;
-
-            if (rolledValue <= chanceToStun)
+            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 25))
             {
                 var victim = @event.Userid;
                 DispatchEffect(new FreezeEffect(Player, victim, 1.0f));
@@ -146,20 +142,10 @@ namespace WarcraftPlugin.Classes
 
         private void MolotovDetonate(EventMolotovDetonate @event)
         {
-            var damage = WarcraftPlayer.GetAbilityLevel(0) * 200 * 0.2f;
-            var radius = WarcraftPlayer.GetAbilityLevel(0) * 500 * 0.2f;
+            var damage = WarcraftPlayer.GetAbilityLevel(0) * 40f;
+            var radius = WarcraftPlayer.GetAbilityLevel(0) * 100f;
             Warcraft.SpawnExplosion(new Vector(@event.X, @event.Y, @event.Z), damage, radius, Player);
             Warcraft.SpawnParticle(new Vector(@event.X, @event.Y, @event.Z), "particles/survival_fx/gas_cannister_impact.vpcf");
-        }
-
-        private void PlayerDeath(EventPlayerDeath obj)
-        {
-            _manaShieldTimer?.Kill();
-        }
-
-        public override void PlayerChangingToAnotherRace()
-        {
-            _manaShieldTimer?.Kill();
         }
     }
 
@@ -186,7 +172,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            if (Target != null && Target.IsValid && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
+            if (Target.IsValid())
             {
                 Target.PlayerPawn.Value.SetColor(Color.White);
                 Utilities.SetStateChanged(Target.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");

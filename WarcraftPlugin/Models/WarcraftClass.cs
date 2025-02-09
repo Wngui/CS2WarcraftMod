@@ -186,6 +186,10 @@ namespace WarcraftPlugin.Models
             CooldownManager.ResetCooldowns(WarcraftPlayer);
         }
 
+        /// <summary>
+        /// Adds a timer which is automatically cleared on death, round start, changing race and disconnect.
+        /// Use 'WarcraftPlugin.Instance.AddTimer' if you want a timer that persists across these events.
+        /// </summary>
         public Timer AddTimer(float duration, Action callback, TimerFlags flags = 0)
         {
             var timer = WarcraftPlugin.Instance.AddTimer(duration, callback, flags);
@@ -201,6 +205,7 @@ namespace WarcraftPlugin.Models
             }
 
             _timers.Clear();
+            WarcraftPlugin.Instance.EffectManager.ClearEffects(Player);
         }
     }
 }

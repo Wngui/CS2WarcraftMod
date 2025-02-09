@@ -57,16 +57,16 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
-            if (!@event.Userid.IsValid || !@event.Userid.PawnIsAlive || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
             var markmansLevel = WarcraftPlayer.GetAbilityLevel(2);
 
             if (markmansLevel > 0 && WeaponTypes.Snipers.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                victim.TakeDamage(markmansLevel * 2, Player);
+                victim.PlayerPawn.Value.Health -= markmansLevel * 2;
                 Warcraft.SpawnParticle(Player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
-                Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
+                Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
             }
         }
 
@@ -218,7 +218,7 @@ namespace WarcraftPlugin.Classes
 
             public override void OnStart()
             {
-                if (_trigger.IsValid) InitialPos = _trigger?.AbsOrigin.With();
+                if (_trigger.IsValid) InitialPos = _trigger?.AbsOrigin.Clone();
             }
 
             public override void OnTick()
@@ -234,14 +234,14 @@ namespace WarcraftPlugin.Classes
 
             private void TriggerTrap()
             {
-                Warcraft.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
+                Warcraft.SpawnParticle(_trap.AbsOrigin.Clone().Add(z: 20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
                 //Show trap
                 _trap.SetColor(Color.FromArgb(255, 255, 255, 255));
                 //Create 3D box around trap
-                var dangerzone = Geometry.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
+                var dangerzone = Warcraft.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
                 //Find players within area
                 var players = Utilities.GetPlayers().Where(x => x.PlayerPawn.IsValid && x.PawnIsAlive);
-                var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
+                var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
                 //Set movement speed + small hurt
                 if (playersInTrap.Any())
                 {
@@ -286,16 +286,16 @@ namespace WarcraftPlugin.Classes
             : base(owner, duration)
             {
                 var spawnBoxPoint = stormpos.With(z: stormpos.Z + _stormHeight);
-                _spawnBox = Geometry.CreateBoxAroundPoint(spawnBoxPoint, _stormArea, _stormArea, 50);
+                _spawnBox = Warcraft.CreateBoxAroundPoint(spawnBoxPoint, _stormArea, _stormArea, 50);
 
                 var hurtBoxPoint = stormpos.With(z: stormpos.Z + _stormHeight / 2);
-                _hurtBox = Geometry.CreateBoxAroundPoint(hurtBoxPoint, _stormArea, _stormArea, _stormHeight);
+                _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _stormArea, _stormArea, _stormHeight);
 
             }
 
             public override void OnStart()
             {
-                //Geometry.DrawVertices(_hurtBox.ComputeVertices()); //debug
+                //_hurtBox.Show(duration: Duration); //Debug
                 Owner.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
             }
 
@@ -315,11 +315,11 @@ namespace WarcraftPlugin.Classes
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => x.IsValid && x.PlayerPawn.IsValid && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d())).ToList();
+                var playersInHurtZone = players.Where(x => x.IsValid() && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
                 //Set movement speed + small hurt
                 foreach (var player in playersInHurtZone)
                 {
-                    if (!player.IsValid || !player.PlayerPawn.IsValid) continue;
+                    if (!player.IsValid()) continue;
 
                     player.TakeDamage(2, Owner);
                     player.PlayerPawn.Value.VelocityModifier = 0;
@@ -338,7 +338,7 @@ namespace WarcraftPlugin.Classes
                 arrow.DispatchSpawn();
                 arrow.SetModel("models/tools/bullet_hit_marker.vmdl");
                 arrow.SetColor(Color.FromArgb(255, 45, 25, 25));
-                arrow.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
+                arrow.SetScale(0.5f);
 
                 arrow.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_NEVER;
                 arrow.Collision.SolidFlags = 12;

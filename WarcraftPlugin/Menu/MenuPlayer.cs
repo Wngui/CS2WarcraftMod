@@ -5,6 +5,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using Microsoft.Extensions.Localization;
+using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Menu;
 
@@ -201,7 +202,7 @@ internal class MenuPlayer
             }
         }
 
-        var selectKey = (player.IsValid && player.PlayerPawn.IsValid && player.PawnIsAlive) ? "Space" : "E";
+        var selectKey = player.IsValid() ? "Space" : "E";
         builder.AppendLine($"<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-s'> W↑ S↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>{selectKey}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>");
         builder.AppendLine("<br>");
         CenterHtml = builder.ToString();

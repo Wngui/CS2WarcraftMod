@@ -66,10 +66,7 @@ namespace WarcraftPlugin.Classes
             //Disguise
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
-                double rolledValue = Random.Shared.NextDouble();
-                float chanceToDisguide = WarcraftPlayer.GetAbilityLevel(0) / 5 * 0.40f;
-
-                if (rolledValue <= chanceToDisguide)
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 40))
                 {
                     Disguise();
                 }
@@ -84,12 +81,12 @@ namespace WarcraftPlugin.Classes
 
             //Imposter syndrom
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
-                _checkSpottedTimer = WarcraftPlugin.Instance.AddTimer(1, CheckIfSpotted, TimerFlags.REPEAT);
+                _checkSpottedTimer = AddTimer(1, CheckIfSpotted, TimerFlags.REPEAT);
         }
 
         private void CheckIfSpotted()
         {
-            if (!Player.IsValid || !Player.PawnIsAlive)
+            if (!Player.IsValid())
             {
                 _checkSpottedTimer?.Kill();
                 return;
@@ -99,22 +96,18 @@ namespace WarcraftPlugin.Classes
             {
                 //disable timer and start timer again after cooldown
                 _checkSpottedTimer?.Kill();
-                WarcraftPlugin.Instance.AddTimer(5, () =>
+                AddTimer(5, () =>
                 {
                     _checkSpottedTimer?.Kill();
-                    _checkSpottedTimer = WarcraftPlugin.Instance.AddTimer(1, CheckIfSpotted, TimerFlags.REPEAT);
+                    _checkSpottedTimer = AddTimer(1, CheckIfSpotted, TimerFlags.REPEAT);
                 });
 
-                //chance
-                double rolledValue = Random.Shared.NextDouble();
-                float chanceToAlert = WarcraftPlayer.GetAbilityLevel(2) / 5f;
-
-                if (rolledValue <= chanceToAlert)
+                //chance to notify
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2)))
                 {
                     Player.PrintToCenter($"[Spotted]");
                     Player.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
-                    Player.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + 0.2f;
-                    Utilities.SetStateChanged(Player.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
+                    Player.AdrenalineSurgeEffect(0.2f);
                 }
             }
         }
@@ -261,7 +254,7 @@ namespace WarcraftPlugin.Classes
 
         private void UpdateCamera()
         {
-            if (!_cameraProp.IsValid || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
+            if (!_cameraProp.IsValid || !Player.IsValid())
             {
                 UnhookCamera();
                 return;
@@ -352,12 +345,12 @@ namespace WarcraftPlugin.Classes
             _clone.SetModel("models/generic/bust_02/bust_02_a.vmdl");
             _clone.DispatchSpawn();
             _clone.SetModel(Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
-            _clone.Teleport(_decoyVector.With().Add(z: -2), new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y, 0), new Vector());
+            _clone.Teleport(_decoyVector.Clone().Add(z: -2), new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y, 0), new Vector());
 
             _cloneDebrisHead = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
             _cloneDebrisHead.SetModel("models/generic/bust_02/bust_02_a.vmdl");
             _cloneDebrisHead.DispatchSpawn();
-            _cloneDebrisHead.Teleport(_decoyVector.With().Add(z: 35), new QAngle(), new Vector());
+            _cloneDebrisHead.Teleport(_decoyVector.Clone().Add(z: 35), new QAngle(), new Vector());
             _cloneDebrisHead.SetColor(Color.FromArgb(1, 255, 255, 255));
         }
 

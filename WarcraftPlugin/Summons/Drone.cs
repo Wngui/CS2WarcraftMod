@@ -131,7 +131,7 @@ namespace WarcraftPlugin.Summons
                 var endPos = RayTracer.Trace(turretMuzzle, playerCollison.Center.ToVector(), false);
 
                 //ensure trace has hit the players hitbox
-                if (endPos != null && playerCollison.Contains(endPos.ToVector3d()))
+                if (endPos != null && playerCollison.Contains(endPos))
                 {
                     _target = endPos;
 

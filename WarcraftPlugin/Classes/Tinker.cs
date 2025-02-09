@@ -62,10 +62,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
-                double rolledValue = Random.Shared.NextDouble();
-                float sparePartsChance = WarcraftPlayer.GetAbilityLevel(0) * 0.02f;
-
-                if (rolledValue <= sparePartsChance)
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 20))
                 {
                     var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
                     if (activeWeapon != null && activeWeapon.IsValid)
@@ -95,7 +92,7 @@ namespace WarcraftPlugin.Classes
             DeactivateDrones();
             for (int i = 0; i < numberOfDrones; i++)
             {
-                _drones.Add(new Drone(Player, _droneDefaultPosition.With()));
+                _drones.Add(new Drone(Player, _droneDefaultPosition.Clone()));
             }
 
             WarcraftPlugin.Instance.RegisterListener<OnTick>(UpdateDrones);
@@ -103,6 +100,12 @@ namespace WarcraftPlugin.Classes
 
         private void UpdateDrones()
         {
+            if (!Player.IsValid())
+            {
+                DeactivateDrones();
+                return;
+            }
+
             foreach (var drone in _drones)
             {
                 drone.Update();
@@ -117,6 +120,7 @@ namespace WarcraftPlugin.Classes
         public override void PlayerChangingToAnotherRace()
         {
             DeactivateDrones();
+            base.PlayerChangingToAnotherRace();
         }
 
         private void DeactivateDrones()
@@ -146,10 +150,10 @@ namespace WarcraftPlugin.Classes
         {
             //trap model
             var trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
-            trap.Teleport(vector.With().Add(z: -7), new QAngle(), new Vector());
+            trap.Teleport(vector.Clone().Add(z: -7), new QAngle(), new Vector());
             trap.DispatchSpawn();
             trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
-            trap.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
+            trap.SetScale(0.5f);
 
             //event prop
             var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
@@ -181,7 +185,7 @@ namespace WarcraftPlugin.Classes
 
             public override void OnStart()
             {
-                InitialPos = _trigger?.AbsOrigin.With();
+                InitialPos = _trigger?.AbsOrigin.Clone();
             }
 
             public override void OnTick()
@@ -197,15 +201,15 @@ namespace WarcraftPlugin.Classes
 
             private void TriggerTrap()
             {
-                Warcraft.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
+                Warcraft.SpawnParticle(_trap.AbsOrigin.Clone().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
                 //Show trap
                 _trap.SetColor(Color.FromArgb(255, 255, 255, 255));
 
                 //Create 3D box around trap
-                var dangerzone = Geometry.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
+                var dangerzone = Warcraft.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
+                var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
                 //launch players
                 if (playersInTrap.Any())
                 {
@@ -234,7 +238,7 @@ namespace WarcraftPlugin.Classes
         private void Ultimate()
         {
             //Ultimate effect
-            var ultEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/ui/ui_experience_award_innerpoint.vpcf");
+            var ultEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ui_experience_award_innerpoint.vpcf");
             ultEffect.SetParent(Player.PlayerPawn.Value);
 
             ActivateDrones(_droneUltimateAmount);
@@ -253,7 +257,7 @@ namespace WarcraftPlugin.Classes
             float speed = 16f; // Speed of the circular motion
 
             // Create a timer to update the drone's position every 0.01 seconds
-            _ultimateTimer = WarcraftPlugin.Instance.AddTimer(0.01f, () =>
+            _ultimateTimer = AddTimer(0.01f, () =>
             {
                 foreach (var drone in _drones)
                 {

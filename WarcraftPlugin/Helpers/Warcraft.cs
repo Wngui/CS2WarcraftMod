@@ -10,6 +10,7 @@ using System.Linq;
 using g3;
 using System.Collections.Generic;
 using CounterStrikeSharp.API.Modules.Entities;
+using static g3.RoundRectGenerator;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -164,7 +165,7 @@ namespace WarcraftPlugin.Helpers
         {
             if (!childEntity.IsValid || !parentEntity.IsValid) return;
 
-            offset = offset == null ? new Vector(IntPtr.Zero) : parentEntity.AbsOrigin.With().Add(x: offset.X, y: offset.Y, z: offset.Z);
+            offset = offset == null ? new Vector(IntPtr.Zero) : parentEntity.AbsOrigin.Clone().Add(x: offset.X, y: offset.Y, z: offset.Z);
             rotation ??= new QAngle(IntPtr.Zero);
 
             childEntity.Teleport(offset, rotation, new Vector(IntPtr.Zero));
@@ -207,10 +208,27 @@ namespace WarcraftPlugin.Helpers
         /// <param name="color">The color to set.</param>
         public static void SetColor(this CBaseModelEntity entity, Color color)
         {
-            if (entity == null) return;
+            if (entity == null || !entity.IsValid) return;
 
             entity.Render = color;
             Utilities.SetStateChanged(entity, "CBaseModelEntity", "m_clrRender");
+        }
+
+        /// <summary>
+        /// Sets the scale of the skeleton instance of the entity's body component.
+        /// </summary>
+        /// <param name="entity">The entity whose skeleton instance scale is to be set.</param>
+        /// <param name="scale">The scale value to set.</param>
+        public static void SetScale(this CBaseModelEntity entity, float scale)
+        {
+            if (entity == null || !entity.IsValid) return;
+
+            var skeletonInstance = entity.CBodyComponent.SceneNode.GetSkeletonInstance();
+            if (skeletonInstance != null)
+            {
+                skeletonInstance.Scale = scale;
+                Utilities.SetStateChanged(entity, "CBaseEntity", "m_CBodyComponent");
+            }
         }
 
         /// <summary>
@@ -223,6 +241,14 @@ namespace WarcraftPlugin.Helpers
             if (player == null || !player.IsValid) return;
 
             player.ExecuteClientCommand($"play {soundPath}");
+        }
+
+        public static void AdrenalineSurgeEffect(this CCSPlayerController player, float duration = 5f)
+        {
+            if (!player.IsValid()) return;
+
+            player.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + duration;
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
         }
 
         /// <summary>
@@ -313,6 +339,19 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
+        /// Inflicts damage to the player.
+        /// </summary>
+        /// <param name="player">The player receiving the damage.</param>
+        /// <param name="damage">The amount of damage to inflict.</param>
+        public static void TakeDamage(this CCSPlayerController player, int damage)
+        {
+            if (player.IsValid())
+            {
+                player.PlayerPawn.Value.Health -= damage;
+            }
+        }
+
+        /// <summary>
         /// Inflicts damage to the player from an attacker, with an optional inflictor.
         /// </summary>
         /// <param name="player">The player receiving the damage.</param>
@@ -338,7 +377,7 @@ namespace WarcraftPlugin.Helpers
             damageInfo.Damage = damage;
             damageInfo.NumObjectsPenetrated = 0;
 
-            if (!player.IsValid || !player.PlayerPawn.IsValid || !player.Pawn.IsValid) return;
+            if (!player.IsValid() || !player.Pawn.IsValid) return;
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(player.Pawn.Value, damageInfo);
             Marshal.FreeHGlobal(ptr);
         }
@@ -370,6 +409,16 @@ namespace WarcraftPlugin.Helpers
             {
                 obj?.Remove();
             }
+        }
+
+        /// <summary>
+        /// Checks if the player controller is valid and the pawn is alive.
+        /// </summary>
+        /// <param name="player">The player controller to check.</param>
+        /// <returns>True if the player controller is valid and the pawn is alive, otherwise false.</returns>
+        public static bool IsValid(this CCSPlayerController player)
+        {
+            return player != null && player.IsValid && player.PawnIsAlive;
         }
 
         /// <summary>
@@ -412,7 +461,7 @@ namespace WarcraftPlugin.Helpers
         /// </summary>
         /// <param name="chanceOfSuccess">The chance of success (0-100).</param>
         /// <returns>True if the roll is successful, otherwise false.</returns>
-        public static bool RollDice(int chanceOfSuccess)
+        private static bool RollDice(int chanceOfSuccess)
         {
             var roll = Random.Shared.NextInt64(100);
             return roll >= 100 - chanceOfSuccess;

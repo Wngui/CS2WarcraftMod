@@ -31,7 +31,6 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
-            HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
             HookEvent<EventRoundStart>(RoundStart);
 
@@ -60,20 +59,20 @@ namespace WarcraftPlugin.Classes
         private void StartHealingAura()
         {
             _healingAuraTimer?.Kill();
-            _healingAuraTimer = WarcraftPlugin.Instance.AddTimer(5f, () =>
+            _healingAuraTimer = AddTimer(5f, () =>
             {
-                if (Player == null || !Player.IsValid || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
+                if (!Player.IsValid())
                 {
                     _healingAuraTimer?.Kill();
                     return;
                 }
 
                 var auraSize = WarcraftPlayer.GetAbilityLevel(0) * 100;
-                var healingZone = Geometry.CreateBoxAroundPoint(Player.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
-                //Geometry.DrawVertices(healingZone.ComputeVertices()); //debug
+                var healingZone = Warcraft.CreateBoxAroundPoint(Player.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
+                //healingZone.Show(duration: 2); //Debug
                 //Find players within area
                 var playersToHeal = Utilities.GetPlayers().Where(x => x.Team == Player.Team && x.PawnIsAlive && Player.IsValid &&
-                healingZone.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
+                healingZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
 
                 if (playersToHeal.Any())
                 {
@@ -82,22 +81,12 @@ namespace WarcraftPlugin.Classes
                         if (player.PlayerPawn.Value.Health < player.PlayerPawn.Value.MaxHealth)
                         {
                             var healthAfterHeal = player.PlayerPawn.Value.Health + WarcraftPlayer.GetAbilityLevel(0);
-                            player.SetHp(healthAfterHeal > player.PlayerPawn.Value.MaxHealth ? player.PlayerPawn.Value.MaxHealth : healthAfterHeal);
-                            Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
+                            player.SetHp(Math.Min(healthAfterHeal, player.PlayerPawn.Value.MaxHealth));
+                            Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
                         }
                     }
                 }
             }, TimerFlags.REPEAT);
-        }
-
-        private void PlayerDeath(EventPlayerDeath death)
-        {
-            _healingAuraTimer?.Kill();
-        }
-
-        public override void PlayerChangingToAnotherRace()
-        {
-            _healingAuraTimer?.Kill();
         }
 
         private void Ultimate()
@@ -145,17 +134,14 @@ namespace WarcraftPlugin.Classes
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
             var victim = @event.Userid;
-            if (!victim.IsValid || !victim.PawnIsAlive || victim.UserId == Player.UserId) return;
+            if (!victim.IsValid() || victim.UserId == Player.UserId) return;
 
-            double rolledValue = Random.Shared.NextDouble();
-            float chanceToSmite = WarcraftPlayer.GetAbilityLevel(2) * 0.15f;
-
-            if (rolledValue <= chanceToSmite)
+            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
             {
                 if (victim.PlayerPawn.Value.ArmorValue > 0)
                 {
                     victim.SetArmor(victim.PlayerPawn.Value.ArmorValue - WarcraftPlayer.GetAbilityLevel(2) * 5);
-                    Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
+                    Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
                     Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
                 }
             }

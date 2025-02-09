@@ -35,7 +35,7 @@ namespace WarcraftPlugin.Summons
             Entity.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 2f;
             Entity.Health = _maxHealth;
 
-            Warcraft.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+            Warcraft.SpawnParticle(Entity.AbsOrigin.Clone().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
 
             Entity.OwnerEntity.Raw = Owner.PlayerPawn.Raw;
             FollowLeader();
@@ -44,14 +44,14 @@ namespace WarcraftPlugin.Summons
         internal void Update()
         {
             if (Entity == null || !Entity.IsValid) return;
-            if (Owner == null || !Owner.IsValid || !Owner.PlayerPawn.IsValid || !Owner.PawnIsAlive) Kill();
+            if (!Owner.IsValid()) Kill();
 
             if(InterestScore <= 0)
             {
                 FollowLeader();
             }
 
-            if (Target != null && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
+            if (Target.IsValid())
             {
                 if (LastLeapTick == 0 || LastLeapTick + _leapCooldown + Random.Shared.NextDouble() < Server.TickedTime)
                 {
@@ -68,7 +68,7 @@ namespace WarcraftPlugin.Summons
                     Entity.AbsOrigin.X = chickenResetPoint.X;
                     Entity.AbsOrigin.Y = chickenResetPoint.Y;
                     Entity.AbsOrigin.Z = Owner.PlayerPawn.Value.AbsOrigin.Z+5;
-                    Warcraft.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+                    Warcraft.SpawnParticle(Entity.AbsOrigin.Clone().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
                     return;
                 }
                 Vector velocity = CircularGetVelocityToPosition(Owner.PlayerPawn.Value.AbsOrigin, Entity.AbsOrigin);
@@ -90,7 +90,7 @@ namespace WarcraftPlugin.Summons
             float offsetY = (float)(_radius * Math.Sin(angle));
 
             // Add these offsets to the owner's position
-            Vector targetPosition = circleTarget.With()
+            Vector targetPosition = circleTarget.Clone()
                 .Add(x: offsetX, y: offsetY);
 
             // Calculate the travel velocity
@@ -113,10 +113,10 @@ namespace WarcraftPlugin.Summons
 
         private void Attack()
         {
-            var playerCollison = Target.PlayerPawn.Value.Collision.ToBox(Target.PlayerPawn.Value.AbsOrigin.With().Add(z: -60));
+            var playerCollison = Target.PlayerPawn.Value.Collision.ToBox(Target.PlayerPawn.Value.AbsOrigin.Clone().Add(z: -60));
 
             //Check if zombie is inside targets collision box
-            if (playerCollison.Contains(Entity.AbsOrigin.ToVector3d()))
+            if (playerCollison.Contains(Entity.AbsOrigin))
             {
                 //dodamage to target
                 Target.TakeDamage(_damage, Owner);
@@ -136,9 +136,9 @@ namespace WarcraftPlugin.Summons
 
         internal void SetEnemy(CCSPlayerController enemy)
         {
-            if (!enemy.PlayerPawn.IsValid || !enemy.PawnIsAlive) return;
+            if (!enemy.IsValid()) return;
 
-            if (Target != null && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
+            if (Target.IsValid())
             {
                 return;
             }

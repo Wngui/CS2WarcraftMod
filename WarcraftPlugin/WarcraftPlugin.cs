@@ -18,6 +18,7 @@ using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace WarcraftPlugin
 {
@@ -336,6 +337,16 @@ namespace WarcraftPlugin
 
         public override void Unload(bool hotReload)
         {
+            foreach (var player in Utilities.GetPlayers())
+            {
+                if (player.IsValid())
+                {
+                    //Avoid getting stuck in old menu
+                    player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+                    Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+                    Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+                }
+            }
             base.Unload(hotReload);
         }
 

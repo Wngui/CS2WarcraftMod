@@ -1,5 +1,4 @@
-﻿using System;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
@@ -45,15 +44,9 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerShoot(EventWeaponFire @event)
         {
-            if (WarcraftPlayer.GetAbilityLevel(2) > 0)
+            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 25))
             {
-                double rolledValue = Random.Shared.NextDouble();
-                float chanceToAxe = WarcraftPlayer.GetAbilityLevel(2) * 0.05f;
-
-                if (rolledValue <= chanceToAxe)
-                {
-                    ThrowAxe();
-                }
+                ThrowAxe();
             }
         }
 
@@ -88,8 +81,7 @@ namespace WarcraftPlugin.Classes
 
         private void SetBloodlust()
         {
-            Player.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + _bloodlustLength;
-            Utilities.SetStateChanged(Player.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
+            Player.AdrenalineSurgeEffect(_bloodlustLength);
             DispatchEffect(new BloodlustEffect(Player, _bloodlustLength));
         }
 
@@ -103,14 +95,14 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
-            if (!@event.Userid.IsValid || !@event.Userid.PawnIsAlive || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
             var carnageLevel = WarcraftPlayer.GetAbilityLevel(0);
 
             if (carnageLevel > 0 && WeaponTypes.Shotguns.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                victim.TakeDamage(carnageLevel * 5f, Player);
+                victim.PlayerPawn.Value.Health -= carnageLevel * 5;
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 Player.PlayLocalSound("sounds/physics/body/body_medium_break3.vsnd");
             }
@@ -167,33 +159,33 @@ namespace WarcraftPlugin.Classes
 
         public override void OnTick()
         {
-            if (!Owner.IsValid || !Owner.PawnIsAlive) return;
+            if (!Owner.IsValid()) return;
 
             //Refill ammo
             Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
 
-            //Regenerate healthw
+            //Regenerate health
             if (Owner.PlayerPawn.Value.Health < Owner.PlayerPawn.Value.MaxHealth)
             {
                 Owner.SetHp(Owner.PlayerPawn.Value.Health + 1);
             }
 
             //Rage growth spurt
-            if (Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale < _maxSize)
+            var scale = Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale;
+            if (scale < _maxSize)
             {
-                Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale += 0.01f;
-                Utilities.SetStateChanged(Owner.PlayerPawn.Value, "CBaseEntity", "m_CBodyComponent");
+                Owner.PlayerPawn.Value.SetScale(scale + 0.01f);
             }
         }
 
         public override void OnFinish()
         {
-            if (!Owner.IsValid || !Owner.PawnIsAlive) return;
+            if (!Owner.IsValid()) return;
 
-            Owner.PlayerPawn.Value.SetColor(Color.White);
-            Owner.PlayerPawn.Value.VelocityModifier = 1f;
-            Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 1f;
-            Utilities.SetStateChanged(Owner.PlayerPawn.Value, "CBaseEntity", "m_CBodyComponent");
+            var pawn = Owner.PlayerPawn.Value;
+            pawn.SetColor(Color.White);
+            pawn.VelocityModifier = 1f;
+            pawn.SetScale(1);
         }
     }
 }

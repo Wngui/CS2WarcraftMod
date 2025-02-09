@@ -9,6 +9,7 @@ using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
+using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Models;
 using static CounterStrikeSharp.API.Core.BasePlugin;
@@ -126,7 +127,7 @@ namespace WarcraftPlugin.Events
 
             foreach (var spottedPlayer in players)
             {
-                if (!spottedPlayer.IsValid || !spottedPlayer.PawnIsAlive) continue;
+                if (!spottedPlayer.IsValid()) continue;
 
                 var spottedByMask = spottedPlayer.PlayerPawn.Value.EntitySpottedState.SpottedByMask;
 
@@ -139,7 +140,7 @@ namespace WarcraftPlugin.Events
                     {
                         int playerIndex = baseId + BitOperations.TrailingZeroCount(mask) + 1; // Offset by 1 to match the 1-based index
 
-                        if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsValid && spottedByPlayer.PawnIsAlive)
+                        if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsValid())
                         {
                             spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventSpottedByEnemy() { UserId = spottedByPlayer });
                             spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventSpottedEnemy() { UserId = spottedPlayer });
@@ -175,11 +176,12 @@ namespace WarcraftPlugin.Events
             {
                 var warcraftPlayer = player.GetWarcraftPlayer();
                 var warcraftClass = warcraftPlayer?.GetClass();
+                warcraftPlayer?.GetClass()?.ClearTimers();
                 warcraftPlayer?.GetClass()?.InvokeEvent(@event);
 
                 if (warcraftClass != null)
                 {
-                    if (_config.DeactivatedClasses.Contains(warcraftClass.InternalName, StringComparer.InvariantCultureIgnoreCase))
+                    if (_config.DeactivatedClasses.Contains(warcraftClass.InternalName, StringComparer.InvariantCultureIgnoreCase) || _config.DeactivatedClasses.Contains(warcraftClass.DisplayName, StringComparer.InvariantCultureIgnoreCase))
                     {
                         player.PrintToChat($"{ChatColors.Green}{warcraftClass.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
                         player.ExecuteClientCommandFromServer("class");
@@ -207,7 +209,6 @@ namespace WarcraftPlugin.Events
 
                     Server.NextFrame(() =>
                     {
-                        WarcraftPlugin.Instance.EffectManager.ClearEffects(player);
                         warcraftClass.ResetCooldowns();
                     });
                 }
@@ -260,8 +261,8 @@ namespace WarcraftPlugin.Events
             var victim = @event.Userid;
             var attacker = @event.Attacker;
 
-            if (victim != null && (!victim.IsValid || !victim.PawnIsAlive)) return HookResult.Continue;
-            if (attacker != null && (!attacker.IsValid || !attacker.PawnIsAlive || attacker.ControllingBot)) return HookResult.Continue;
+            if (victim != null && (!victim.IsValid())) return HookResult.Continue;
+            if (attacker != null && (!attacker.IsValid() || attacker.ControllingBot)) return HookResult.Continue;
 
             //Prevent shotguns, etc from triggering multiple hurt other events
             var attackingClass = attacker?.GetWarcraftPlayer()?.GetClass();
@@ -287,7 +288,6 @@ namespace WarcraftPlugin.Events
             {
                 Server.NextFrame(() =>
                 {
-                    WarcraftPlugin.Instance.EffectManager.ClearEffects(player);
                     warcraftClass.SetDefaultAppearance();
                     warcraftClass.ClearTimers();
                     warcraftClass.InvokeEvent(@event);
@@ -348,7 +348,7 @@ namespace WarcraftPlugin.Events
                 victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
             }
 
-            WarcraftPlugin.Instance.EffectManager.ClearEffects(victim);
+            victim?.GetWarcraftPlayer()?.GetClass()?.ClearTimers();
 
             return HookResult.Continue;
         }
