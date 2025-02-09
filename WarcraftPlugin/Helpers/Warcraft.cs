@@ -341,11 +341,13 @@ namespace WarcraftPlugin.Helpers
         /// </summary>
         /// <param name="player">The player receiving the damage.</param>
         /// <param name="damage">The amount of damage to inflict.</param>
-        public static void TakeDamage(this CCSPlayerController player, int damage)
+        /// <param name="forceClientUpdate">Force client UI to update new health values.</param>
+        public static void TakeDamage(this CCSPlayerController player, int damage, bool forceClientUpdate = false)
         {
             if (player.IsValid())
             {
                 player.PlayerPawn.Value.Health -= damage;
+                if (forceClientUpdate) Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_iHealth");
             }
         }
 

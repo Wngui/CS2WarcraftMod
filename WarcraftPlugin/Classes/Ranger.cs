@@ -64,7 +64,7 @@ namespace WarcraftPlugin.Classes
             if (markmansLevel > 0 && WeaponTypes.Snipers.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                victim.PlayerPawn.Value.Health -= markmansLevel * 2;
+                victim.TakeDamage(markmansLevel * 2);
                 Warcraft.SpawnParticle(Player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
             }

@@ -120,7 +120,7 @@ namespace WarcraftPlugin.Classes
             if (attackerWeapon == "weapon_knife")
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(2) * 12;
-                @event.Userid.PlayerPawn.Value.Health -= damageBonus;
+                @event.Userid.TakeDamage(damageBonus);
             }
         }
 
@@ -132,7 +132,7 @@ namespace WarcraftPlugin.Classes
             if (Math.Abs(attackerAngle - victimAngle) <= 50)
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
-                eventPlayerHurt.Userid.PlayerPawn.Value.Health -= damageBonus;
+                eventPlayerHurt.Userid.TakeDamage(damageBonus);
                 Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}", 1);
                 Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }

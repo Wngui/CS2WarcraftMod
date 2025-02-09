@@ -24,7 +24,7 @@ namespace WarcraftPlugin.Core
             _connection.Execute(@"
                 CREATE TABLE IF NOT EXISTS `players` (
 	                `steamid` UNSIGNED BIG INT NOT NULL,
-	                `currentRace` VARCHAR(32) NOT NULL DEFAULT 'barbarian',
+	                `currentRace` VARCHAR(32) NOT NULL,
                   `name` VARCHAR(64),
 	                PRIMARY KEY (`steamid`));");
 

@@ -22,7 +22,6 @@ namespace WarcraftPlugin.Summons
         private Timer _fireRateTimer;
         private CBeam _lazerDot;
         private Vector _target;
-        private Timer _idleTimer;
         private readonly CCSPlayerController _owner;
 
         internal float Angle { get; set; } = 0f;
@@ -111,10 +110,9 @@ namespace WarcraftPlugin.Summons
 
                 for (var i = 0; i < timesToShoot; i++)
                 {
-                    double rolledValue = Random.Shared.NextDouble();
-                    float rocketChance = droneLevel * 0.02f;
+                    int rocketMaxChance = 20;
 
-                    WarcraftPlugin.Instance.AddTimer((float)(0.2 * i), () => TryShootTarget(enemy, rolledValue <= rocketChance));
+                    WarcraftPlugin.Instance.AddTimer((float)(0.2 * i), () => TryShootTarget(enemy, Warcraft.RollDice(droneLevel, rocketMaxChance)));
                 }
             }
         }
@@ -123,8 +121,8 @@ namespace WarcraftPlugin.Summons
         {
             if (_turret != null && _turret.IsValid)
             {
-                var playerCollison = target.PlayerPawn.Value.Collision.ToBox(target.PlayerPawn.Value.AbsOrigin);
-                //Geometry.DrawVertices(playerCollison.ComputeVertices()); //debug
+                var playerCollison = target.PlayerPawn.Value.CollisionBox();
+                //playerCollison.Show(); //debug
 
                 //check if we have a clear line of sight to target
                 var turretMuzzle = _turret.CalculatePositionInFront(new Vector(0, 30, 2));
