@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using WarcraftPlugin.Models;
@@ -26,7 +28,7 @@ namespace WarcraftPlugin.Core
                   `name` VARCHAR(64),
 	                PRIMARY KEY (`steamid`));");
 
-                            _connection.Execute(@"
+            _connection.Execute(@"
                 CREATE TABLE IF NOT EXISTS `raceinformation` (
                   `steamid` UNSIGNED BIG INT NOT NULL,
                   `racename` VARCHAR(32) NOT NULL,
@@ -49,11 +51,12 @@ namespace WarcraftPlugin.Core
 
         internal void AddNewPlayerToDatabase(CCSPlayerController player)
         {
+            var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
             Console.WriteLine($"Adding client to database {player.SteamID}");
             _connection.Execute(@"
             INSERT INTO players (`steamid`, `currentRace`)
-	        VALUES(@steamid, 'ranger')",
-                new { steamid = player.SteamID });
+            VALUES(@steamid, @className)",
+                new { steamid = player.SteamID, className = defaultClass.InternalName });
         }
 
         internal WarcraftPlayer LoadPlayerFromDatabase(CCSPlayerController player, XpSystem xpSystem)
@@ -68,6 +71,14 @@ namespace WarcraftPlugin.Core
                 dbPlayer = _connection.QueryFirstOrDefault<DatabasePlayer>(@"
                     SELECT * FROM `players` WHERE `steamid` = @steamid",
                     new { steamid = player.SteamID });
+            }
+
+            // If the class no longer exists, set it to the default class
+            if (!WarcraftPlugin.Instance.classManager.GetAllClasses().Any(x => x.InternalName == dbPlayer.CurrentRace))
+            {
+                var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
+                dbPlayer.CurrentRace = defaultClass.InternalName;
+                player.PrintToChat($"{ChatColors.Green}Current class is{ChatColors.Red} disabled{ChatColors.Green}! Now playing as {defaultClass.DisplayName}.{ChatColors.Default}");
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"

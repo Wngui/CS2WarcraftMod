@@ -44,8 +44,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 .ThenByDescending(x => x.CurrentXp)
                 .ThenBy(x => x.DisplayName))
             {
-                if (WarcraftPlugin.Instance.Config.DeactivatedClasses.Contains(warClassInformation.InternalName, StringComparer.InvariantCultureIgnoreCase) ||
-                    WarcraftPlugin.Instance.Config.DeactivatedClasses.Contains(warClassInformation.DisplayName, StringComparer.InvariantCultureIgnoreCase))
+                if (!WarcraftPlugin.Instance.classManager.GetAllClasses().Any(x => x.InternalName == warClassInformation.InternalName))
                 {
                     continue;
                 }

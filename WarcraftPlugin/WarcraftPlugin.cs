@@ -108,7 +108,7 @@ namespace WarcraftPlugin
 
             _database = new Database();
             classManager = new ClassManager();
-            classManager.Initialize(ModuleDirectory);
+            classManager.Initialize(ModuleDirectory, Config);
 
             EffectManager = new EffectManager();
             EffectManager.Initialize();

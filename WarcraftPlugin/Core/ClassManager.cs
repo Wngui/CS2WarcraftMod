@@ -1,9 +1,12 @@
-﻿using CounterStrikeSharp.API.Modules.Timers;
+﻿using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using WarcraftPlugin.Compiler;
 using WarcraftPlugin.Models;
@@ -13,15 +16,17 @@ namespace WarcraftPlugin.Core
 {
     internal class ClassManager
     {
-        private  Dictionary<string, Type> _classes = [];
-        private  Dictionary<string, WarcraftClass> _classObjects = [];
+        private Dictionary<string, Type> _classes = [];
+        private Dictionary<string, WarcraftClass> _classObjects = [];
 
         private DirectoryInfo _customHeroesFolder;
         private long _customHeroesFilesTimestamp;
         private bool _checkingCustomHeroFiles;
+        private Config _config;
 
-        internal void Initialize(string moduleDirectory)
+        internal void Initialize(string moduleDirectory, Config config)
         {
+            _config = config;
             RegisterDefaultClasses();
 
             _customHeroesFolder = Directory.CreateDirectory(Path.Combine(moduleDirectory, "CustomHeroes"));
@@ -58,16 +63,38 @@ namespace WarcraftPlugin.Core
 
             foreach (var heroClass in heroClasses)
             {
-                Console.WriteLine($"Registering class: {heroClass.Name}");
                 RegisterClass(heroClass);
             }
         }
 
         private void RegisterClass(Type type)
         {
-            var heroClass = InstantiateClass(type);
-            heroClass.Register();
+            if (_config.DeactivatedClasses.Contains(type.Name, StringComparer.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine($"Skipping deactivated class: {type.Name}");
+                return;
+            }
 
+            WarcraftClass heroClass;
+            try
+            {
+                heroClass = InstantiateClass(type);
+                heroClass.Register();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Error registering class {type.Name}");
+                throw;
+            }
+
+            if (_config.DeactivatedClasses.Contains(heroClass.InternalName, StringComparer.InvariantCultureIgnoreCase) ||
+                _config.DeactivatedClasses.Contains(heroClass.DisplayName, StringComparer.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine($"Skipping deactivated class: {heroClass.DisplayName}");
+                return;
+            }
+
+            Console.WriteLine($"Registered class: {heroClass.DisplayName}");
             _classes[heroClass.InternalName] = type;
             _classObjects[heroClass.InternalName] = heroClass;
         }
@@ -121,6 +148,12 @@ namespace WarcraftPlugin.Core
         internal WarcraftClass[] GetAllClasses()
         {
             return _classObjects.Values.ToArray();
+        }
+
+        internal WarcraftClass GetDefaultClass()
+        {
+            var defaultClass = _classObjects.Values.FirstOrDefault();
+            return defaultClass ?? throw new Exception("No warcraft classes registered!!!");
         }
 
         private static long GetLatestTimestamp(string[] files)

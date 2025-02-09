@@ -181,14 +181,6 @@ namespace WarcraftPlugin.Events
 
                 if (warcraftClass != null)
                 {
-                    if (_config.DeactivatedClasses.Contains(warcraftClass.InternalName, StringComparer.InvariantCultureIgnoreCase) || _config.DeactivatedClasses.Contains(warcraftClass.DisplayName, StringComparer.InvariantCultureIgnoreCase))
-                    {
-                        player.PrintToChat($"{ChatColors.Green}{warcraftClass.DisplayName}{ChatColors.Default} is currently {ChatColors.Red}disabled{ChatColors.Default}, please choose another class and rejoin a team.{ChatColors.Default}");
-                        player.ExecuteClientCommandFromServer("class");
-                        player.ChangeTeam(CsTeam.Spectator);
-                        return;
-                    }
-
                     if (warcraftPlayer.DesiredClass != null && warcraftPlayer.DesiredClass != warcraftClass.InternalName)
                     {
                         WarcraftPlugin.Instance.ChangeClass(player, warcraftPlayer.DesiredClass);
