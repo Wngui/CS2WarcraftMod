@@ -13,8 +13,8 @@ namespace WarcraftPlugin.Core
 {
     internal class ClassManager
     {
-        private Dictionary<string, Type> _classes = [];
-        private Dictionary<string, WarcraftClass> _classObjects = [];
+        private readonly Dictionary<string, Type> _classes = [];
+        private readonly Dictionary<string, WarcraftClass> _classObjects = [];
 
         private DirectoryInfo _customHeroesFolder;
         private long _customHeroesFilesTimestamp;
@@ -144,13 +144,28 @@ namespace WarcraftPlugin.Core
 
         internal WarcraftClass[] GetAllClasses()
         {
+            if (_classObjects.Count == 0)
+            {
+                throw new Exception("No warcraft classes registered!!!");
+            }
             return _classObjects.Values.ToArray();
         }
 
         internal WarcraftClass GetDefaultClass()
         {
-            var defaultClass = _classObjects.Values.FirstOrDefault();
-            return defaultClass ?? throw new Exception("No warcraft classes registered!!!");
+            var allClasses = GetAllClasses();
+            WarcraftClass defaultClass = null;
+
+            if (_config.DefaultClass != null)
+            {
+                defaultClass = allClasses.FirstOrDefault(x =>
+                    x.InternalName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase) ||
+                    x.DisplayName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            defaultClass ??= allClasses.First();
+
+            return defaultClass;
         }
 
         private static long GetLatestTimestamp(string[] files)

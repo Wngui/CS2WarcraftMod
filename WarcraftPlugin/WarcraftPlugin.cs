@@ -28,6 +28,7 @@ namespace WarcraftPlugin
 
         [JsonPropertyName("DeactivatedClasses")] internal string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] internal bool ShowCommandAdverts { get; set; } = false;
+        [JsonPropertyName("DefaultClass")] internal string DefaultClass { get; set; }
     }
 
     internal static class WarcraftPlayerExtensions
