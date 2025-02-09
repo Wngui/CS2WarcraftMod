@@ -152,6 +152,7 @@ namespace WarcraftPlugin.Classes
         {
             BreakTransformation();
             _checkSpottedTimer?.Kill();
+            base.PlayerChangingToAnotherRace();
         }
 
         private void PlayerShoot(EventWeaponFire fire)

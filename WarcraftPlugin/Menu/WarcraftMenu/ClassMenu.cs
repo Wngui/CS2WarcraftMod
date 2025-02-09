@@ -37,7 +37,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
             var totalLevels = warcraftClassInformations.Sum(x => x.CurrentLevel);
 
-            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><font color='darkgrey' class='{FontSizes.FontSizeSm}'> ( </font><font color='darkgrey' class='{FontSizes.FontSizeM}'>!class</font><font color='darkgrey' class='{FontSizes.FontSizeSm}'> )</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
+            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
 
             foreach (var warClassInformation in warcraftClassInformations
                 .OrderByDescending(x => x.CurrentLevel)
@@ -53,10 +53,10 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
                 var isCurrentClass = player.GetWarcraftPlayer().className == warClassInformation.InternalName;
 
-                var displayString = @$"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeS}'>(</font>
+                var displayString = @$"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>(</font>
                 <font color='{(isCurrentClass ? Color.Gray.Name : "white")}' class='{FontSizes.FontSizeSm}'>{warClassInformation.DisplayName}</font>
-                <font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeS}'>)</font>
-                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeS}'>- Level {warClassInformation.CurrentLevel}</font>";
+                <font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>)</font>
+                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeSm}'>- level {warClassInformation.CurrentLevel}</font>";
 
                 var classInternalName = warClassInformation.InternalName;
                 classMenu.Add(displayString, null, (p, opt) =>

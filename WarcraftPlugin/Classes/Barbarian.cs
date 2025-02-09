@@ -102,7 +102,7 @@ namespace WarcraftPlugin.Classes
             if (carnageLevel > 0 && WeaponTypes.Shotguns.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                victim.PlayerPawn.Value.Health -= carnageLevel * 5;
+                victim.TakeDamage(carnageLevel * 5);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 Player.PlayLocalSound("sounds/physics/body/body_medium_break3.vsnd");
             }
