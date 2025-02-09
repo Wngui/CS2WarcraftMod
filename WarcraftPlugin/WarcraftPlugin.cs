@@ -27,8 +27,9 @@ namespace WarcraftPlugin
         [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 2;
 
         [JsonPropertyName("DeactivatedClasses")] internal string[] DeactivatedClasses { get; set; } = [];
-        [JsonPropertyName("ShowCommandAdverts")] internal bool ShowCommandAdverts { get; set; } = false;
+        [JsonPropertyName("ShowCommandAdverts")] internal bool ShowCommandAdverts { get; set; } = true;
         [JsonPropertyName("DefaultClass")] internal string DefaultClass { get; set; }
+        [JsonPropertyName("DisableNamePrefix")] internal bool DisableNamePrefix { get; set; } = false;
     }
 
     internal static class WarcraftPlayerExtensions
@@ -89,12 +90,12 @@ namespace WarcraftPlugin
         internal static void RefreshPlayerName(WarcraftPlayer wcPlayer)
         {
             if (wcPlayer == null || !wcPlayer.Player.IsValid) return;
+            if (Instance.Config.DisableNamePrefix) return;
 
-            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"\d+ \[\w+\] ", "");
-            wcPlayer.Player.PlayerName = $"{wcPlayer.currentLevel} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
-            wcPlayer.Player.Clan = "";
+            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @$"\d+ \[{wcPlayer.GetClass().DisplayName}] ", "");
+            wcPlayer.Player.PlayerName = $"{wcPlayer.GetLevel()} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
+
             Utilities.SetStateChanged(wcPlayer.Player, "CBasePlayerController", "m_iszPlayerName");
-            Utilities.SetStateChanged(wcPlayer.Player, "CCSPlayerController", "m_szClan");
         }
 
         public override void Load(bool hotReload)
