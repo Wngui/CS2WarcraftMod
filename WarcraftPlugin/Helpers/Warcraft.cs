@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using g3;
 using System.Collections.Generic;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -337,28 +338,13 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
-        /// Inflicts damage to the player.
-        /// </summary>
-        /// <param name="player">The player receiving the damage.</param>
-        /// <param name="damage">The amount of damage to inflict.</param>
-        /// <param name="forceClientUpdate">Force client UI to update new health values.</param>
-        public static void TakeDamage(this CCSPlayerController player, int damage, bool forceClientUpdate = false)
-        {
-            if (player.IsValid())
-            {
-                player.PlayerPawn.Value.Health -= damage;
-                if (forceClientUpdate) Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_iHealth");
-            }
-        }
-
-        /// <summary>
         /// Inflicts damage to the player from an attacker, with an optional inflictor.
         /// </summary>
         /// <param name="player">The player receiving the damage.</param>
         /// <param name="damage">The amount of damage to inflict.</param>
         /// <param name="attacker">The player causing the damage.</param>
         /// <param name="inflictor">The entity causing the damage, if different from the attacker.</param>
-        public static void TakeDamage(this CCSPlayerController player, float damage, CCSPlayerController attacker, CCSPlayerController inflictor = null)
+        public static void TakeDamage(this CCSPlayerController player, float damage, CCSPlayerController attacker, KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false)
         {
             var size = Schema.GetClassSize("CTakeDamageInfo");
             var ptr = Marshal.AllocHGlobal(size);
@@ -375,9 +361,10 @@ namespace WarcraftPlugin.Helpers
             Schema.SetSchemaValue(damageInfo.Handle, "CTakeDamageInfo", "m_hAttacker", attacker.Pawn.Raw);
 
             damageInfo.Damage = damage;
-            damageInfo.NumObjectsPenetrated = 0;
+            damageInfo.NumObjectsPenetrated = penetrationKill ? 1 : 0;
 
             if (!player.IsValid() || !player.Pawn.IsValid) return;
+            if (killFeedIcon != null) player.GetWarcraftPlayer(includeBot: true)?.SetKillFeedIcon(killFeedIcon);
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(player.Pawn.Value, damageInfo);
             Marshal.FreeHGlobal(ptr);
         }

@@ -345,8 +345,8 @@ namespace WarcraftPlugin.Classes
             _clone = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
             _clone.SetModel("models/generic/bust_02/bust_02_a.vmdl");
             _clone.DispatchSpawn();
-            _clone.SetModel(Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
-            _clone.Teleport(_decoyVector.Clone().Add(z: -2), new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y, 0), new Vector());
+            _clone.SetModel(Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
+            _clone.Teleport(_decoyVector.Clone().Add(z: -2), new QAngle(0, Player.PlayerPawn.Value.EyeAngles.Y, 0), new Vector());
 
             _cloneDebrisHead = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
             _cloneDebrisHead.SetModel("models/generic/bust_02/bust_02_a.vmdl");

@@ -7,6 +7,7 @@ using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Timers;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Summons
 {
@@ -166,7 +167,7 @@ namespace WarcraftPlugin.Summons
             _turret.EmitSound("Weapon_M4A1.Silenced");
 
             //dodamage to target
-            target.TakeDamage(_owner.GetWarcraftPlayer().GetAbilityLevel(0) * 1, _owner);
+            target.TakeDamage(_owner.GetWarcraftPlayer().GetAbilityLevel(0) * 1, _owner, KillFeedIcon.controldrone);
         }
 
         private void FireRocket(Vector muzzle, Vector endPos)

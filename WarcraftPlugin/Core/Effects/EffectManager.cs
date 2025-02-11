@@ -43,7 +43,7 @@ namespace WarcraftPlugin.Core.Effects
             for (int i = _effects.Count - 1; i >= 0; i--)
             {
                 var effect = _effects[i];
-                if (effect.Target?.Handle == player.Handle || effect.Owner?.Handle == player.Handle)
+                if (effect.Player?.Handle == player.Handle)
                 {
                     effect.OnFinish();
                     _effects.RemoveAt(i);

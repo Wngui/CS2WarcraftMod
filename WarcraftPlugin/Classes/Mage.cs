@@ -104,6 +104,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
 
             // Hack to get players aim point in the world, see player ping event
+            // TODO replace with ray-tracing
             Player.ExecuteClientCommandFromServer("player_ping");
         }
 
@@ -114,7 +115,7 @@ namespace WarcraftPlugin.Classes
             if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 25))
             {
                 var victim = @event.Userid;
-                DispatchEffect(new FreezeEffect(Player, victim, 1.0f));
+                DispatchEffect(new FreezeEffect(Player, 1.0f, victim));
             }
         }
 
@@ -151,18 +152,21 @@ namespace WarcraftPlugin.Classes
 
     internal class FreezeEffect : WarcraftEffect
     {
-        internal FreezeEffect(CCSPlayerController owner, CCSPlayerController target, float duration) : base(owner, duration, target)
+        private readonly CCSPlayerController _victim;
+
+        internal FreezeEffect(CCSPlayerController player, float duration, CCSPlayerController target) : base(player, duration)
         {
+            _victim = target;
         }
 
         public override void OnStart()
         {
-            Target.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}", Duration);
-            var targetPlayerModel = Target.PlayerPawn.Value;
+            _victim.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}", Duration);
+            var targetPlayerModel = _victim.PlayerPawn.Value;
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;
 
-            Warcraft.DrawLaserBetween(Owner.ToCenterOrigin(), Target.ToCenterOrigin(), Color.Cyan);
+            Warcraft.DrawLaserBetween(Player.ToCenterOrigin(), _victim.ToCenterOrigin(), Color.Cyan);
             targetPlayerModel.SetColor(Color.Cyan);
         }
 
@@ -172,10 +176,10 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            if (Target.IsValid())
+            if (_victim.IsValid())
             {
-                Target.PlayerPawn.Value.SetColor(Color.White);
-                Utilities.SetStateChanged(Target.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");
+                _victim.PlayerPawn.Value.SetColor(Color.White);
+                Utilities.SetStateChanged(_victim.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");
             }
         }
     }

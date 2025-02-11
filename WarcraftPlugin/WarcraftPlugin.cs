@@ -19,6 +19,7 @@ using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
 using CounterStrikeSharp.API.Modules.Memory;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin
 {
@@ -34,9 +35,9 @@ namespace WarcraftPlugin
 
     internal static class WarcraftPlayerExtensions
     {
-        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
+        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player, bool includeBot = false)
         {
-            return WarcraftPlugin.Instance.GetWcPlayer(player);
+            return WarcraftPlugin.Instance.GetWcPlayer(player, includeBot);
         }
     }
 
@@ -65,21 +66,29 @@ namespace WarcraftPlugin
         internal float XpHeadshotModifier = 0.15f;
         internal float XpKnifeModifier = 0.25f;
 
-        internal List<WarcraftPlayer> Players => WarcraftPlayers.Values.ToList();
-
         public Config Config { get; set; } = null!;
 
-        internal WarcraftPlayer GetWcPlayer(CCSPlayerController player)
+        internal WarcraftPlayer GetWcPlayer(CCSPlayerController player, bool includeBot = false)
         {
-            if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
+            if (!player.IsValid) return null;
+
+            if (!includeBot && (player.IsBot || player.ControllingBot)) return null;
 
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
+                if (player.IsBot || player.ControllingBot)
+                {
+                    wcPlayer = new WarcraftPlayer(player); //create dummy player for bot
+                }
+                else
+                {
+                    wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
+                }
+                WarcraftPlayers[player.Handle] = wcPlayer;
             }
 
-            return WarcraftPlayers[player.Handle];
+            return wcPlayer;
         }
 
         internal void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
@@ -250,10 +259,12 @@ namespace WarcraftPlugin
         private void OnClientDisconnectHandler(int slot)
         {
             var player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
-            // No bots, invalid clients or non-existent clients.
-            // TODO: If player controls a bot while disconnecting, progress is not saved
-            if (!player.IsValid || player.IsBot || player.ControllingBot) return;
+
+            if (!player.IsValid) return;
             SetWcPlayer(player, null);
+
+            // No bots, invalid clients or non-existent clients.
+            if (player.IsBot || player.ControllingBot) return;
             _database.SavePlayerToDatabase(player);
         }
 
@@ -275,7 +286,7 @@ namespace WarcraftPlugin
             var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
             foreach (var player in playerEntities)
             {
-                if (!player.IsValid) continue;
+                if (!player.IsValid || !player.IsBot || !player.ControllingBot) continue;
 
                 var wcPlayer = GetWcPlayer(player);
 
@@ -302,20 +313,21 @@ namespace WarcraftPlugin
             Console.WriteLine("Player just connected: " + WarcraftPlayers[player.Handle]);
         }
 
-        internal void ChangeClass(CCSPlayerController player, string classInternalName)
+        internal WarcraftPlayer ChangeClass(CCSPlayerController player, string classInternalName)
         {
             _database.SavePlayerToDatabase(player);
 
             // Dont do anything if were already that race.
-            if (classInternalName == player.GetWarcraftPlayer().className) return;
+            if (classInternalName == player.GetWarcraftPlayer().className) return null;
 
             player.GetWarcraftPlayer().GetClass().PlayerChangingToAnotherRace();
             player.GetWarcraftPlayer().className = classInternalName;
 
             _database.SaveCurrentClass(player);
-            _database.LoadPlayerFromDatabase(player, XpSystem);
+            var warcraftClass = _database.LoadPlayerFromDatabase(player, XpSystem);
 
             RefreshPlayerName(player.GetWarcraftPlayer());
+            return warcraftClass;
         }
 
         private void UltimatePressed(CCSPlayerController? client, CommandInfo commandinfo)

@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Modules.Timers;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 
@@ -15,18 +16,19 @@ namespace WarcraftPlugin.Core
 
         private void CooldownTick()
         {
-            foreach (var player in WarcraftPlugin.Instance.Players)
+            foreach (var player in Utilities.GetPlayers())
             {
-                if (player == null) continue;
-                for (int i = 0; i < player.AbilityCooldowns.Count; i++)
+                var warcraftPlayer = player?.GetWarcraftPlayer();
+                if (warcraftPlayer == null) continue;
+                for (int i = 0; i < warcraftPlayer.AbilityCooldowns.Count; i++)
                 {
-                    if (player.AbilityCooldowns[i] <= 0) continue;
+                    if (warcraftPlayer.AbilityCooldowns[i] <= 0) continue;
 
-                    player.AbilityCooldowns[i] -= 0.25f;
+                    warcraftPlayer.AbilityCooldowns[i] -= 0.25f;
 
-                    if (player.AbilityCooldowns[i] <= 0)
+                    if (warcraftPlayer.AbilityCooldowns[i] <= 0)
                     {
-                        PlayEffects(player, i);
+                        PlayEffects(warcraftPlayer, i);
                     }
                 }
             }

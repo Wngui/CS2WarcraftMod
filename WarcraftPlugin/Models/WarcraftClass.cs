@@ -9,6 +9,7 @@ using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Linq;
+using WarcraftPlugin.Events;
 
 namespace WarcraftPlugin.Models
 {

@@ -2,21 +2,12 @@
 
 namespace WarcraftPlugin.Core.Effects
 {
-    public abstract class WarcraftEffect
+    public abstract class WarcraftEffect(CCSPlayerController player, float duration)
     {
-        protected WarcraftEffect(CCSPlayerController owner, float duration, CCSPlayerController target = null)
-        {
-            Owner = owner;
-            Target = target;
-            Duration = duration;
-            RemainingDuration = duration;
-        }
+        public CCSPlayerController Player { get; } = player;
 
-        public CCSPlayerController Owner { get; }
-        public CCSPlayerController Target { get; }
-
-        public float Duration { get; }
-        public float RemainingDuration { get; set; }
+        public float Duration { get; } = duration;
+        public float RemainingDuration { get; set; } = duration;
 
         public abstract void OnStart();
         public abstract void OnTick();

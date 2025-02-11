@@ -215,7 +215,7 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInTrap)
                     {
-                        player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
+                        player.PlayerPawn.Value.AbsVelocity.Add(z: Player.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
                         player.PlayLocalSound("sounds/buttons/lever6.vsnd");
                     }
                 }

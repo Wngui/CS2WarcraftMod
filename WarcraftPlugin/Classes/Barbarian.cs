@@ -93,7 +93,7 @@ namespace WarcraftPlugin.Classes
             StartCooldown(3);
         }
 
-        private void PlayerHurtOther(EventPlayerHurt @event)
+        private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
             if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
@@ -102,7 +102,7 @@ namespace WarcraftPlugin.Classes
             if (carnageLevel > 0 && WeaponTypes.Shotguns.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                victim.TakeDamage(carnageLevel * 5);
+                @event.AddBonusDamage(carnageLevel * 5);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 Player.PlayLocalSound("sounds/physics/body/body_medium_break3.vsnd");
             }
@@ -117,7 +117,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnStart()
         {
-            Owner.PlayLocalSound("sounds/player/effort_m_09.vsnd");
+            Player.PlayLocalSound("sounds/player/effort_m_09.vsnd");
         }
 
         public override void OnTick()
@@ -152,37 +152,37 @@ namespace WarcraftPlugin.Classes
 
         public override void OnStart()
         {
-            Owner.PlayerPawn.Value.VelocityModifier = 1.3f;
-            Owner.PlayerPawn.Value.SetColor(Color.IndianRed);
-            Owner.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");
+            Player.PlayerPawn.Value.VelocityModifier = 1.3f;
+            Player.PlayerPawn.Value.SetColor(Color.IndianRed);
+            Player.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");
         }
 
         public override void OnTick()
         {
-            if (!Owner.IsValid()) return;
+            if (!Player.IsValid()) return;
 
             //Refill ammo
-            Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
+            Player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
 
             //Regenerate health
-            if (Owner.PlayerPawn.Value.Health < Owner.PlayerPawn.Value.MaxHealth)
+            if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
             {
-                Owner.SetHp(Owner.PlayerPawn.Value.Health + 1);
+                Player.SetHp(Player.PlayerPawn.Value.Health + 1);
             }
 
             //Rage growth spurt
-            var scale = Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale;
+            var scale = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale;
             if (scale < _maxSize)
             {
-                Owner.PlayerPawn.Value.SetScale(scale + 0.01f);
+                Player.PlayerPawn.Value.SetScale(scale + 0.01f);
             }
         }
 
         public override void OnFinish()
         {
-            if (!Owner.IsValid()) return;
+            if (!Player.IsValid()) return;
 
-            var pawn = Owner.PlayerPawn.Value;
+            var pawn = Player.PlayerPawn.Value;
             pawn.SetColor(Color.White);
             pawn.VelocityModifier = 1f;
             pawn.SetScale(1);

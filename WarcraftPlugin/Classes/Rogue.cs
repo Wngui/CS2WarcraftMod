@@ -89,14 +89,6 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerKilledOther(EventPlayerKilledOther @event)
-        {
-            if (WarcraftPlayer.GetAbilityLevel(0) > 0)
-            {
-                SetInvisible();
-            }
-        }
-
         private void SetInvisible()
         {
             if (Player.PlayerPawn.Value.Render.A != 0)
@@ -105,7 +97,15 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerHurtOther(EventPlayerHurt @event)
+        private void PlayerKilledOther(EventPlayerKilledOther @event)
+        {
+            if (WarcraftPlayer.GetAbilityLevel(0) > 0)
+            {
+                SetInvisible();
+            }
+        }
+
+        private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
             if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
@@ -113,18 +113,18 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0) Backstab(@event);
         }
 
-        private void BladeDanceDamage(EventPlayerHurt @event)
+        private void BladeDanceDamage(EventPlayerHurtOther @event)
         {
             var attackerWeapon = @event.Attacker.PlayerPawn.Value.WeaponServices!.ActiveWeapon.Value.DesignerName;
 
             if (attackerWeapon == "weapon_knife")
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(2) * 12;
-                @event.Userid.TakeDamage(damageBonus);
+                @event.AddBonusDamage(damageBonus);
             }
         }
 
-        private void Backstab(EventPlayerHurt eventPlayerHurt)
+        private void Backstab(EventPlayerHurtOther eventPlayerHurt)
         {
             var attackerAngle = eventPlayerHurt.Attacker.PlayerPawn.Value.EyeAngles.Y;
             var victimAngle = eventPlayerHurt.Userid.PlayerPawn.Value.EyeAngles.Y;
@@ -132,7 +132,7 @@ namespace WarcraftPlugin.Classes
             if (Math.Abs(attackerAngle - victimAngle) <= 50)
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
-                eventPlayerHurt.Userid.TakeDamage(damageBonus);
+                eventPlayerHurt.AddBonusDamage(damageBonus);
                 Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}", 1);
                 Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }
@@ -144,10 +144,10 @@ namespace WarcraftPlugin.Classes
 
             public override void OnStart()
             {
-                Owner.PrintToCenter($"[Invisible]");
-                Owner.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
+                Player.PrintToCenter($"[Invisible]");
+                Player.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
 
-                Owner.AdrenalineSurgeEffect(Duration);
+                Player.AdrenalineSurgeEffect(Duration);
             }
 
             public override void OnTick()
@@ -156,8 +156,8 @@ namespace WarcraftPlugin.Classes
 
             public override void OnFinish()
             {
-                Owner.PlayerPawn.Value.SetColor(Color.White);
-                Owner.PrintToCenter($"[Visible]");
+                Player.PlayerPawn.Value.SetColor(Color.White);
+                Player.PrintToCenter($"[Visible]");
             }
         }
     }

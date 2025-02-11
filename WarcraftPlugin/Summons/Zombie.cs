@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Drawing;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Summons
 {
@@ -119,7 +120,7 @@ namespace WarcraftPlugin.Summons
             if (playerCollison.Contains(Entity.AbsOrigin))
             {
                 //dodamage to target
-                Target.TakeDamage(_damage, Owner);
+                Target.TakeDamage(_damage, Owner, KillFeedIcon.fists);
                 InterestScore = _interestMax;
             }
             else

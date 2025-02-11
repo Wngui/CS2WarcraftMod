@@ -31,10 +31,10 @@ namespace WarcraftPlugin.Events
         internal void Initialize()
         {
             // middleware
-            RegisterEventHandler<EventPlayerDeath>(PlayerDeathHandler);
+            RegisterEventHandler<EventPlayerDeath>(PlayerDeathHandler, HookMode.Pre);
+            RegisterEventHandler<EventPlayerHurt>(PlayerHurtHandler, HookMode.Pre);
             RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
             RegisterEventHandler<EventPlayerSpawn>(PlayerSpawnHandler);
-            RegisterEventHandler<EventPlayerHurt>(PlayerHurtHandler, HookMode.Pre);
             RegisterEventHandler<EventRoundStart>(RoundStart);
             //RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre); // no logic, todo remove?
 
@@ -172,7 +172,7 @@ namespace WarcraftPlugin.Events
 
         private HookResult RoundStart(EventRoundStart @event, GameEventInfo info)
         {
-            Utilities.GetPlayers().ForEach(player =>
+            Utilities.GetPlayers().Where(x => !x.IsBot && !x.ControllingBot).ToList().ForEach(player =>
             {
                 var warcraftPlayer = player.GetWarcraftPlayer();
                 var warcraftClass = warcraftPlayer?.GetClass();
@@ -183,7 +183,8 @@ namespace WarcraftPlugin.Events
                 {
                     if (warcraftPlayer.DesiredClass != null && warcraftPlayer.DesiredClass != warcraftClass.InternalName)
                     {
-                        WarcraftPlugin.Instance.ChangeClass(player, warcraftPlayer.DesiredClass);
+                        warcraftPlayer = WarcraftPlugin.Instance.ChangeClass(player, warcraftPlayer.DesiredClass);
+                        warcraftClass = warcraftPlayer.GetClass();
                     }
 
                     if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
@@ -254,17 +255,25 @@ namespace WarcraftPlugin.Events
             var attacker = @event.Attacker;
 
             if (victim != null && (!victim.IsValid())) return HookResult.Continue;
-            if (attacker != null && (!attacker.IsValid() || attacker.ControllingBot)) return HookResult.Continue;
+            var victimPlayer = victim?.GetWarcraftPlayer(includeBot: true);
+
+            if (attacker != null && (!attacker.IsValid() || attacker.ControllingBot || attacker.IsBot))
+            {
+                victimPlayer?.ResetKillFeedIcon();
+                return HookResult.Continue;
+            }
+
+            var attackingClass = attacker?.GetWarcraftPlayer()?.GetClass();
 
             //Prevent shotguns, etc from triggering multiple hurt other events
-            var attackingClass = attacker?.GetWarcraftPlayer()?.GetClass();
             if (attackingClass != null && attackingClass?.LastHurtOther != Server.CurrentTime)
             {
+                victimPlayer?.ResetKillFeedIcon();
                 attackingClass.LastHurtOther = Server.CurrentTime;
                 attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle));
             }
 
-            victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
+            victimPlayer?.GetClass()?.InvokeEvent(@event);
 
             return HookResult.Continue;
         }
@@ -337,7 +346,12 @@ namespace WarcraftPlugin.Events
 
             if (victim.IsValid && attacker.IsValid && attacker != victim)
             {
-                victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
+                var victimClass = victim.GetWarcraftPlayer()?.GetClass();
+                victimClass?.InvokeEvent(@event);
+
+                var victimPlayer = victim.GetWarcraftPlayer(includeBot: true);
+                @event.Weapon = victimPlayer?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
+                victimPlayer?.ResetKillFeedIcon();
             }
 
             victim?.GetWarcraftPlayer()?.GetClass()?.ClearTimers();

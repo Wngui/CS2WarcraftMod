@@ -221,7 +221,7 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInHurtZone)
                     {
-                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Owner);
+                        player.TakeDamage(Player.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Player, KillFeedIcon.prop_exploding_barrel);
                     }
                 }
             }

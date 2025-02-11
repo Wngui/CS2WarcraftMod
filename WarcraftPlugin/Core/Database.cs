@@ -94,20 +94,20 @@ namespace WarcraftPlugin.Core
                     new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
             }
 
-            var raceInformation = _connection.QueryFirst<DatabaseClassInformation>(@"
+            var raceInformation = _connection.QueryFirst<ClassInformation>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid AND `racename` = @racename",
                 new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
 
             var wcPlayer = new WarcraftPlayer(player);
-            wcPlayer.LoadFromDatabase(raceInformation, xpSystem);
+            wcPlayer.LoadClassInformation(raceInformation, xpSystem);
             WarcraftPlugin.Instance.SetWcPlayer(player, wcPlayer);
 
             return wcPlayer;
         }
 
-        internal List<DatabaseClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
+        internal List<ClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
         {
-            var raceInformation = _connection.Query<DatabaseClassInformation>(@"
+            var raceInformation = _connection.Query<ClassInformation>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid",
                 new { steamid = player.SteamID });
 
@@ -190,7 +190,7 @@ namespace WarcraftPlugin.Core
         internal string Name { get; set; }
     }
 
-    internal class DatabaseClassInformation
+    internal class ClassInformation
     {
         internal ulong SteamId { get; set; }
         internal string RaceName { get; set; }

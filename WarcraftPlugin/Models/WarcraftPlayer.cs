@@ -27,13 +27,14 @@ namespace WarcraftPlugin.Models
         internal List<float> AbilityCooldowns = new(new float[4]);
 
         private WarcraftClass _class;
+        private KillFeedIcon? _killFeedIcon;
 
         internal WarcraftPlayer(CCSPlayerController player)
         {
             Player = player;
         }
 
-        internal void LoadFromDatabase(DatabaseClassInformation dbRace, XpSystem xpSystem)
+        internal void LoadClassInformation(ClassInformation dbRace, XpSystem xpSystem)
         {
             currentLevel = dbRace.CurrentLevel;
             currentXp = dbRace.CurrentXp;
@@ -94,6 +95,21 @@ namespace WarcraftPlugin.Models
         {
             Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
+        }
+
+        internal void SetKillFeedIcon(KillFeedIcon? damageType)
+        {
+            _killFeedIcon = damageType;
+        }
+
+        public KillFeedIcon? GetKillFeedIcon()
+        {
+            return _killFeedIcon;
+        }
+
+        internal void ResetKillFeedIcon()
+        {
+            _killFeedIcon = null;
         }
     }
 }

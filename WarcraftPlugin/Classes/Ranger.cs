@@ -55,7 +55,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerHurtOther(EventPlayerHurt @event)
+        private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
             if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
 
@@ -64,7 +64,7 @@ namespace WarcraftPlugin.Classes
             if (markmansLevel > 0 && WeaponTypes.Snipers.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                victim.TakeDamage(markmansLevel * 2);
+                @event.AddBonusDamage(markmansLevel * 2);
                 Warcraft.SpawnParticle(Player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 60), "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf");
             }
@@ -247,7 +247,7 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInTrap)
                     {
-                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Owner);
+                        player.TakeDamage(Player.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Player, KillFeedIcon.tripwirefire);
                         player.PlayerPawn.Value.VelocityModifier = 0;
                         player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
                         Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
@@ -296,7 +296,7 @@ namespace WarcraftPlugin.Classes
             public override void OnStart()
             {
                 //_hurtBox.Show(duration: Duration); //Debug
-                Owner.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
+                Player.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
             }
 
             public override void OnTick()
@@ -321,7 +321,7 @@ namespace WarcraftPlugin.Classes
                 {
                     if (!player.IsValid()) continue;
 
-                    player.TakeDamage(2, Owner);
+                    player.TakeDamage(2, Player, KillFeedIcon.flair0);
                     player.PlayerPawn.Value.VelocityModifier = 0;
                     Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                 }
@@ -344,7 +344,7 @@ namespace WarcraftPlugin.Classes
                 arrow.Collision.SolidFlags = 12;
                 arrow.Collision.SolidType = SolidType_t.SOLID_VPHYSICS;
 
-                Schema.SetSchemaValue(arrow.Handle, "CBaseGrenade", "m_hThrower", Owner.PlayerPawn.Raw); //Fixes killfeed
+                Schema.SetSchemaValue(arrow.Handle, "CBaseGrenade", "m_hThrower", Player.PlayerPawn.Raw); //Fixes killfeed
 
                 //Cleanup
                 WarcraftPlugin.Instance.AddTimer(0.6f, () => { arrow?.RemoveIfValid(); });
