@@ -95,7 +95,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
-            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsAlive() || @event.Userid.UserId == Player.UserId) return;
 
             var carnageLevel = WarcraftPlayer.GetAbilityLevel(0);
 
@@ -159,7 +159,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnTick()
         {
-            if (!Player.IsValid()) return;
+            if (!Player.IsAlive()) return;
 
             //Refill ammo
             Player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
@@ -180,7 +180,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            if (!Player.IsValid()) return;
+            if (!Player.IsAlive()) return;
 
             var pawn = Player.PlayerPawn.Value;
             pawn.SetColor(Color.White);

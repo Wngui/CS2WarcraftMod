@@ -25,7 +25,7 @@ internal class MenuPlayer
         if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
         {
             player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
-            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 0);
+            //Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 0);
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
         }
 
@@ -34,7 +34,7 @@ internal class MenuPlayer
             if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
             {
                 player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
-                Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+                //Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
                 Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
             }
             MainMenu = null;
@@ -202,7 +202,7 @@ internal class MenuPlayer
             }
         }
 
-        var selectKey = player.IsValid() ? "Space" : "E";
+        var selectKey = player.IsAlive() ? "Space" : "E";
         builder.AppendLine($"<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-s'> W↑ S↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>{selectKey}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>");
         builder.AppendLine("<br>");
         CenterHtml = builder.ToString();

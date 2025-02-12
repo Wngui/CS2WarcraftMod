@@ -45,14 +45,14 @@ namespace WarcraftPlugin.Summons
         internal void Update()
         {
             if (Entity == null || !Entity.IsValid) return;
-            if (!Owner.IsValid()) Kill();
+            if (!Owner.IsAlive()) Kill();
 
             if(InterestScore <= 0)
             {
                 FollowLeader();
             }
 
-            if (Target.IsValid())
+            if (Target.IsAlive())
             {
                 if (LastLeapTick == 0 || LastLeapTick + _leapCooldown + Random.Shared.NextDouble() < Server.TickedTime)
                 {
@@ -137,9 +137,9 @@ namespace WarcraftPlugin.Summons
 
         internal void SetEnemy(CCSPlayerController enemy)
         {
-            if (!enemy.IsValid()) return;
+            if (!enemy.IsAlive()) return;
 
-            if (Target.IsValid())
+            if (Target.IsAlive())
             {
                 return;
             }

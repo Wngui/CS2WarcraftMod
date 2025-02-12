@@ -127,7 +127,7 @@ namespace WarcraftPlugin.Events
 
             foreach (var spottedPlayer in players)
             {
-                if (!spottedPlayer.IsValid()) continue;
+                if (!spottedPlayer.IsAlive()) continue;
 
                 var spottedByMask = spottedPlayer.PlayerPawn.Value.EntitySpottedState.SpottedByMask;
 
@@ -140,7 +140,7 @@ namespace WarcraftPlugin.Events
                     {
                         int playerIndex = baseId + BitOperations.TrailingZeroCount(mask) + 1; // Offset by 1 to match the 1-based index
 
-                        if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsValid())
+                        if (playerDictionary.TryGetValue((uint)playerIndex, out var spottedByPlayer) && spottedByPlayer.IsAlive())
                         {
                             spottedPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventSpottedByEnemy() { UserId = spottedByPlayer });
                             spottedByPlayer.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventSpottedEnemy() { UserId = spottedPlayer });
@@ -254,26 +254,27 @@ namespace WarcraftPlugin.Events
             var victim = @event.Userid;
             var attacker = @event.Attacker;
 
-            if (victim != null && (!victim.IsValid())) return HookResult.Continue;
-            var victimPlayer = victim?.GetWarcraftPlayer(includeBot: true);
-
-            if (attacker != null && (!attacker.IsValid() || attacker.ControllingBot || attacker.IsBot))
-            {
-                victimPlayer?.ResetKillFeedIcon();
-                return HookResult.Continue;
-            }
+            if (victim != null && (!victim.IsAlive())) return HookResult.Continue;
 
             var attackingClass = attacker?.GetWarcraftPlayer()?.GetClass();
 
-            //Prevent shotguns, etc from triggering multiple hurt other events
-            if (attackingClass != null && attackingClass?.LastHurtOther != Server.CurrentTime)
+            if (attackingClass != null)
             {
-                victimPlayer?.ResetKillFeedIcon();
-                attackingClass.LastHurtOther = Server.CurrentTime;
-                attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle));
+                if (attackingClass.GetLastPlayerHit().UserId != victim.UserId)
+                {
+                    attackingClass.ResetKillFeedIcon();
+                    attackingClass.SetLastPlayerHit(victim);
+                }
+
+                //Prevent shotguns, etc from triggering multiple hurt other events
+                if (attackingClass?.LastHurtOther != Server.CurrentTime)
+                {
+                    attackingClass.LastHurtOther = Server.CurrentTime;
+                    attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle));
+                }
             }
 
-            victimPlayer?.GetClass()?.InvokeEvent(@event);
+            victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event);
 
             return HookResult.Continue;
         }
@@ -348,10 +349,8 @@ namespace WarcraftPlugin.Events
             {
                 var victimClass = victim.GetWarcraftPlayer()?.GetClass();
                 victimClass?.InvokeEvent(@event);
-
-                var victimPlayer = victim.GetWarcraftPlayer(includeBot: true);
-                @event.Weapon = victimPlayer?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
-                victimPlayer?.ResetKillFeedIcon();
+                @event.Weapon = victimClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
+                victimClass?.ResetKillFeedIcon();
             }
 
             victim?.GetWarcraftPlayer()?.GetClass()?.ClearTimers();

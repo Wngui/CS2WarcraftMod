@@ -244,7 +244,7 @@ namespace WarcraftPlugin.Helpers
 
         public static void AdrenalineSurgeEffect(this CCSPlayerController player, float duration = 5f)
         {
-            if (!player.IsValid()) return;
+            if (!player.IsAlive()) return;
 
             player.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + duration;
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
@@ -340,11 +340,11 @@ namespace WarcraftPlugin.Helpers
         /// <summary>
         /// Inflicts damage to the player from an attacker, with an optional inflictor.
         /// </summary>
-        /// <param name="player">The player receiving the damage.</param>
+        /// <param name="victim">The player receiving the damage.</param>
         /// <param name="damage">The amount of damage to inflict.</param>
         /// <param name="attacker">The player causing the damage.</param>
         /// <param name="inflictor">The entity causing the damage, if different from the attacker.</param>
-        public static void TakeDamage(this CCSPlayerController player, float damage, CCSPlayerController attacker, KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false)
+        public static void TakeDamage(this CCSPlayerController victim, float damage, CCSPlayerController attacker, KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false)
         {
             var size = Schema.GetClassSize("CTakeDamageInfo");
             var ptr = Marshal.AllocHGlobal(size);
@@ -353,7 +353,7 @@ namespace WarcraftPlugin.Helpers
                 Marshal.WriteByte(ptr, i, 0);
 
             var damageInfo = new CTakeDamageInfo(ptr);
-            var attackerInfo = new Struct.CAttackerInfo(player);
+            var attackerInfo = new Struct.CAttackerInfo(victim);
 
             Marshal.StructureToPtr(attackerInfo, new IntPtr(ptr.ToInt64() + 0x80), false);
 
@@ -363,9 +363,12 @@ namespace WarcraftPlugin.Helpers
             damageInfo.Damage = damage;
             damageInfo.NumObjectsPenetrated = penetrationKill ? 1 : 0;
 
-            if (!player.IsValid() || !player.Pawn.IsValid) return;
-            if (killFeedIcon != null) player.GetWarcraftPlayer(includeBot: true)?.SetKillFeedIcon(killFeedIcon);
-            VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(player.Pawn.Value, damageInfo);
+            if (!victim.IsAlive() || !victim.Pawn.IsValid) return;
+            var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
+            attackerClass?.SetLastPlayerHit(victim);
+            if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
+
+            VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);
             Marshal.FreeHGlobal(ptr);
         }
 
@@ -403,9 +406,19 @@ namespace WarcraftPlugin.Helpers
         /// </summary>
         /// <param name="player">The player controller to check.</param>
         /// <returns>True if the player controller is valid and the pawn is alive, otherwise false.</returns>
-        public static bool IsValid(this CCSPlayerController player)
+        public static bool IsAlive(this CCSPlayerController player)
         {
             return player != null && player.IsValid && player.PawnIsAlive;
+        }
+
+        /// <summary>
+        /// Checks if the player controller and pawn is valid.
+        /// </summary>
+        /// <param name="player">The player controller to check.</param>
+        /// <returns>True if the player controller and pawn is valid</returns>
+        public static bool IsValid(this CCSPlayerController player)
+        {
+            return player != null && player.IsValid && player.PlayerPawn.IsValid;
         }
 
         /// <summary>

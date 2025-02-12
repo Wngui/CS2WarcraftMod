@@ -100,7 +100,7 @@ namespace WarcraftPlugin.Classes
 
         private void UpdateDrones()
         {
-            if (!Player.IsValid())
+            if (!Player.IsAlive())
             {
                 DeactivateDrones();
                 return;

@@ -107,7 +107,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
-            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsAlive() || @event.Userid.UserId == Player.UserId) return;
 
             if (WarcraftPlayer.GetAbilityLevel(2) > 0) BladeDanceDamage(@event);
             if (WarcraftPlayer.GetAbilityLevel(1) > 0) Backstab(@event);

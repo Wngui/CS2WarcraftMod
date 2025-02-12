@@ -57,6 +57,8 @@ namespace WarcraftPlugin.Models
         private readonly Dictionary<string, GameAction> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
         private readonly List<Timer> _timers = [];
+        private KillFeedIcon? _killFeedIcon;
+        private CCSPlayerController _lastPlayerHit;
 
         public float LastHurtOther { get; set; } = 0;
 
@@ -207,6 +209,31 @@ namespace WarcraftPlugin.Models
 
             _timers.Clear();
             WarcraftPlugin.Instance.EffectManager.ClearEffects(Player);
+        }
+
+        public void SetKillFeedIcon(KillFeedIcon? damageType)
+        {
+            _killFeedIcon = damageType;
+        }
+
+        public KillFeedIcon? GetKillFeedIcon()
+        {
+            return _killFeedIcon;
+        }
+
+        public void ResetKillFeedIcon()
+        {
+            _killFeedIcon = null;
+        }
+
+        public void SetLastPlayerHit(CCSPlayerController player)
+        {
+            _lastPlayerHit = player;
+        }
+
+        public CCSPlayerController GetLastPlayerHit()
+        {
+            return _lastPlayerHit;
         }
     }
 }

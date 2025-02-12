@@ -17,14 +17,17 @@ namespace WarcraftPlugin.Events
         public static void AddBonusDamage(this EventPlayerHurtOther @event, int damageHealth, int damageArmor = 0, KillFeedIcon? killFeedIcon = null)
         {
             var victim = @event.Userid;
-            if (victim.IsValid())
+            var attacker = @event.Attacker;
+            if (victim.IsAlive())
             {
                 victim.PlayerPawn.Value.Health -= damageHealth;
                 victim.PlayerPawn.Value.ArmorValue -= damageArmor;
                 @event.DmgHealth += damageHealth;
                 @event.DmgArmor += damageArmor;
 
-                if (killFeedIcon != null) victim.GetWarcraftPlayer(includeBot: true)?.SetKillFeedIcon(killFeedIcon);
+                var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
+                attackerClass?.SetLastPlayerHit(victim);
+                if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
             }
         }
 
@@ -36,7 +39,7 @@ namespace WarcraftPlugin.Events
         public static void IgnoreDamage(this EventPlayerHurt @event, int? healthDamageToIgnore = null, int? armorDamageToIgnore = null)
         {
             var victim = @event.Userid;
-            if (victim.IsValid())
+            if (victim.IsAlive())
             {
                 victim.PlayerPawn.Value.Health += Math.Clamp(healthDamageToIgnore ?? @event.DmgHealth, 0, @event.DmgHealth);
                 victim.PlayerPawn.Value.ArmorValue += Math.Clamp(armorDamageToIgnore ?? @event.DmgArmor, 0, @event.DmgArmor);

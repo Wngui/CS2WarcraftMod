@@ -57,7 +57,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
-            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsAlive() || @event.Userid.UserId == Player.UserId) return;
 
             var markmansLevel = WarcraftPlayer.GetAbilityLevel(2);
 
@@ -315,11 +315,11 @@ namespace WarcraftPlugin.Classes
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => x.IsValid() && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
+                var playersInHurtZone = players.Where(x => x.IsAlive() && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
                 //Set movement speed + small hurt
                 foreach (var player in playersInHurtZone)
                 {
-                    if (!player.IsValid()) continue;
+                    if (!player.IsAlive()) continue;
 
                     player.TakeDamage(2, Player, KillFeedIcon.flair0);
                     player.PlayerPawn.Value.VelocityModifier = 0;

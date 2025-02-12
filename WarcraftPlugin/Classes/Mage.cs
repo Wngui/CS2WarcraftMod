@@ -87,7 +87,7 @@ namespace WarcraftPlugin.Classes
 
         private void RegenManaShield()
         {
-            if (!Player.IsValid())
+            if (!Player.IsAlive())
             {
                 _manaShieldTimer?.Kill();
                 return;
@@ -110,7 +110,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
-            if (!@event.Userid.IsValid() || @event.Userid.UserId == Player.UserId) return;
+            if (!@event.Userid.IsAlive() || @event.Userid.UserId == Player.UserId) return;
 
             if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 25))
             {
@@ -176,7 +176,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            if (_victim.IsValid())
+            if (_victim.IsAlive())
             {
                 _victim.PlayerPawn.Value.SetColor(Color.White);
                 Utilities.SetStateChanged(_victim.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");

@@ -86,7 +86,7 @@ namespace WarcraftPlugin.Classes
 
         private void CheckIfSpotted()
         {
-            if (!Player.IsValid())
+            if (!Player.IsAlive())
             {
                 _checkSpottedTimer?.Kill();
                 return;
@@ -255,7 +255,7 @@ namespace WarcraftPlugin.Classes
 
         private void UpdateCamera()
         {
-            if (!_cameraProp.IsValid || !Player.IsValid())
+            if (!_cameraProp.IsValid || !Player.IsAlive())
             {
                 UnhookCamera();
                 return;

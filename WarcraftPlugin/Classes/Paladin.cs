@@ -61,7 +61,7 @@ namespace WarcraftPlugin.Classes
             _healingAuraTimer?.Kill();
             _healingAuraTimer = AddTimer(5f, () =>
             {
-                if (!Player.IsValid())
+                if (!Player.IsAlive())
                 {
                     _healingAuraTimer?.Kill();
                     return;
@@ -134,7 +134,7 @@ namespace WarcraftPlugin.Classes
         private void PlayerHurtOther(EventPlayerHurt @event)
         {
             var victim = @event.Userid;
-            if (!victim.IsValid() || victim.UserId == Player.UserId) return;
+            if (!victim.IsAlive() || victim.UserId == Player.UserId) return;
 
             if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
             {

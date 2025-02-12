@@ -107,7 +107,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurtOther(EventPlayerHurt hurt)
         {
-            if (!hurt.Userid.IsValid() || hurt.Userid.UserId == Player.UserId) return;
+            if (!hurt.Userid.IsAlive() || hurt.Userid.UserId == Player.UserId) return;
 
             if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
             {

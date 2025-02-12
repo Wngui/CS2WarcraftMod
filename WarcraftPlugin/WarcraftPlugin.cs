@@ -35,9 +35,9 @@ namespace WarcraftPlugin
 
     internal static class WarcraftPlayerExtensions
     {
-        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player, bool includeBot = false)
+        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
         {
-            return WarcraftPlugin.Instance.GetWcPlayer(player, includeBot);
+            return WarcraftPlugin.Instance.GetWcPlayer(player);
         }
     }
 
@@ -68,23 +68,14 @@ namespace WarcraftPlugin
 
         public Config Config { get; set; } = null!;
 
-        internal WarcraftPlayer GetWcPlayer(CCSPlayerController player, bool includeBot = false)
+        internal WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
-            if (!player.IsValid) return null;
-
-            if (!includeBot && (player.IsBot || player.ControllingBot)) return null;
+            if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
 
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                if (player.IsBot || player.ControllingBot)
-                {
-                    wcPlayer = new WarcraftPlayer(player); //create dummy player for bot
-                }
-                else
-                {
-                    wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
-                }
+                wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
                 WarcraftPlayers[player.Handle] = wcPlayer;
             }
 
@@ -259,12 +250,10 @@ namespace WarcraftPlugin
         private void OnClientDisconnectHandler(int slot)
         {
             var player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
-
-            if (!player.IsValid) return;
-            SetWcPlayer(player, null);
-
             // No bots, invalid clients or non-existent clients.
-            if (player.IsBot || player.ControllingBot) return;
+            // TODO: If player controls a bot while disconnecting, progress is not saved
+            if (!player.IsValid || player.IsBot || player.ControllingBot) return;
+            SetWcPlayer(player, null);
             _database.SavePlayerToDatabase(player);
         }
 
@@ -318,7 +307,7 @@ namespace WarcraftPlugin
             _database.SavePlayerToDatabase(player);
 
             // Dont do anything if were already that race.
-            if (classInternalName == player.GetWarcraftPlayer().className) return null;
+            if (classInternalName == player.GetWarcraftPlayer().className) return player.GetWarcraftPlayer();
 
             player.GetWarcraftPlayer().GetClass().PlayerChangingToAnotherRace();
             player.GetWarcraftPlayer().className = classInternalName;
@@ -353,7 +342,7 @@ namespace WarcraftPlugin
         {
             foreach (var player in Utilities.GetPlayers())
             {
-                if (player.IsValid())
+                if (player.IsAlive())
                 {
                     //Avoid getting stuck in old menu
                     player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
