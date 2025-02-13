@@ -15,6 +15,8 @@ namespace WarcraftPlugin.Classes
 {
     internal class Mage : WarcraftClass
     {
+        private int _tick;
+
         public override string DisplayName => "Mage";
         public override Color DefaultColor => Color.Blue;
 
@@ -39,6 +41,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerPing(EventPlayerPing ping)
         {
+            //Teleport ultimate
             if (WarcraftPlayer.GetAbilityLevel(3) > 0 && IsAbilityReady(3))
             {
                 StartCooldown(3);
@@ -129,9 +132,16 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
+    internal class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval, duration: 10)
     {
-        public override void OnStart(){}
+        public override void OnStart()
+        {
+            if (Owner.PlayerPawn.Value.ArmorValue == 0)
+            {
+                Owner.GiveNamedItem("item_assaultsuit");
+                Owner.SetArmor(1);
+            }
+        }
         public override void OnTick()
         {
             if (Owner.PlayerPawn.Value.ArmorValue < 100)
@@ -154,13 +164,10 @@ namespace WarcraftPlugin.Classes
             Warcraft.DrawLaserBetween(Owner.ToCenterOrigin(), target.ToCenterOrigin(), Color.Cyan);
             targetPlayerModel.SetColor(Color.Cyan);
         }
-        public override void OnTick(){}
+        public override void OnTick() { }
         public override void OnFinish()
         {
-            if (target.IsAlive())
-            {
-                target.PlayerPawn.Value.SetColor(Color.White);
-            }
+            target.PlayerPawn.Value.SetColor(Color.White);
         }
     }
 }

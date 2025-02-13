@@ -40,16 +40,6 @@ namespace WarcraftPlugin.Events
             RegisterEventHandler<EventRoundStart>(RoundStart, HookMode.Pre);
             RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
 
-            // no logic, todo remove
-            //RegisterEventHandler<EventItemEquip>(PlayerItemEquip); //
-            //RegisterEventHandler<EventMolotovDetonate>(PlayerMolotovDetonateHandler); //
-            //RegisterEventHandler<EventWeaponFire>(PlayerShoot); //
-            //RegisterEventHandler<EventPlayerJump>(PlayerJump); //
-            //RegisterEventHandler<EventDecoyStarted>(DecoyStart); //
-            //RegisterEventHandler<EventPlayerPing>(PlayerPing); //
-            //RegisterEventHandler<EventGrenadeThrown>(GrenadeThrown); //
-            //RegisterEventHandler<EventSmokegrenadeDetonate>(SmokeGrenadeDetonate); //
-
             //Custom events
             _plugin.AddTimer(1, PlayerSpottedOnRadar, TimerFlags.REPEAT);
 
@@ -215,7 +205,7 @@ namespace WarcraftPlugin.Events
 
             if (attackingClass != null)
             {
-                if (attackingClass.GetLastPlayerHit().UserId != victim.UserId)
+                if (attackingClass.GetLastPlayerHit()?.UserId != victim.UserId)
                 {
                     attackingClass.ResetKillFeedIcon();
                     attackingClass.SetLastPlayerHit(victim);
@@ -238,8 +228,7 @@ namespace WarcraftPlugin.Events
         {
             var player = @event.Userid;
 
-            var warcraftPlayer = player.GetWarcraftPlayer();
-            var warcraftClass = warcraftPlayer?.GetClass();
+            var warcraftClass = player?.GetWarcraftPlayer()?.GetClass();
 
             if (warcraftClass != null)
             {

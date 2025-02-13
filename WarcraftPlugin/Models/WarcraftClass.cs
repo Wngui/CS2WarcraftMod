@@ -5,11 +5,8 @@ using CounterStrikeSharp.API.Modules.Events;
 using System.Drawing;
 using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Utils;
-using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core;
-using CounterStrikeSharp.API.Modules.Timers;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace WarcraftPlugin.Models
 {
@@ -111,7 +108,7 @@ namespace WarcraftPlugin.Models
             return Abilities[index];
         }
 
-        protected void HookEvent<T>(Action<T> handler, HookMode hookMode = HookMode.Post) where T : GameEvent
+        protected void HookEvent<T>(Action<T> handler, HookMode hookMode = HookMode.Pre) where T : GameEvent
         {
             _eventHandlers[typeof(T).Name + (hookMode == HookMode.Pre ? "-pre" : "")] = new GameAction
             {
@@ -127,7 +124,8 @@ namespace WarcraftPlugin.Models
                         handler((T)evt);
                         Console.WriteLine($"Handler for event expects an event of type {typeof(T).Name}.");
                     }
-                }
+                },
+                HookMode = hookMode
             };
         }
 
@@ -138,6 +136,7 @@ namespace WarcraftPlugin.Models
 
         public void InvokeEvent(GameEvent @event, HookMode hookMode = HookMode.Post)
         {
+            //Console.WriteLine($"Invoking event {@event.GetType().Name + (hookMode == HookMode.Pre ? "-pre" : "")}");
             if (_eventHandlers.TryGetValue(@event.GetType().Name + (hookMode == HookMode.Pre ? "-pre" : ""), out GameAction gameAction))
             {
                 gameAction.Handler.Invoke(@event);

@@ -18,7 +18,7 @@ namespace WarcraftPlugin.Core.Effects
     /// <remarks>
     /// All destroy events happen in the pre hook, before invoke.
     /// </remarks>
-    public abstract class WarcraftEffect(CCSPlayerController owner, float duration = float.MaxValue,
+    public abstract class WarcraftEffect(CCSPlayerController owner, float duration = 100000,
             bool destroyOnDeath = true, bool destroyOnRoundEnd = true,
             bool destroyOnChangingRace = true, bool destroyOnDisconnect = true,
             bool destroyOnSpawn = true, bool finishOnDestroy = true, float onTickInterval = 0.25f)

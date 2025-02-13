@@ -9,7 +9,6 @@ using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using System.Collections.Generic;
 using WarcraftPlugin.Events.ExtendedEvents;
-using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin.Classes
 {
@@ -112,7 +111,7 @@ namespace WarcraftPlugin.Classes
         public override void OnTick()
         {
             if (!_throwingAxe.IsValid) return;
-            var hasHitPlayer = _throwingAxe?.HasEverHitPlayer ?? false;
+            var hasHitPlayer = _throwingAxe?.HasEverHitEnemy ?? false;
             if (hasHitPlayer)
             {
                 try

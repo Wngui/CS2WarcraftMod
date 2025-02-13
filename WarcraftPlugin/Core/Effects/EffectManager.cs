@@ -7,7 +7,7 @@ namespace WarcraftPlugin.Core.Effects
     internal class EffectManager
     {
         private readonly List<WarcraftEffect> _effects = [];
-        public static readonly float _tickRate = 0.05f;
+        public static readonly float _tickRate = 0.1f; //Lowest possible interval for native timer
 
         internal void Initialize()
         {
