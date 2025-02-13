@@ -1,7 +1,4 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using WarcraftPlugin.Helpers;
-using WarcraftPlugin.Models;
+﻿using CounterStrikeSharp.API.Core;
 
 namespace WarcraftPlugin.Events.ExtendedEvents
 {
