@@ -11,7 +11,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 {
     internal static class ClassMenu
     {
-        internal static void Show(CCSPlayerController? player, List<ClassInformation> classInformations)
+        internal static void Show(CCSPlayerController player, List<ClassInformation> classInformations)
         {
             var plugin = WarcraftPlugin.Instance;
 

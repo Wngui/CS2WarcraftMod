@@ -184,8 +184,8 @@ namespace WarcraftPlugin.Classes
 
         internal class EnsnaringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
         {
-            private readonly CPhysicsPropMultiplayer _trap;
-            private readonly CPhysicsPropMultiplayer _trigger;
+            private CPhysicsPropMultiplayer _trap;
+            private CPhysicsPropMultiplayer _trigger;
 
             private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
@@ -193,18 +193,18 @@ namespace WarcraftPlugin.Classes
             public override void OnStart()
             {
                 //Beartrap model
-                var trap = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-                trap.Teleport(trapPosition, new QAngle(), new Vector());
-                trap.DispatchSpawn();
-                trap.SetModel("models/weapons/w_eq_beartrap_dropped.vmdl");
-                trap.SetColor(Color.FromArgb(60, 255, 255, 255));
+                _trap = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+                _trap.Teleport(trapPosition, new QAngle(), new Vector());
+                _trap.DispatchSpawn();
+                _trap.SetModel("models/weapons/w_eq_beartrap_dropped.vmdl");
+                _trap.SetColor(Color.FromArgb(60, 255, 255, 255));
 
                 //event prop
-                var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-                trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
-                trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
-                trigger.Teleport(trapPosition, new QAngle(), new Vector());
-                trigger.DispatchSpawn();
+                _trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+                _trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
+                _trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
+                _trigger.Teleport(trapPosition, new QAngle(), new Vector());
+                _trigger.DispatchSpawn();
 
                 if (_trigger.IsValid) InitialPos = _trigger?.AbsOrigin.Clone();
             }

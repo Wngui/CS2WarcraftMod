@@ -26,8 +26,6 @@ echo Updating CS2...
 powershell -Command "(Get-Content $env:GAMEINFO_FILE) | Where-Object { $_ -notmatch \".*csgo/addons/metamod.*\" } | Set-Content $env:GAMEINFO_FILE"
 powershell -Command "(Get-Content $env:GAMEINFO_FILE) -replace \"(Game_LowViolence.*)\", \"`$1`r`n`t`t`tGame`tcsgo/addons/metamod\" | Set-Content $env:GAMEINFO_FILE"
 
-pause
-
 :: Create download folder if does not exist
 if not exist "%DOWNLOAD_DIR%" mkdir "%DOWNLOAD_DIR%"
 

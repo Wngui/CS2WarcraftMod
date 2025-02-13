@@ -116,12 +116,12 @@ namespace WarcraftPlugin.Classes
             public override void OnStart() {}
             public override void OnTick()
             {
-                var currentAbilityLevel = owner.GetWarcraftPlayer().GetAbilityLevel(0);
+                var currentAbilityLevel = Owner.GetWarcraftPlayer().GetAbilityLevel(0);
                 var auraSize = currentAbilityLevel * 100;
-                var healingZone = Warcraft.CreateBoxAroundPoint(owner.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
+                var healingZone = Warcraft.CreateBoxAroundPoint(Owner.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
                 //healingZone.Show(duration: 2); //Debug
                 //Find players within area
-                var playersToHeal = Utilities.GetPlayers().Where(x => x.Team == owner.Team && x.PawnIsAlive && owner.IsValid &&
+                var playersToHeal = Utilities.GetPlayers().Where(x => x.Team == Owner.Team && x.PawnIsAlive && Owner.IsValid &&
                 healingZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
 
                 if (playersToHeal.Any())

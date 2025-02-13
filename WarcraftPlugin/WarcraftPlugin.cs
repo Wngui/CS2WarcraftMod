@@ -208,7 +208,7 @@ namespace WarcraftPlugin
         }
 
         [RequiresPermissions("@css/addxp")]
-        private void CommandAddXp(CCSPlayerController? client, CommandInfo commandinfo)
+        private void CommandAddXp(CCSPlayerController client, CommandInfo commandinfo)
         {
             if (string.IsNullOrEmpty(commandinfo.ArgByIndex(1))) return;
 
@@ -218,12 +218,12 @@ namespace WarcraftPlugin
             XpSystem.AddXp(client, xpToAdd);
         }
 
-        private void CommandHelp(CCSPlayerController? player, CommandInfo commandinfo)
+        private void CommandHelp(CCSPlayerController player, CommandInfo commandinfo)
         {
             player.PrintToChat($" {ChatColors.Green}Type !class to change classes, !skills to level-up");
         }
 
-        private void CommandResetSkills(CCSPlayerController? client, CommandInfo commandinfo)
+        private void CommandResetSkills(CCSPlayerController client, CommandInfo commandinfo)
         {
             var wcPlayer = GetWcPlayer(client);
 
@@ -319,7 +319,7 @@ namespace WarcraftPlugin
             return warcraftClass;
         }
 
-        private void UltimatePressed(CCSPlayerController? client, CommandInfo commandinfo)
+        private void UltimatePressed(CCSPlayerController client, CommandInfo commandinfo)
         {
             var warcraftPlayer = client.GetWarcraftPlayer();
             if (warcraftPlayer.GetAbilityLevel(3) < 1)

@@ -13,8 +13,8 @@ internal class MenuPlayer
 {
     internal CCSPlayerController player { get; set; }
     internal Menu MainMenu = null;
-    internal LinkedListNode<MenuOption>? CurrentChoice = null;
-    internal LinkedListNode<MenuOption>? MenuStart = null;
+    internal LinkedListNode<MenuOption> CurrentChoice = null;
+    internal LinkedListNode<MenuOption> MenuStart = null;
     internal string CenterHtml = "";
     internal int VisibleOptions = 5;
     internal static IStringLocalizer Localizer = null;
@@ -63,7 +63,7 @@ internal class MenuPlayer
         MenuStart = CurrentChoice;
         UpdateCenterHtml();
     }
-    internal void GoBackToPrev(LinkedListNode<MenuOption>? menu)
+    internal void GoBackToPrev(LinkedListNode<MenuOption> menu)
     {
         if (menu == null)
         {
@@ -152,7 +152,7 @@ internal class MenuPlayer
 
         StringBuilder builder = new StringBuilder();
         int i = 0;
-        LinkedListNode<MenuOption>? option = MenuStart!;
+        LinkedListNode<MenuOption> option = MenuStart!;
         builder.AppendLine($"{option.Value.Parent?.Title}<br>");
 
         while (i < VisibleOptions && option != null)

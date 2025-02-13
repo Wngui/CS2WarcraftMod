@@ -308,23 +308,24 @@ namespace WarcraftPlugin.Classes
 
     internal class ImposterSyndromEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
     {
-        public override void OnStart() { }
+        float _startingTickInterval;
+        public override void OnStart() { _startingTickInterval = OnTickInterval; }
         public override void OnTick() {
-            if (owner.PlayerPawn.Value.EntitySpottedState.Spotted)
+            if (Owner.PlayerPawn.Value.EntitySpottedState.Spotted)
             {
                 //chance to notify
-                if (Warcraft.RollDice(owner.GetWarcraftPlayer().GetAbilityLevel(2)))
+                if (Warcraft.RollDice(Owner.GetWarcraftPlayer().GetAbilityLevel(2)))
                 {
-                    owner.PrintToCenter($"[Spotted]");
-                    owner.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
-                    owner.AdrenalineSurgeEffect(0.2f);
+                    Owner.PrintToCenter($"[Spotted]");
+                    Owner.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
+                    Owner.AdrenalineSurgeEffect(0.2f);
                     OnTickInterval = 5; //Add delay before next check
                 }
             }
             else
             {
                 //Reset tick interval when no longer spotted
-                OnTickInterval = onTickInterval;
+                OnTickInterval = _startingTickInterval;
             }
         }
         public override void OnFinish() { }

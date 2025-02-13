@@ -161,18 +161,18 @@ namespace WarcraftPlugin.Classes
             public override void OnStart()
             {
                 //trap model
-                var trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
-                trap.Teleport(trapPosition.Clone().Add(z: -7), new QAngle(), new Vector());
-                trap.DispatchSpawn();
-                trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
-                trap.SetScale(0.5f);
+                _trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
+                _trap.Teleport(trapPosition.Clone().Add(z: -7), new QAngle(), new Vector());
+                _trap.DispatchSpawn();
+                _trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
+                _trap.SetScale(0.5f);
 
                 //event prop
-                var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-                trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
-                trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
-                trigger.Teleport(trapPosition, new QAngle(), new Vector());
-                trigger.DispatchSpawn();
+                _trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+                _trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
+                _trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
+                _trigger.Teleport(trapPosition, new QAngle(), new Vector());
+                _trigger.DispatchSpawn();
 
                 InitialPos = _trigger?.AbsOrigin.Clone();
             }

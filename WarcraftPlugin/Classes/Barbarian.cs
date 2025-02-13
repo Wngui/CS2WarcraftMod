@@ -92,14 +92,14 @@ namespace WarcraftPlugin.Classes
         {
             _throwingAxe = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
 
-            Vector velocity = owner.CalculateVelocityAwayFromPlayer(1800);
+            Vector velocity = Owner.CalculateVelocityAwayFromPlayer(1800);
 
-            var rotation = new QAngle(0, owner.PlayerPawn.Value.EyeAngles.Y + 90, 0);
+            var rotation = new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y + 90, 0);
 
-            _throwingAxe.Teleport(owner.CalculatePositionInFront(new Vector(10, 10, 60)), rotation, velocity);
+            _throwingAxe.Teleport(Owner.CalculatePositionInFront(new Vector(10, 10, 60)), rotation, velocity);
             _throwingAxe.DispatchSpawn();
             _throwingAxe.SetModel("models/weapons/v_axe.vmdl");
-            Schema.SetSchemaValue(_throwingAxe.Handle, "CBaseGrenade", "m_hThrower", owner.PlayerPawn.Raw); //Fixes killfeed
+            Schema.SetSchemaValue(_throwingAxe.Handle, "CBaseGrenade", "m_hThrower", Owner.PlayerPawn.Raw); //Fixes killfeed
 
             _throwingAxe.AcceptInput("InitializeSpawnFromWorld");
             _throwingAxe.Damage = 40;
@@ -139,7 +139,7 @@ namespace WarcraftPlugin.Classes
 
         public override void OnStart()
         {
-            Owner.AdrenalineSurgeEffect(duration);
+            Owner.AdrenalineSurgeEffect(Duration);
             Owner.PlayerPawn.Value.VelocityModifier = 1.3f;
             Owner.PlayerPawn.Value.SetColor(Color.IndianRed);
             Owner.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");

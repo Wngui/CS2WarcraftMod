@@ -134,9 +134,9 @@ namespace WarcraftPlugin.Classes
         public override void OnStart(){}
         public override void OnTick()
         {
-            if (owner.PlayerPawn.Value.ArmorValue < 100)
+            if (Owner.PlayerPawn.Value.ArmorValue < 100)
             {
-                owner.SetArmor(owner.PlayerPawn.Value.ArmorValue + 1);
+                Owner.SetArmor(Owner.PlayerPawn.Value.ArmorValue + 1);
             }
         }
         public override void OnFinish(){}
