@@ -337,6 +337,20 @@ namespace WarcraftPlugin.Helpers
             return velocityVector;
         }
 
+        public static void DisableMovement(this CCSPlayerController player)
+        {
+            if (!player.IsAlive()) return;
+            player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+        }
+
+        public static void EnableMovement(this CCSPlayerController player)
+        {
+            if (!player.IsAlive()) return;
+            player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+        }
+
         /// <summary>
         /// Inflicts damage to the player from an attacker, with an optional inflictor.
         /// </summary>

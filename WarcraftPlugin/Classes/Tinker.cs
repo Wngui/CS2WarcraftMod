@@ -6,8 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
+using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Summons;
@@ -142,49 +143,37 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
                 Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
-                SpawnTrap(new Vector(decoy.X, decoy.Y, decoy.Z));
+                WarcraftPlugin.Instance.AddTimer(1f, () =>
+                {
+                    new SpringTrapEffect(Player, 120, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
+                });
             }
         }
 
-        private void SpawnTrap(Vector vector)
+        internal class SpringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
         {
-            //trap model
-            var trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
-            trap.Teleport(vector.Clone().Add(z: -7), new QAngle(), new Vector());
-            trap.DispatchSpawn();
-            trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
-            trap.SetScale(0.5f);
-
-            //event prop
-            var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-            trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
-            trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
-            trigger.Teleport(vector, new QAngle(), new Vector());
-            trigger.DispatchSpawn();
-
-            WarcraftPlugin.Instance.AddTimer(1f, () =>
-            {
-                DispatchEffect(new SpringTrapEffect(Player, trap, trigger, 120));
-            });
-        }
-
-        internal class SpringTrapEffect : WarcraftEffect
-        {
-            private readonly CDynamicProp _trap;
-            private readonly CPhysicsPropMultiplayer _trigger;
+            private CDynamicProp _trap;
+            private CPhysicsPropMultiplayer _trigger;
 
             private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
 
-            internal SpringTrapEffect(CCSPlayerController owner, CDynamicProp trap, CPhysicsPropMultiplayer trigger, float duration)
-                : base(owner, duration)
-            {
-                _trap = trap;
-                _trigger = trigger;
-            }
-
             public override void OnStart()
             {
+                //trap model
+                var trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
+                trap.Teleport(trapPosition.Clone().Add(z: -7), new QAngle(), new Vector());
+                trap.DispatchSpawn();
+                trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
+                trap.SetScale(0.5f);
+
+                //event prop
+                var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+                trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
+                trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
+                trigger.Teleport(trapPosition, new QAngle(), new Vector());
+                trigger.DispatchSpawn();
+
                 InitialPos = _trigger?.AbsOrigin.Clone();
             }
 
@@ -215,7 +204,7 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInTrap)
                     {
-                        player.PlayerPawn.Value.AbsVelocity.Add(z: Player.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
+                        player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
                         player.PlayLocalSound("sounds/buttons/lever6.vsnd");
                     }
                 }
@@ -257,7 +246,7 @@ namespace WarcraftPlugin.Classes
             float speed = 16f; // Speed of the circular motion
 
             // Create a timer to update the drone's position every 0.01 seconds
-            _ultimateTimer = AddTimer(0.01f, () =>
+            _ultimateTimer = WarcraftPlugin.Instance.AddTimer(0.01f, () =>
             {
                 foreach (var drone in _drones)
                 {
@@ -280,7 +269,8 @@ namespace WarcraftPlugin.Classes
             WarcraftPlugin.Instance.AddTimer(_ultimateTime, () =>
             {
                 _ultimateTimer?.Kill();
-                ActivateDrones(1);
+                if (Player.IsAlive())
+                    ActivateDrones(1);
             });
         }
     }

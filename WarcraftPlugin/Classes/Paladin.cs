@@ -2,19 +2,18 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
-using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API;
 using System.Linq;
 using WarcraftPlugin.Models;
 using System.Drawing;
-using WarcraftPlugin.Events;
 using System.Collections.Generic;
+using WarcraftPlugin.Events.ExtendedEvents;
+using WarcraftPlugin.Core.Effects;
 
 namespace WarcraftPlugin.Classes
 {
     internal class Paladin : WarcraftClass
     {
-        private Timer _healingAuraTimer;
         private bool _hasUsedDivineResurrection = false;
 
         public override string DisplayName => "Paladin";
@@ -46,7 +45,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
-                StartHealingAura();
+                new HealingAuraEffect(Player, 5f).Start();
             }
 
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
@@ -54,39 +53,6 @@ namespace WarcraftPlugin.Classes
                 Player.GiveNamedItem("item_assaultsuit");
                 Player.SetArmor(Player.PlayerPawn.Value.ArmorValue + WarcraftPlayer.GetAbilityLevel(1) * 20);
             }
-        }
-
-        private void StartHealingAura()
-        {
-            _healingAuraTimer?.Kill();
-            _healingAuraTimer = AddTimer(5f, () =>
-            {
-                if (!Player.IsAlive())
-                {
-                    _healingAuraTimer?.Kill();
-                    return;
-                }
-
-                var auraSize = WarcraftPlayer.GetAbilityLevel(0) * 100;
-                var healingZone = Warcraft.CreateBoxAroundPoint(Player.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
-                //healingZone.Show(duration: 2); //Debug
-                //Find players within area
-                var playersToHeal = Utilities.GetPlayers().Where(x => x.Team == Player.Team && x.PawnIsAlive && Player.IsValid &&
-                healingZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
-
-                if (playersToHeal.Any())
-                {
-                    foreach (var player in playersToHeal)
-                    {
-                        if (player.PlayerPawn.Value.Health < player.PlayerPawn.Value.MaxHealth)
-                        {
-                            var healthAfterHeal = player.PlayerPawn.Value.Health + WarcraftPlayer.GetAbilityLevel(0);
-                            player.SetHp(Math.Min(healthAfterHeal, player.PlayerPawn.Value.MaxHealth));
-                            Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
-                        }
-                    }
-                }
-            }, TimerFlags.REPEAT);
         }
 
         private void Ultimate()
@@ -131,20 +97,47 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerHurtOther(EventPlayerHurt @event)
+        private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
             var victim = @event.Userid;
             if (!victim.IsAlive() || victim.UserId == Player.UserId) return;
 
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
+            //Smite
+            if (victim.PlayerPawn.Value.ArmorValue > 0 && Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
             {
-                if (victim.PlayerPawn.Value.ArmorValue > 0)
+                victim.SetArmor(victim.PlayerPawn.Value.ArmorValue - WarcraftPlayer.GetAbilityLevel(2) * 5);
+                Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
+                Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
+            }
+        }
+
+        internal class HealingAuraEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
+        {
+            public override void OnStart() {}
+            public override void OnTick()
+            {
+                var currentAbilityLevel = owner.GetWarcraftPlayer().GetAbilityLevel(0);
+                var auraSize = currentAbilityLevel * 100;
+                var healingZone = Warcraft.CreateBoxAroundPoint(owner.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
+                //healingZone.Show(duration: 2); //Debug
+                //Find players within area
+                var playersToHeal = Utilities.GetPlayers().Where(x => x.Team == owner.Team && x.PawnIsAlive && owner.IsValid &&
+                healingZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
+
+                if (playersToHeal.Any())
                 {
-                    victim.SetArmor(victim.PlayerPawn.Value.ArmorValue - WarcraftPlayer.GetAbilityLevel(2) * 5);
-                    Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
-                    Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
+                    foreach (var player in playersToHeal)
+                    {
+                        if (player.PlayerPawn.Value.Health < player.PlayerPawn.Value.MaxHealth)
+                        {
+                            var healthAfterHeal = player.PlayerPawn.Value.Health + currentAbilityLevel;
+                            player.SetHp(Math.Min(healthAfterHeal, player.PlayerPawn.Value.MaxHealth));
+                            Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
+                        }
+                    }
                 }
             }
+            public override void OnFinish(){}
         }
     }
 }

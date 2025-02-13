@@ -3,7 +3,7 @@ using System;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 
-namespace WarcraftPlugin.Events
+namespace WarcraftPlugin.Events.ExtendedEvents
 {
     public static class EventExtensions
     {
@@ -32,7 +32,7 @@ namespace WarcraftPlugin.Events
         }
 
         /// <summary>
-        /// Ignores all incoming damage to the player. Only works in combination with Hookmode.Pre
+        /// Ignores all incoming damage to the player. Only works if the event is coming from Hookmode.Pre
         /// </summary>
         /// <param name="damageHealth">Optional amount of health damage to ignore.</param>
         /// <param name="damageArmor">Optional amount of armor damage to ignore.</param>
@@ -41,8 +41,12 @@ namespace WarcraftPlugin.Events
             var victim = @event.Userid;
             if (victim.IsAlive())
             {
-                victim.PlayerPawn.Value.Health += Math.Clamp(healthDamageToIgnore ?? @event.DmgHealth, 0, @event.DmgHealth);
-                victim.PlayerPawn.Value.ArmorValue += Math.Clamp(armorDamageToIgnore ?? @event.DmgArmor, 0, @event.DmgArmor);
+                int ignoredHealthDamage = Math.Clamp(healthDamageToIgnore ?? @event.DmgHealth, 0, @event.DmgHealth);
+                int ignoredArmorDamage = Math.Clamp(armorDamageToIgnore ?? @event.DmgArmor, 0, @event.DmgArmor);
+                victim.PlayerPawn.Value.Health += ignoredHealthDamage;
+                victim.PlayerPawn.Value.ArmorValue += ignoredArmorDamage;
+                @event.DmgHealth -= ignoredHealthDamage;
+                @event.DmgArmor -= ignoredArmorDamage;
             }
         }
     }

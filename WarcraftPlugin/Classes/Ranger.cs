@@ -12,8 +12,8 @@ using g3;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
 using System.Collections.Generic;
+using WarcraftPlugin.Events.ExtendedEvents;
 
 namespace WarcraftPlugin.Classes
 {
@@ -159,30 +159,11 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
-                SpawnTrap(new Vector(decoy.X, decoy.Y, decoy.Z));
+                WarcraftPlugin.Instance.AddTimer(1f, () =>
+                {
+                    new EnsnaringTrapEffect(Player, 20, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
+                });
             }
-        }
-
-        private void SpawnTrap(Vector vector)
-        {
-            //Beartrap model
-            var trap = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-            trap.Teleport(vector, new QAngle(), new Vector());
-            trap.DispatchSpawn();
-            trap.SetModel("models/weapons/w_eq_beartrap_dropped.vmdl");
-            trap.SetColor(Color.FromArgb(60, 255, 255, 255));
-
-            //event prop
-            var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-            trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
-            trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
-            trigger.Teleport(vector, new QAngle(), new Vector());
-            trigger.DispatchSpawn();
-
-            WarcraftPlugin.Instance.AddTimer(1f, () =>
-            {
-                DispatchEffect(new EnsnaringTrapEffect(Player, trap, trigger, 20));
-            });
         }
         #endregion
 
@@ -198,10 +179,10 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
             StartCooldown(3);
-            DispatchEffect(new ArrowStormEffect(Player, new Vector(ping.X, ping.Y, ping.Z), 10));
+            new ArrowStormEffect(Player, 10, new Vector(ping.X, ping.Y, ping.Z)).Start();
         }
 
-        internal class EnsnaringTrapEffect : WarcraftEffect
+        internal class EnsnaringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
         {
             private readonly CPhysicsPropMultiplayer _trap;
             private readonly CPhysicsPropMultiplayer _trigger;
@@ -209,15 +190,22 @@ namespace WarcraftPlugin.Classes
             private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
 
-            internal EnsnaringTrapEffect(CCSPlayerController owner, CPhysicsPropMultiplayer trap, CPhysicsPropMultiplayer trigger, float duration)
-                : base(owner, duration)
-            {
-                _trap = trap;
-                _trigger = trigger;
-            }
-
             public override void OnStart()
             {
+                //Beartrap model
+                var trap = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+                trap.Teleport(trapPosition, new QAngle(), new Vector());
+                trap.DispatchSpawn();
+                trap.SetModel("models/weapons/w_eq_beartrap_dropped.vmdl");
+                trap.SetColor(Color.FromArgb(60, 255, 255, 255));
+
+                //event prop
+                var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+                trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
+                trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
+                trigger.Teleport(trapPosition, new QAngle(), new Vector());
+                trigger.DispatchSpawn();
+
                 if (_trigger.IsValid) InitialPos = _trigger?.AbsOrigin.Clone();
             }
 
@@ -247,7 +235,7 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInTrap)
                     {
-                        player.TakeDamage(Player.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Player, KillFeedIcon.tripwirefire);
+                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Owner, KillFeedIcon.tripwirefire);
                         player.PlayerPawn.Value.VelocityModifier = 0;
                         player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
                         Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
@@ -258,45 +246,37 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInTrap)
                     {
-                        player.PlayerPawn.Value.MovementServices.Maxspeed = 260;
+                        if (player.IsAlive())
+                            player.PlayerPawn.Value.MovementServices.Maxspeed = 260;
                     }
-                    _trap?.RemoveIfValid();
+                    this.Destroy();
                 });
             }
 
             public override void OnFinish()
             {
-                if (!IsTriggered)
-                {
-                    _trap?.RemoveIfValid();
-                    _trigger?.RemoveIfValid();
-                }
+                _trap?.RemoveIfValid();
+                _trigger?.RemoveIfValid();
             }
         }
 
-        internal class ArrowStormEffect : WarcraftEffect
+        internal class ArrowStormEffect(CCSPlayerController owner, float duration, Vector stormpos) : WarcraftEffect(owner, duration)
         {
-            private readonly Box3d _spawnBox;
-            private readonly Box3d _hurtBox;
-
             private readonly int _stormHeight = 150;
             private readonly int _stormArea = 280;
+            private readonly int _arrowsPerVolley = 15;
+            private Box3d _spawnBox;
+            private Box3d _hurtBox;
 
-            internal ArrowStormEffect(CCSPlayerController owner, Vector stormpos, float duration)
-            : base(owner, duration)
+            public override void OnStart()
             {
                 var spawnBoxPoint = stormpos.With(z: stormpos.Z + _stormHeight);
                 _spawnBox = Warcraft.CreateBoxAroundPoint(spawnBoxPoint, _stormArea, _stormArea, 50);
 
                 var hurtBoxPoint = stormpos.With(z: stormpos.Z + _stormHeight / 2);
                 _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _stormArea, _stormArea, _stormHeight);
-
-            }
-
-            public override void OnStart()
-            {
                 //_hurtBox.Show(duration: Duration); //Debug
-                Player.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
+                Owner.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
             }
 
             public override void OnTick()
@@ -305,7 +285,7 @@ namespace WarcraftPlugin.Classes
 
                 HurtPlayersInside();
 
-                for (int i = 0; i < 15; i++)
+                for (int i = 0; i < _arrowsPerVolley; i++)
                 {
                     SpawnArrow();
                 }
@@ -321,7 +301,7 @@ namespace WarcraftPlugin.Classes
                 {
                     if (!player.IsAlive()) continue;
 
-                    player.TakeDamage(2, Player, KillFeedIcon.flair0);
+                    player.TakeDamage(2, Owner, KillFeedIcon.flair0);
                     player.PlayerPawn.Value.VelocityModifier = 0;
                     Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
                 }
@@ -344,15 +324,13 @@ namespace WarcraftPlugin.Classes
                 arrow.Collision.SolidFlags = 12;
                 arrow.Collision.SolidType = SolidType_t.SOLID_VPHYSICS;
 
-                Schema.SetSchemaValue(arrow.Handle, "CBaseGrenade", "m_hThrower", Player.PlayerPawn.Raw); //Fixes killfeed
+                Schema.SetSchemaValue(arrow.Handle, "CBaseGrenade", "m_hThrower", Owner.PlayerPawn.Raw); //Fixes killfeed
 
                 //Cleanup
                 WarcraftPlugin.Instance.AddTimer(0.6f, () => { arrow?.RemoveIfValid(); });
             }
 
-            public override void OnFinish()
-            {
-            }
+            public override void OnFinish() { }
         }
     }
 }

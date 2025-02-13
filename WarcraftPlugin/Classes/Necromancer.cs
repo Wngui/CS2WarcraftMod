@@ -9,9 +9,9 @@ using System.Linq;
 using g3;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
 using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Summons;
+using WarcraftPlugin.Events.ExtendedEvents;
 
 namespace WarcraftPlugin.Classes
 {
@@ -84,7 +84,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
-                DispatchEffect(new PoisonCloud(Player, new Vector(detonate.X, detonate.Y, detonate.Z), 13));
+                new PoisonCloudEffect(Player, 13, new Vector(detonate.X, detonate.Y, detonate.Z)).Start();
             }
         }
 
@@ -105,7 +105,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerHurtOther(EventPlayerHurt hurt)
+        private void PlayerHurtOther(EventPlayerHurtOther hurt)
         {
             if (!hurt.Userid.IsAlive() || hurt.Userid.UserId == Player.UserId) return;
 
@@ -154,7 +154,7 @@ namespace WarcraftPlugin.Classes
 
             _zombieUpdateTimer?.Kill();
 
-            _zombieUpdateTimer = AddTimer(0.1f, () =>
+            _zombieUpdateTimer = WarcraftPlugin.Instance.AddTimer(0.1f, () =>
             {
                 var hasValidZombies = false;
                 var zombieCount = _zombies.Count;
@@ -187,31 +187,20 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        internal class PoisonCloud : WarcraftEffect
+        internal class PoisonCloudEffect(CCSPlayerController owner, float duration, Vector cloudPos) : WarcraftEffect(owner, duration)
         {
-            private readonly Box3d _hurtBox;
-
             readonly int _cloudHeight = 100;
             readonly int _cloudWidth = 260;
-
-            internal PoisonCloud(CCSPlayerController owner, Vector cloudPos, float duration)
-            : base(owner, duration)
-            {
-                var hurtBoxPoint = cloudPos.With(z: cloudPos.Z + _cloudHeight / 2);
-                _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _cloudWidth, _cloudWidth, _cloudHeight);
-            }
+            private Box3d _hurtBox;
 
             public override void OnStart()
             {
+                var hurtBoxPoint = cloudPos.With(z: cloudPos.Z + _cloudHeight / 2);
+                _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _cloudWidth, _cloudWidth, _cloudHeight);
                 //_hurtBox.Show(duration: Duration); //Debug
             }
 
             public override void OnTick()
-            {
-                HurtPlayersInside();
-            }
-
-            private void HurtPlayersInside()
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
@@ -221,14 +210,12 @@ namespace WarcraftPlugin.Classes
                 {
                     foreach (var player in playersInHurtZone)
                     {
-                        player.TakeDamage(Player.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Player, KillFeedIcon.prop_exploding_barrel);
+                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Owner, KillFeedIcon.prop_exploding_barrel);
                     }
                 }
             }
 
-            public override void OnFinish()
-            {
-            }
+            public override void OnFinish(){}
         }
     }
 }

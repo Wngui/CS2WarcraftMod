@@ -6,8 +6,8 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
 using System.Collections.Generic;
+using WarcraftPlugin.Events.ExtendedEvents;
 
 namespace WarcraftPlugin.Classes
 {
@@ -93,7 +93,7 @@ namespace WarcraftPlugin.Classes
         {
             if (Player.PlayerPawn.Value.Render.A != 0)
             {
-                DispatchEffect(new InvisibleEffect(Player, WarcraftPlayer.GetAbilityLevel(0)));
+                new InvisibleEffect(Player, WarcraftPlayer.GetAbilityLevel(0)).Start();
             }
         }
 
@@ -138,26 +138,20 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        internal class InvisibleEffect : WarcraftEffect
+        internal class InvisibleEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
         {
-            internal InvisibleEffect(CCSPlayerController owner, float duration) : base(owner, duration) { }
-
             public override void OnStart()
             {
-                Player.PrintToCenter($"[Invisible]");
-                Player.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
+                Owner.PrintToCenter($"[Invisible]");
+                Owner.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
 
-                Player.AdrenalineSurgeEffect(Duration);
+                Owner.AdrenalineSurgeEffect(Duration);
             }
-
-            public override void OnTick()
-            {
-            }
-
+            public override void OnTick(){}
             public override void OnFinish()
             {
-                Player.PlayerPawn.Value.SetColor(Color.White);
-                Player.PrintToCenter($"[Visible]");
+                Owner.GetWarcraftPlayer().GetClass().SetDefaultAppearance();
+                Owner.PrintToCenter($"[Visible]");
             }
         }
     }

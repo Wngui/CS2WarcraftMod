@@ -7,8 +7,9 @@ using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Drawing;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
 using System.Collections.Generic;
+using WarcraftPlugin.Events.ExtendedEvents;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin.Classes
 {
@@ -46,28 +47,8 @@ namespace WarcraftPlugin.Classes
         {
             if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 25))
             {
-                ThrowAxe();
+                new ThrowingAxeEffect(Player, 2).Start();
             }
-        }
-
-        private void ThrowAxe()
-        {
-            var throwingAxe = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
-
-            Vector velocity = Player.CalculateVelocityAwayFromPlayer(1800);
-
-            var rotation = new QAngle(0, Player.PlayerPawn.Value.EyeAngles.Y + 90, 0);
-
-            throwingAxe.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), rotation, velocity);
-            throwingAxe.DispatchSpawn();
-            throwingAxe.SetModel("models/weapons/v_axe.vmdl");
-            Schema.SetSchemaValue(throwingAxe.Handle, "CBaseGrenade", "m_hThrower", Player.PlayerPawn.Raw); //Fixes killfeed
-
-            throwingAxe.AcceptInput("InitializeSpawnFromWorld");
-            throwingAxe.Damage = 40;
-            throwingAxe.DmgRadius = 180;
-            throwingAxe.DetonateTime = float.MaxValue;
-            DispatchEffect(new ThrowingAxeEffect(Player, throwingAxe, 2));
         }
 
         private void PlayerSpawn(EventPlayerSpawn @event)
@@ -79,17 +60,11 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void SetBloodlust()
-        {
-            Player.AdrenalineSurgeEffect(_bloodlustLength);
-            DispatchEffect(new BloodlustEffect(Player, _bloodlustLength));
-        }
-
         private void Ultimate()
         {
             if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
 
-            SetBloodlust();
+            new BloodlustEffect(Player, _bloodlustLength).Start();
             StartCooldown(3);
         }
 
@@ -109,26 +84,40 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class ThrowingAxeEffect : WarcraftEffect
+    internal class ThrowingAxeEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
     {
-        private readonly CHEGrenadeProjectile _axe;
-
-        internal ThrowingAxeEffect(CCSPlayerController owner, CHEGrenadeProjectile axe, float duration) : base(owner, duration) { _axe = axe; }
+        private CHEGrenadeProjectile _throwingAxe;
 
         public override void OnStart()
         {
-            Player.PlayLocalSound("sounds/player/effort_m_09.vsnd");
+            _throwingAxe = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
+
+            Vector velocity = owner.CalculateVelocityAwayFromPlayer(1800);
+
+            var rotation = new QAngle(0, owner.PlayerPawn.Value.EyeAngles.Y + 90, 0);
+
+            _throwingAxe.Teleport(owner.CalculatePositionInFront(new Vector(10, 10, 60)), rotation, velocity);
+            _throwingAxe.DispatchSpawn();
+            _throwingAxe.SetModel("models/weapons/v_axe.vmdl");
+            Schema.SetSchemaValue(_throwingAxe.Handle, "CBaseGrenade", "m_hThrower", owner.PlayerPawn.Raw); //Fixes killfeed
+
+            _throwingAxe.AcceptInput("InitializeSpawnFromWorld");
+            _throwingAxe.Damage = 40;
+            _throwingAxe.DmgRadius = 180;
+            _throwingAxe.DetonateTime = float.MaxValue;
+
+            Owner.PlayLocalSound("sounds/player/effort_m_09.vsnd");
         }
 
         public override void OnTick()
         {
-            if (!_axe.IsValid) return;
-            var hasHitPlayer = _axe?.HasEverHitPlayer ?? false;
+            if (!_throwingAxe.IsValid) return;
+            var hasHitPlayer = _throwingAxe?.HasEverHitPlayer ?? false;
             if (hasHitPlayer)
             {
                 try
                 {
-                    _axe.DetonateTime = 0;
+                    _throwingAxe.DetonateTime = 0;
                 }
                 catch { }
             }
@@ -136,53 +125,52 @@ namespace WarcraftPlugin.Classes
 
         public override void OnFinish()
         {
-            if (_axe.IsValid)
+            if (_throwingAxe.IsValid)
             {
-                _axe.DetonateTime = 0;
-                WarcraftPlugin.Instance.AddTimer(1, () => _axe?.RemoveIfValid());
+                _throwingAxe.DetonateTime = 0;
+                WarcraftPlugin.Instance.AddTimer(1, () => _throwingAxe?.RemoveIfValid());
             }
         }
     }
 
-    internal class BloodlustEffect : WarcraftEffect
+    internal class BloodlustEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
     {
-        internal BloodlustEffect(CCSPlayerController owner, float duration) : base(owner, duration) { }
-
         private const float _maxSize = 1.1f;
 
         public override void OnStart()
         {
-            Player.PlayerPawn.Value.VelocityModifier = 1.3f;
-            Player.PlayerPawn.Value.SetColor(Color.IndianRed);
-            Player.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");
+            Owner.AdrenalineSurgeEffect(duration);
+            Owner.PlayerPawn.Value.VelocityModifier = 1.3f;
+            Owner.PlayerPawn.Value.SetColor(Color.IndianRed);
+            Owner.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");
         }
 
         public override void OnTick()
         {
-            if (!Player.IsAlive()) return;
+            if (!Owner.IsAlive()) return;
 
             //Refill ammo
-            Player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
+            Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.Clip1 = Owner.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.GetVData<CBasePlayerWeaponVData>().MaxClip1;
 
             //Regenerate health
-            if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
+            if (Owner.PlayerPawn.Value.Health < Owner.PlayerPawn.Value.MaxHealth)
             {
-                Player.SetHp(Player.PlayerPawn.Value.Health + 1);
+                Owner.SetHp(Owner.PlayerPawn.Value.Health + 1);
             }
 
             //Rage growth spurt
-            var scale = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale;
+            var scale = Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().Scale;
             if (scale < _maxSize)
             {
-                Player.PlayerPawn.Value.SetScale(scale + 0.01f);
+                Owner.PlayerPawn.Value.SetScale(scale + 0.01f);
             }
         }
 
         public override void OnFinish()
         {
-            if (!Player.IsAlive()) return;
+            if (!Owner.IsAlive()) return;
 
-            var pawn = Player.PlayerPawn.Value;
+            var pawn = Owner.PlayerPawn.Value;
             pawn.SetColor(Color.White);
             pawn.VelocityModifier = 1f;
             pawn.SetScale(1);

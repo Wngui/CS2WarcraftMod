@@ -1,4 +1,4 @@
-﻿namespace WarcraftPlugin.Events
+﻿namespace WarcraftPlugin.Events.ExtendedEvents
 {
     internal interface ICustomGameEvent
     {

@@ -3,14 +3,13 @@ using System.Drawing;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
-using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
 using System.Collections.Generic;
+using WarcraftPlugin.Events.ExtendedEvents;
 
 namespace WarcraftPlugin.Classes
 {
@@ -26,8 +25,6 @@ namespace WarcraftPlugin.Classes
             new WarcraftAbility("Mana Shield", "Passive magical shield, which regenerates armor over time."),
             new WarcraftCooldownAbility("Teleport", "When you press your ultimate key, you will teleport to the spot you're aiming.", 20f)
         ];
-
-        private Timer _manaShieldTimer = null;
 
         public override void Register()
         {
@@ -70,32 +67,14 @@ namespace WarcraftPlugin.Classes
         private void PlayerSpawn(EventPlayerSpawn @event)
         {
             //Mana shield
-            _manaShieldTimer?.Kill();
-            if (WarcraftPlayer.GetAbilityLevel(2) > 0)
-            {
-                _manaShieldTimer = AddTimer(5 / WarcraftPlayer.GetAbilityLevel(2),
-                RegenManaShield, TimerFlags.REPEAT);
-            }
+            var regenArmorRate = 5 / WarcraftPlayer.GetAbilityLevel(2);
+            new ManaShieldEffect(Player, regenArmorRate).Start();
 
             //Fireball
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_molotov"));
                 decoy.AttributeManager.Item.CustomName = "Fireball";
-            }
-        }
-
-        private void RegenManaShield()
-        {
-            if (!Player.IsAlive())
-            {
-                _manaShieldTimer?.Kill();
-                return;
-            }
-
-            if (Player.PlayerPawn.Value.ArmorValue < 100)
-            {
-                Player.SetArmor(Player.PlayerPawn.Value.ArmorValue + 1);
             }
         }
 
@@ -108,14 +87,14 @@ namespace WarcraftPlugin.Classes
             Player.ExecuteClientCommandFromServer("player_ping");
         }
 
-        private void PlayerHurtOther(EventPlayerHurt @event)
+        private void PlayerHurtOther(EventPlayerHurtOther @event)
         {
             if (!@event.Userid.IsAlive() || @event.Userid.UserId == Player.UserId) return;
 
             if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 25))
             {
                 var victim = @event.Userid;
-                DispatchEffect(new FreezeEffect(Player, 1.0f, victim));
+                new FreezeEffect(Player, 1.0f, victim).Start();
             }
         }
 
@@ -150,36 +129,37 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class FreezeEffect : WarcraftEffect
+    internal class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
     {
-        private readonly CCSPlayerController _victim;
-
-        internal FreezeEffect(CCSPlayerController player, float duration, CCSPlayerController target) : base(player, duration)
+        public override void OnStart(){}
+        public override void OnTick()
         {
-            _victim = target;
+            if (owner.PlayerPawn.Value.ArmorValue < 100)
+            {
+                owner.SetArmor(owner.PlayerPawn.Value.ArmorValue + 1);
+            }
         }
+        public override void OnFinish(){}
+    }
 
+    internal class FreezeEffect(CCSPlayerController owner, float duration, CCSPlayerController target) : WarcraftEffect(owner, duration)
+    {
         public override void OnStart()
         {
-            _victim.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}", Duration);
-            var targetPlayerModel = _victim.PlayerPawn.Value;
+            target.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}", Duration);
+            var targetPlayerModel = target.PlayerPawn.Value;
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;
 
-            Warcraft.DrawLaserBetween(Player.ToCenterOrigin(), _victim.ToCenterOrigin(), Color.Cyan);
+            Warcraft.DrawLaserBetween(Owner.ToCenterOrigin(), target.ToCenterOrigin(), Color.Cyan);
             targetPlayerModel.SetColor(Color.Cyan);
         }
-
-        public override void OnTick()
-        {
-        }
-
+        public override void OnTick(){}
         public override void OnFinish()
         {
-            if (_victim.IsAlive())
+            if (target.IsAlive())
             {
-                _victim.PlayerPawn.Value.SetColor(Color.White);
-                Utilities.SetStateChanged(_victim.PlayerPawn.Value, "CBaseModelEntity", "m_clrRender");
+                target.PlayerPawn.Value.SetColor(Color.White);
             }
         }
     }

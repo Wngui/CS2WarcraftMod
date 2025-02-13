@@ -9,7 +9,7 @@ using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Linq;
-using WarcraftPlugin.Events;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace WarcraftPlugin.Models
 {
@@ -48,7 +48,7 @@ namespace WarcraftPlugin.Models
     {
         public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
         public abstract string DisplayName { get; }
-        public virtual DefaultClassModel DefaultModel { get; }
+        public virtual DefaultClassModel DefaultModel { get; } = new DefaultClassModel();
         public abstract Color DefaultColor { get; }
         internal WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
@@ -56,7 +56,6 @@ namespace WarcraftPlugin.Models
         public abstract List<IWarcraftAbility> Abilities { get; }
         private readonly Dictionary<string, GameAction> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
-        private readonly List<Timer> _timers = [];
         private KillFeedIcon? _killFeedIcon;
         private CCSPlayerController _lastPlayerHit;
 
@@ -64,10 +63,13 @@ namespace WarcraftPlugin.Models
 
         public abstract void Register();
 
+        public virtual void PlayerChangingToAnotherRace() { Player.PlayerPawn.Value.SetColor(Color.White); }
+
         public virtual List<string> PreloadResources { get; } = [];
 
         public void SetDefaultAppearance()
         {
+            if (!Player.IsAlive()) return;
             Player.PlayerPawn.Value.SetColor(GenerateShade(DefaultColor, Player.GetWarcraftPlayer().currentLevel));
 
             var model = Player.Team == CsTeam.CounterTerrorist ? DefaultModel?.CTModel : DefaultModel?.TModel;
@@ -147,12 +149,6 @@ namespace WarcraftPlugin.Models
             return _eventHandlers.Values.ToList();
         }
 
-        public virtual void PlayerChangingToAnotherRace()
-        {
-            Player.PlayerPawn.Value.SetColor(Color.White);
-            ClearTimers();
-        }
-
         public bool IsAbilityReady(int abilityIndex)
         {
             return CooldownManager.IsAvailable(WarcraftPlayer, abilityIndex);
@@ -179,36 +175,9 @@ namespace WarcraftPlugin.Models
             }
         }
 
-        public static void DispatchEffect(WarcraftEffect effect)
-        {
-            WarcraftPlugin.Instance.EffectManager.AddEffect(effect);
-        }
-
         public void ResetCooldowns()
         {
             CooldownManager.ResetCooldowns(WarcraftPlayer);
-        }
-
-        /// <summary>
-        /// Adds a timer which is automatically cleared on death, round start, changing race and disconnect.
-        /// Use 'WarcraftPlugin.Instance.AddTimer' if you want a timer that persists across these events.
-        /// </summary>
-        public Timer AddTimer(float duration, Action callback, TimerFlags flags = 0)
-        {
-            var timer = WarcraftPlugin.Instance.AddTimer(duration, callback, flags);
-            _timers.Add(timer);
-            return timer;
-        }
-
-        public void ClearTimers()
-        {
-            foreach (var timer in _timers)
-            {
-                timer?.Kill();
-            }
-
-            _timers.Clear();
-            WarcraftPlugin.Instance.EffectManager.ClearEffects(Player);
         }
 
         public void SetKillFeedIcon(KillFeedIcon? damageType)

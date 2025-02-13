@@ -6,8 +6,8 @@ namespace WarcraftPlugin.Core.Effects
 {
     internal class EffectManager
     {
-        private readonly List<WarcraftEffect> _effects = new();
-        private readonly float _tickRate = 0.25f;
+        private readonly List<WarcraftEffect> _effects = [];
+        public static readonly float _tickRate = 0.05f;
 
         internal void Initialize()
         {
@@ -25,29 +25,43 @@ namespace WarcraftPlugin.Core.Effects
             for (int i = _effects.Count - 1; i >= 0; i--)
             {
                 var effect = _effects[i];
-
                 effect.RemainingDuration -= _tickRate;
-                effect.OnTick();
 
-                if (effect.RemainingDuration <= 0)
+                if (effect.RemainingDuration <= 0) // Effect expired, remove it immediately
                 {
-                    effect.RemainingDuration = 0;
                     effect.OnFinish();
+                    _effects.RemoveAt(i);
+                    continue;
+                }
+
+                // Run OnTick only if the specified interval has passed
+                float elapsedTime = effect.Duration - effect.RemainingDuration;
+                if (elapsedTime - effect.LastTick >= effect.OnTickInterval)
+                {
+                    effect.OnTick();
+                    effect.LastTick = elapsedTime;
+                }
+            }
+        }
+
+        internal void DestroyEffects(CCSPlayerController player, EffectDestroyFlags flag)
+        {
+            for (int i = _effects.Count - 1; i >= 0; i--)
+            {
+                var effect = _effects[i];
+                if (effect.Owner?.Handle == player.Handle && effect.ShouldDestroy(flag))
+                {
+                    if(effect.FinishOnDestroy) effect.OnFinish();
                     _effects.RemoveAt(i);
                 }
             }
         }
 
-        internal void ClearEffects(CCSPlayerController player)
+        internal void DestroyEffect(WarcraftEffect effect)
         {
-            for (int i = _effects.Count - 1; i >= 0; i--)
+            if (_effects.Remove(effect) && effect.FinishOnDestroy)
             {
-                var effect = _effects[i];
-                if (effect.Player?.Handle == player.Handle)
-                {
-                    effect.OnFinish();
-                    _effects.RemoveAt(i);
-                }
+                effect.OnFinish();
             }
         }
     }
