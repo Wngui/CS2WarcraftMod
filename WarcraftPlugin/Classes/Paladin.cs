@@ -22,7 +22,7 @@ namespace WarcraftPlugin.Classes
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Healing Aura", "Emit an aura that gradually heals nearby allies over time."),
-            new WarcraftAbility("Holy Shield", "Surround yourself with a protective barrier that absorbs incoming damage."),
+            new WarcraftAbility("Holy Shield", "Gain an additional 20/40/60/80/100 armor."),
             new WarcraftAbility("Smite", "Infuse your attacks with divine energy, potentially stripping enemy armor."),
             new WarcraftAbility("Divine Resurrection", "Instantly revive a random fallen ally.")
         ];
@@ -105,7 +105,7 @@ namespace WarcraftPlugin.Classes
             //Smite
             if (victim.PlayerPawn.Value.ArmorValue > 0 && Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
             {
-                victim.SetArmor(victim.PlayerPawn.Value.ArmorValue - WarcraftPlayer.GetAbilityLevel(2) * 5);
+                @event.AddBonusDamage(0, WarcraftPlayer.GetAbilityLevel(2) * 5);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
                 Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
             }

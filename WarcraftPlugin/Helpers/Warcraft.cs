@@ -341,6 +341,7 @@ namespace WarcraftPlugin.Helpers
         {
             if (!player.IsAlive()) return;
             player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 0);
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
         }
 
@@ -348,6 +349,7 @@ namespace WarcraftPlugin.Helpers
         {
             if (!player.IsAlive()) return;
             player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
         }
 

@@ -15,8 +15,6 @@ namespace WarcraftPlugin.Classes
 {
     internal class Mage : WarcraftClass
     {
-        private int _tick;
-
         public override string DisplayName => "Mage";
         public override Color DefaultColor => Color.Blue;
 
@@ -46,7 +44,6 @@ namespace WarcraftPlugin.Classes
             {
                 StartCooldown(3);
                 Player.DropWeaponByDesignerName("weapon_c4");
-
                 //To avoid getting stuck we offset towards the players original pos
                 var offset = 40;
                 var playerOrigin = Player.PlayerPawn.Value.AbsOrigin;
@@ -132,7 +129,7 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval, duration: 10)
+    internal class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
     {
         public override void OnStart()
         {

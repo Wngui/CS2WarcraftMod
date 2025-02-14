@@ -266,6 +266,7 @@ namespace WarcraftPlugin
 
         private void OnMapEndHandler()
         {
+            EffectManager.DestroyAllEffects();
             _database.SaveClients();
         }
 

@@ -51,7 +51,7 @@ namespace WarcraftPlugin.Core.Effects
                 var effect = _effects[i];
                 if (effect.Owner?.Handle == player.Handle && effect.ShouldDestroy(flag))
                 {
-                    if(effect.FinishOnDestroy) effect.OnFinish();
+                    if (effect.FinishOnDestroy) effect.OnFinish();
                     _effects.RemoveAt(i);
                 }
             }
@@ -63,6 +63,11 @@ namespace WarcraftPlugin.Core.Effects
             {
                 effect.OnFinish();
             }
+        }
+
+        internal void DestroyAllEffects()
+        {
+            _effects.Clear();
         }
     }
 }

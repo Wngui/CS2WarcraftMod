@@ -60,13 +60,12 @@ namespace WarcraftPlugin.Models
 
         public abstract void Register();
 
-        public virtual void PlayerChangingToAnotherRace() { Player.PlayerPawn.Value.SetColor(Color.White); }
+        public virtual void PlayerChangingToAnotherRace() { SetDefaultAppearance(); }
 
         public virtual List<string> PreloadResources { get; } = [];
 
         public void SetDefaultAppearance()
         {
-            if (!Player.IsAlive()) return;
             Player.PlayerPawn.Value.SetColor(GenerateShade(DefaultColor, Player.GetWarcraftPlayer().currentLevel));
 
             var model = Player.Team == CsTeam.CounterTerrorist ? DefaultModel?.CTModel : DefaultModel?.TModel;

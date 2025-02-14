@@ -38,7 +38,7 @@ namespace WarcraftPlugin.Classes
         public override void Register()
         {
             HookEvent<EventPlayerJump>(PlayerJump);
-            HookEvent<EventDecoyStarted>(DecoyStart);
+            HookEvent<EventDecoyStarted>(DecoyStart, HookMode.Post);
             HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
             HookEvent<EventPlayerPing>(PlayerPing);
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
@@ -158,7 +158,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
-                Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
+                Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.RemoveIfValid();
                 WarcraftPlugin.Instance.AddTimer(1f, () =>
                 {
                     new EnsnaringTrapEffect(Player, 20, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();

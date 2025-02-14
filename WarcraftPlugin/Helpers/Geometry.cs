@@ -133,7 +133,7 @@ namespace WarcraftPlugin.Helpers
         /// </summary>
         public static Vector Clone(this Vector vector)
         {
-            return vector.Clone();
+            return vector.With();
         }
     }
 }
