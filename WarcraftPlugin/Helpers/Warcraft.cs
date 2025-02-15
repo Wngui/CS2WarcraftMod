@@ -369,9 +369,9 @@ namespace WarcraftPlugin.Helpers
                 Marshal.WriteByte(ptr, i, 0);
 
             var damageInfo = new CTakeDamageInfo(ptr);
-            var attackerInfo = new Struct.CAttackerInfo(victim);
+            var attackerInfo = new Struct.CAttackerInfo(attacker);
 
-            Marshal.StructureToPtr(attackerInfo, new IntPtr(ptr.ToInt64() + 0x80), false);
+            Marshal.StructureToPtr(attackerInfo, new IntPtr(ptr.ToInt64() + 0x98), false);
 
             Schema.SetSchemaValue(damageInfo.Handle, "CTakeDamageInfo", "m_hInflictor", inflictor?.Pawn?.Raw ?? attacker.Pawn.Raw);
             Schema.SetSchemaValue(damageInfo.Handle, "CTakeDamageInfo", "m_hAttacker", attacker.Pawn.Raw);

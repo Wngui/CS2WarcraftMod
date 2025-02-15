@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Reflection;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -217,6 +218,7 @@ namespace WarcraftPlugin.Events
                     attackingClass.LastHurtOther = Server.CurrentTime;
                     attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle), HookMode.Pre);
                 }
+                //Console.WriteLine($"Killfeed currently: " + attackingClass?.GetKillFeedIcon()?.ToString());
             }
 
             victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event, HookMode.Pre);
@@ -290,13 +292,13 @@ namespace WarcraftPlugin.Events
 
             if (victim.IsValid && attacker.IsValid && attacker != victim)
             {
+                var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
                 var victimClass = victim.GetWarcraftPlayer()?.GetClass();
                 WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
                 victimClass?.InvokeEvent(@event, HookMode.Pre);
-                @event.Weapon = victimClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
-                victimClass?.ResetKillFeedIcon();
+                @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
+                attackerClass?.ResetKillFeedIcon();
             }
-
             return HookResult.Continue;
         }
 

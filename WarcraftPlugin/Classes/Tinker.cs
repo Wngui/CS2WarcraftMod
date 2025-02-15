@@ -2,6 +2,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
+using g3;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -152,9 +153,8 @@ namespace WarcraftPlugin.Classes
         internal class SpringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
         {
             private CDynamicProp _trap;
-            private CPhysicsPropMultiplayer _trigger;
+            private Box3d _triggerZone;
 
-            private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
 
             public override void OnStart()
@@ -166,59 +166,45 @@ namespace WarcraftPlugin.Classes
                 _trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
                 _trap.SetScale(0.5f);
 
-                //event prop
-                _trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-                _trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
-                _trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
-                _trigger.Teleport(trapPosition, new QAngle(), new Vector());
-                _trigger.DispatchSpawn();
-
-                InitialPos = _trigger?.AbsOrigin.Clone();
+                _triggerZone = Warcraft.CreateBoxAroundPoint(trapPosition, 100, 100, 100);
+                //_triggerZone.Show(duration: Duration); //Debug
             }
 
             public override void OnTick()
             {
-                if (!IsTriggered && _trigger.IsValid && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
+                if (!IsTriggered)
                 {
-                    IsTriggered = true;
-                    _trigger?.Remove();
-
-                    TriggerTrap();
+                    //Find players in trap trigger zone
+                    var players = Utilities.GetPlayers();
+                    var playersInHurtZone = players.Where(x => x.PawnIsAlive && _triggerZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
+                    if (playersInHurtZone.Count != 0)
+                    {
+                        IsTriggered = true;
+                        TriggerTrap(playersInHurtZone);
+                    }
                 }
             }
 
-            private void TriggerTrap()
+            private void TriggerTrap(List<CCSPlayerController> playersInTrap)
             {
                 Warcraft.SpawnParticle(_trap.AbsOrigin.Clone().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
                 //Show trap
                 _trap.SetColor(Color.FromArgb(255, 255, 255, 255));
 
-                //Create 3D box around trap
-                var dangerzone = Warcraft.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
-                //Find players within area
-                var players = Utilities.GetPlayers();
-                var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
                 //launch players
-                if (playersInTrap.Any())
+                foreach (var player in playersInTrap)
                 {
-                    foreach (var player in playersInTrap)
-                    {
-                        player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
-                        player.PlayLocalSound("sounds/buttons/lever6.vsnd");
-                    }
+                    player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
+                    player.PlayLocalSound("sounds/buttons/lever6.vsnd");
                 }
 
                 //Clean-up
-                _trap?.RemoveIfValid();
+                this.Destroy();
             }
 
             public override void OnFinish()
             {
-                if (!IsTriggered)
-                {
-                    _trap?.RemoveIfValid();
-                    _trigger?.RemoveIfValid();
-                }
+                _trap?.RemoveIfValid();
             }
         }
         #endregion
