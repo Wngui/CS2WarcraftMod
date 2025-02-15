@@ -127,3 +127,4 @@ By releasing this mod, I sincerely hope it will aid the community in developing 
 
 Roflmuffin - CounterStrikeSharp & Base plugin</br>
 csportalsk - Testing and bug reporting
+pZyk - Bug reporting & feedback
