@@ -104,7 +104,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Pack NuGet package
-      run: dotnet pack --configuration Release --no-build --output nupkgs /p:Version=${{ env.new_version }}
+      run: dotnet pack WarcraftPlugin/WarcraftPlugin.csproj --configuration Release --no-build --output nupkgs /p:Version=${{ env.new_version }}
 
     - name: Publish to NuGet
       run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
