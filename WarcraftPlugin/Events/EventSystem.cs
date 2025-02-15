@@ -171,13 +171,6 @@ namespace WarcraftPlugin.Events
 
                 if (warcraftClass != null)
                 {
-                    if (warcraftPlayer.DesiredClass != null && warcraftPlayer.DesiredClass != warcraftClass.InternalName)
-                    {
-                        WarcraftPlugin.Instance.EffectManager.DestroyEffects(player, EffectDestroyFlags.OnChangingRace);
-                        warcraftPlayer = WarcraftPlugin.Instance.ChangeClass(player, warcraftPlayer.DesiredClass);
-                        warcraftClass = warcraftPlayer.GetClass();
-                    }
-
                     warcraftClass?.InvokeEvent(@event, HookMode.Pre);
 
                     if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
@@ -225,7 +218,6 @@ namespace WarcraftPlugin.Events
                     attackingClass.LastHurtOther = Server.CurrentTime;
                     attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle), HookMode.Pre);
                 }
-                //Console.WriteLine($"Killfeed currently: " + attackingClass?.GetKillFeedIcon()?.ToString());
             }
 
             victim?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event, HookMode.Pre);
@@ -237,14 +229,22 @@ namespace WarcraftPlugin.Events
         {
             var player = @event.Userid;
 
-            var warcraftClass = player?.GetWarcraftPlayer()?.GetClass();
+            var warcraftPlayer = player?.GetWarcraftPlayer();
 
-            if (warcraftClass != null)
+            if (warcraftPlayer != null)
             {
+                var warcraftClass = warcraftPlayer.GetClass();
+                if (warcraftPlayer.DesiredClass != null && warcraftPlayer.DesiredClass != warcraftClass?.InternalName)
+                {
+                    WarcraftPlugin.Instance.EffectManager.DestroyEffects(player, EffectDestroyFlags.OnChangingRace);
+                    warcraftPlayer = WarcraftPlugin.Instance.ChangeClass(player, warcraftPlayer.DesiredClass);
+                    warcraftClass = warcraftPlayer.GetClass();
+                }
+
                 Server.NextFrame(() =>
                 {
-                    warcraftClass.SetDefaultAppearance();
-                    warcraftClass.InvokeEvent(@event, HookMode.Pre);
+                    warcraftClass?.SetDefaultAppearance();
+                    warcraftClass?.InvokeEvent(@event, HookMode.Pre);
                 });
             }
 
