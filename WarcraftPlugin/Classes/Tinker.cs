@@ -42,6 +42,8 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventWeaponFire>(PlayerShoot);
             HookEvent<EventDecoyStarted>(DecoyStart);
+            HookEvent<EventRoundEnd>(RoundEnd);
+            HookEvent<EventRoundStart>(RoundStart);
 
             HookEvent<EventSpottedEnemy>(SpottedPlayer);
 
@@ -61,15 +63,12 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerShoot(EventWeaponFire fire)
         {
-            if (WarcraftPlayer.GetAbilityLevel(1) > 0)
+            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 20))
             {
-                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 20))
+                var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
+                if (activeWeapon != null && activeWeapon.IsValid)
                 {
-                    var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
-                    if (activeWeapon != null && activeWeapon.IsValid)
-                    {
-                        activeWeapon.Clip1++;
-                    }
+                    activeWeapon.Clip1++;
                 }
             }
         }
@@ -118,6 +117,16 @@ namespace WarcraftPlugin.Classes
             DeactivateDrones();
         }
 
+        private void RoundStart(EventRoundStart start)
+        {
+            DeactivateDrones();
+        }
+
+        private void RoundEnd(EventRoundEnd end)
+        {
+            DeactivateDrones();
+        }
+
         public override void PlayerChangingToAnotherRace()
         {
             DeactivateDrones();
@@ -143,10 +152,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
                 Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
-                WarcraftPlugin.Instance.AddTimer(1f, () =>
-                {
-                    new SpringTrapEffect(Player, 120, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
-                });
+                new SpringTrapEffect(Player, 120, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
             }
         }
 
