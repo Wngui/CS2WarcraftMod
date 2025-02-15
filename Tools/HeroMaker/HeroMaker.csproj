@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WarcraftPlugin" Version="1.0.0" />
+    <PackageReference Include="WarcraftPlugin" Version="*" />
   </ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Debug'">
