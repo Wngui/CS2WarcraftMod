@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7aece590-36ba-4084-a4ca-bbb5adfd28dc" width="40%">
+  <img src="https://github.com/user-attachments/assets/4f6fac3a-d098-4a41-8f46-2612e112529a">
 </p>
+
 <p align="center">
   (https://www.youtube.com/watch?v=Z9HdF47zPss)
 </p>
