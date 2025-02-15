@@ -1,7 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
-using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,40 +14,28 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Shapeshifter : WarcraftClass
+    internal class Shapeshifter : WarcraftClass
     {
-        public override string InternalName => "shapeshifter";
         public override string DisplayName => "Shapeshifter";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_phoenix/tm_phoenix_varianti.vmdl",
-            //CTModel = "characters/models/ctm_swat/ctm_swat_variantj.vmdl"
-        };
         public override Color DefaultColor => Color.Pink;
+        public override List<string> PreloadResources => Props;
 
         private bool _isShapeshifted = false;
         private bool _isDisguised = false;
         private CDynamicProp _playerShapeshiftProp;
         private CDynamicProp _cameraProp;
-        private Timer _checkSpottedTimer;
-        private string _initialPlayerModel;
         private readonly List<string> _weaponList = [];
+
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Adaptive Disguise", "Chance to spawn with an enemy disguise, revealed upon attacking."),
+            new WarcraftAbility("Doppelganger", "Create a temporary inanimate clone of yourself, using a decoy grenade."),
+            new WarcraftAbility("Imposter syndrom", "Chance to be notified when revealed by enemies on radar."),
+            new WarcraftCooldownAbility("Morphling", "Transform into an unassuming object.", 20f)
+        ];
 
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("adaptive_disguise", "Adaptive Disguise",
-                i => $"Chance to spawn with an enemy disguise, revealed upon attacking."));
-
-            AddAbility(new WarcraftAbility("doppelganger", "Doppelganger",
-                i => $"Create a temporary inanimate clone of yourself, using a decoy grenade."));
-
-            AddAbility(new WarcraftAbility("imposter_syndrom", "Imposter syndrom",
-                i => $"Chance to be notified when revealed by enemies on radar."));
-
-            AddAbility(new WarcraftCooldownAbility("morphling", "Morphling",
-                i => $"Transform into an unassuming object.",
-                20f));
-
             HookAbility(3, Ultimate);
 
             HookEvent<EventWeaponFire>(PlayerShoot);
@@ -64,22 +51,25 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
-                DispatchEffect(new CloneDecoyEffect(Player, 5 * WarcraftPlayer.GetAbilityLevel(1), new Vector(decoy.X, decoy.Y, decoy.Z)));
+                new CloneDecoyEffect(Player, 5 * WarcraftPlayer.GetAbilityLevel(1), new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
             }
         }
 
         private void PlayerSpawn(EventPlayerSpawn spawn)
         {
-            _initialPlayerModel = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName;
+            //Set default model in case transformation effects are broken
+            var initialPlayerModel = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName;
+            if (Player.Team == CsTeam.CounterTerrorist)
+                DefaultModel.CTModel = initialPlayerModel;
+            else
+                DefaultModel.TModel = initialPlayerModel;
+
             BreakTransformation();
 
             //Disguise
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
-                double rolledValue = Random.Shared.NextDouble();
-                float chanceToDisguide = WarcraftPlayer.GetAbilityLevel(0) / 5 * 0.40f;
-
-                if (rolledValue <= chanceToDisguide)
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 40))
                 {
                     Disguise();
                 }
@@ -94,39 +84,7 @@ namespace WarcraftPlugin.Classes
 
             //Imposter syndrom
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
-                _checkSpottedTimer = WarcraftPlugin.Instance.AddTimer(1, CheckIfSpotted, TimerFlags.REPEAT);
-        }
-
-        private void CheckIfSpotted()
-        {
-            if (!Player.IsValid || !Player.PawnIsAlive)
-            {
-                _checkSpottedTimer?.Kill();
-                return;
-            }
-
-            if (Player.PlayerPawn.Value.EntitySpottedState.Spotted)
-            {
-                //disable timer and start timer again after cooldown
-                _checkSpottedTimer?.Kill();
-                WarcraftPlugin.Instance.AddTimer(5, () =>
-                {
-                    _checkSpottedTimer?.Kill();
-                    _checkSpottedTimer = WarcraftPlugin.Instance.AddTimer(1, CheckIfSpotted, TimerFlags.REPEAT);
-                });
-
-                //chance
-                double rolledValue = Random.Shared.NextDouble();
-                float chanceToAlert = WarcraftPlayer.GetAbilityLevel(2) / 5f;
-
-                if (rolledValue <= chanceToAlert)
-                {
-                    Player.PrintToCenter($"[Spotted]");
-                    Player.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
-                    Player.PlayerPawn.Value.HealthShotBoostExpirationTime = Server.CurrentTime + 0.2f;
-                    Utilities.SetStateChanged(Player.PlayerPawn.Value, "CCSPlayerPawn", "m_flHealthShotBoostExpirationTime");
-                }
-            }
+                new ImposterSyndromEffect(Player, 1).Start();
         }
 
         private void Disguise()
@@ -156,19 +114,17 @@ namespace WarcraftPlugin.Classes
         private void RoundEnd(EventRoundEnd end)
         {
             BreakTransformation();
-            _checkSpottedTimer?.Kill();
         }
 
         private void PlayerDeath(EventPlayerDeath death)
         {
             BreakTransformation();
-            _checkSpottedTimer?.Kill();
         }
 
         public override void PlayerChangingToAnotherRace()
         {
             BreakTransformation();
-            _checkSpottedTimer?.Kill();
+            base.PlayerChangingToAnotherRace();
         }
 
         private void PlayerShoot(EventWeaponFire fire)
@@ -271,7 +227,7 @@ namespace WarcraftPlugin.Classes
 
         private void UpdateCamera()
         {
-            if (!_cameraProp.IsValid || !Player.PlayerPawn.IsValid || !Player.PawnIsAlive)
+            if (!_cameraProp.IsValid || !Player.IsAlive())
             {
                 UnhookCamera();
                 return;
@@ -311,7 +267,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public static readonly List<string> Props =
+        private static readonly List<string> Props =
         [
             "models/props/de_dust/dust_aid_crate_56.vmdl",
             "models/props/de_dust/dust_food_crates_56.vmdl",
@@ -350,6 +306,31 @@ namespace WarcraftPlugin.Classes
         ];
     }
 
+    internal class ImposterSyndromEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
+    {
+        float _startingTickInterval;
+        public override void OnStart() { _startingTickInterval = OnTickInterval; }
+        public override void OnTick() {
+            if (Owner.PlayerPawn.Value.EntitySpottedState.Spotted)
+            {
+                //chance to notify
+                if (Warcraft.RollDice(Owner.GetWarcraftPlayer().GetAbilityLevel(2)))
+                {
+                    Owner.PrintToCenter($"[Spotted]");
+                    Owner.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
+                    Owner.AdrenalineSurgeEffect(0.2f);
+                    OnTickInterval = 5; //Add delay before next check
+                }
+            }
+            else
+            {
+                //Reset tick interval when no longer spotted
+                OnTickInterval = _startingTickInterval;
+            }
+        }
+        public override void OnFinish() { }
+    }
+
     internal class CloneDecoyEffect(CCSPlayerController owner, float duration, Vector decoyVector) : WarcraftEffect(owner, duration)
     {
         private readonly Vector _decoyVector = decoyVector;
@@ -359,15 +340,16 @@ namespace WarcraftPlugin.Classes
         public override void OnStart()
         {
             _clone = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
+            //Setting breakable prop before dispatching spawn, gives it breakable properties
             _clone.SetModel("models/generic/bust_02/bust_02_a.vmdl");
             _clone.DispatchSpawn();
             _clone.SetModel(Owner.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
-            _clone.Teleport(_decoyVector.With().Add(z: -2), new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y, 0), new Vector());
+            _clone.Teleport(_decoyVector.Clone().Add(z: -2), new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y, 0), new Vector());
 
             _cloneDebrisHead = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
             _cloneDebrisHead.SetModel("models/generic/bust_02/bust_02_a.vmdl");
             _cloneDebrisHead.DispatchSpawn();
-            _cloneDebrisHead.Teleport(_decoyVector.With().Add(z: 35), new QAngle(), new Vector());
+            _cloneDebrisHead.Teleport(_decoyVector.Clone().Add(z: 35), new QAngle(), new Vector());
             _cloneDebrisHead.SetColor(Color.FromArgb(1, 255, 255, 255));
         }
 

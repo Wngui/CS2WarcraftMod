@@ -4,10 +4,11 @@ using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Drawing;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Summons
 {
-    public class Zombie : IDisposable
+    internal class Zombie : IDisposable
     {
         private const int _interestMax = 6;
         private int InterestScore = _interestMax;
@@ -16,15 +17,15 @@ namespace WarcraftPlugin.Summons
         private readonly int _damage = 10;
         private readonly int _maxHealth = 100;
 
-        public int FavouritePosition { get; set; } = 1;
-        public CChicken Entity { get; set; }
-        public CCSPlayerController Owner { get; }
-        public bool IsFollowingLeader { get; private set; }
-        public CCSPlayerController Target { get; set; }
-        public double LastLeapTick { get; private set; } = 0;
-        public double LastAttackTick { get; private set; } = 0;
+        internal int FavouritePosition { get; set; } = 1;
+        internal CChicken Entity { get; set; }
+        internal CCSPlayerController Owner { get; }
+        internal bool IsFollowingLeader { get; private set; }
+        internal CCSPlayerController Target { get; set; }
+        internal double LastLeapTick { get; private set; } = 0;
+        internal double LastAttackTick { get; private set; } = 0;
 
-        public Zombie(CCSPlayerController owner)
+        internal Zombie(CCSPlayerController owner)
         {
             Owner = owner;
             Entity = Utilities.CreateEntityByName<CChicken>("chicken");
@@ -35,23 +36,23 @@ namespace WarcraftPlugin.Summons
             Entity.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 2f;
             Entity.Health = _maxHealth;
 
-            Utility.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+            Warcraft.SpawnParticle(Entity.AbsOrigin.Clone().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
 
             Entity.OwnerEntity.Raw = Owner.PlayerPawn.Raw;
             FollowLeader();
         }
 
-        public void Update()
+        internal void Update()
         {
             if (Entity == null || !Entity.IsValid) return;
-            if (Owner == null || !Owner.IsValid || !Owner.PlayerPawn.IsValid || !Owner.PawnIsAlive) Kill();
+            if (!Owner.IsAlive()) Kill();
 
             if(InterestScore <= 0)
             {
                 FollowLeader();
             }
 
-            if (Target != null && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
+            if (Target.IsAlive())
             {
                 if (LastLeapTick == 0 || LastLeapTick + _leapCooldown + Random.Shared.NextDouble() < Server.TickedTime)
                 {
@@ -68,7 +69,7 @@ namespace WarcraftPlugin.Summons
                     Entity.AbsOrigin.X = chickenResetPoint.X;
                     Entity.AbsOrigin.Y = chickenResetPoint.Y;
                     Entity.AbsOrigin.Z = Owner.PlayerPawn.Value.AbsOrigin.Z+5;
-                    Utility.SpawnParticle(Entity.AbsOrigin.With().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+                    Warcraft.SpawnParticle(Entity.AbsOrigin.Clone().Add(z: -50), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
                     return;
                 }
                 Vector velocity = CircularGetVelocityToPosition(Owner.PlayerPawn.Value.AbsOrigin, Entity.AbsOrigin);
@@ -90,11 +91,11 @@ namespace WarcraftPlugin.Summons
             float offsetY = (float)(_radius * Math.Sin(angle));
 
             // Add these offsets to the owner's position
-            Vector targetPosition = circleTarget.With()
+            Vector targetPosition = circleTarget.Clone()
                 .Add(x: offsetX, y: offsetY);
 
             // Calculate the travel velocity
-            Vector velocity = Utility.CalculateTravelVelocity(zombie, targetPosition, 1);
+            Vector velocity = Warcraft.CalculateTravelVelocity(zombie, targetPosition, 1);
             return velocity;
         }
 
@@ -104,7 +105,7 @@ namespace WarcraftPlugin.Summons
             Attack();
 
             //Leap logic
-            Vector velocity = Utility.CalculateTravelVelocity(Entity.AbsOrigin, Target.PlayerPawn.Value.AbsOrigin, 1);
+            Vector velocity = Warcraft.CalculateTravelVelocity(Entity.AbsOrigin, Target.PlayerPawn.Value.AbsOrigin, 1);
 
             Entity.AbsVelocity.Z = 400;
             Entity.AbsVelocity.X = Math.Clamp(velocity.X, -1000, 1000);
@@ -113,13 +114,13 @@ namespace WarcraftPlugin.Summons
 
         private void Attack()
         {
-            var playerCollison = Target.PlayerPawn.Value.Collision.ToBox3d(Target.PlayerPawn.Value.AbsOrigin.With().Add(z: -60));
+            var playerCollison = Target.PlayerPawn.Value.Collision.ToBox(Target.PlayerPawn.Value.AbsOrigin.Clone().Add(z: -60));
 
             //Check if zombie is inside targets collision box
-            if (playerCollison.Contains(Entity.AbsOrigin.ToVector3d()))
+            if (playerCollison.Contains(Entity.AbsOrigin))
             {
                 //dodamage to target
-                Target.TakeDamage(_damage, Owner);
+                Target.TakeDamage(_damage, Owner, KillFeedIcon.fists);
                 InterestScore = _interestMax;
             }
             else
@@ -128,17 +129,16 @@ namespace WarcraftPlugin.Summons
             }
         }
 
-        public void Kill()
+        internal void Kill()
         {
-            if (Entity == null || !Entity.IsValid) return;
-            Entity.AcceptInput("Explode");
+            Entity.RemoveIfValid();
         }
 
-        public void SetEnemy(CCSPlayerController enemy)
+        internal void SetEnemy(CCSPlayerController enemy)
         {
-            if (!enemy.PlayerPawn.IsValid || !enemy.PawnIsAlive) return;
+            if (!enemy.IsAlive()) return;
 
-            if (Target != null && Target.PlayerPawn.IsValid && Target.PawnIsAlive)
+            if (Target.IsAlive())
             {
                 return;
             }

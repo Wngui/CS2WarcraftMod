@@ -1,53 +1,55 @@
-﻿using CounterStrikeSharp.API.Modules.Timers;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    public class CooldownManager
+    internal class CooldownManager
     {
         private readonly float _tickRate = 0.25f;
 
-        public void Initialize()
+        internal void Initialize()
         {
             WarcraftPlugin.Instance.AddTimer(_tickRate, CooldownTick, TimerFlags.REPEAT);
         }
 
         private void CooldownTick()
         {
-            foreach (var player in WarcraftPlugin.Instance.Players)
+            foreach (var player in Utilities.GetPlayers())
             {
-                if (player == null) continue;
-                for (int i = 0; i < player.AbilityCooldowns.Count; i++)
+                var warcraftPlayer = player?.GetWarcraftPlayer();
+                if (warcraftPlayer == null) continue;
+                for (int i = 0; i < warcraftPlayer.AbilityCooldowns.Count; i++)
                 {
-                    if (player.AbilityCooldowns[i] <= 0) continue;
+                    if (warcraftPlayer.AbilityCooldowns[i] <= 0) continue;
 
-                    player.AbilityCooldowns[i] -= 0.25f;
+                    warcraftPlayer.AbilityCooldowns[i] -= 0.25f;
 
-                    if (player.AbilityCooldowns[i] <= 0)
+                    if (warcraftPlayer.AbilityCooldowns[i] <= 0)
                     {
-                        PlayEffects(player, i);
+                        PlayEffects(warcraftPlayer, i);
                     }
                 }
             }
         }
 
-        public static bool IsAvailable(WarcraftPlayer player, int abilityIndex)
+        internal static bool IsAvailable(WarcraftPlayer player, int abilityIndex)
         {
             return player.AbilityCooldowns[abilityIndex] <= 0;
         }
 
-        public static float Remaining(WarcraftPlayer player, int abilityIndex)
+        internal static float Remaining(WarcraftPlayer player, int abilityIndex)
         {
             return player.AbilityCooldowns[abilityIndex];
         }
 
-        public static void StartCooldown(WarcraftPlayer player, int abilityIndex, float abilityCooldown)
+        internal static void StartCooldown(WarcraftPlayer player, int abilityIndex, float abilityCooldown)
         {
             player.AbilityCooldowns[abilityIndex] = abilityCooldown;
         }
 
-        public static void ResetCooldowns(WarcraftPlayer player)
+        internal static void ResetCooldowns(WarcraftPlayer player)
         {
             for (int abilityIndex = 0; abilityIndex < player.AbilityCooldowns.Count; abilityIndex++)
             {

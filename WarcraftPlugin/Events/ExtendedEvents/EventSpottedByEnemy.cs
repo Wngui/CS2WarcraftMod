@@ -1,9 +1,9 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Events;
 
-namespace WarcraftPlugin.Events
+namespace WarcraftPlugin.Events.ExtendedEvents
 {
-    internal class EventSpottedByEnemy : GameEvent
+    public class EventSpottedByEnemy : GameEvent, ICustomGameEvent
     {
         public EventSpottedByEnemy() : base(0)
         {

@@ -9,22 +9,24 @@ using System.Linq;
 using g3;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
 using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Summons;
+using WarcraftPlugin.Events.ExtendedEvents;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Necromancer : WarcraftClass
+    internal class Necromancer : WarcraftClass
     {
-        public override string InternalName => "necromancer";
         public override string DisplayName => "Necromancer";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_professional/tm_professional_vari.vmdl",
-            //CTModel = "characters/models/ctm_sas/ctm_sas_variantg.vmdl"
-        };
         public override Color DefaultColor => Color.Black;
+
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Life Drain", "Harness dark magic to siphon health from foes and restore your own vitality."),
+            new WarcraftAbility("Poison Cloud", "Infuses smoke grenades with potent toxins, damaging enemies over time."),
+            new WarcraftAbility("Splintered Soul", "Chance to cheat death with a fraction of vitality."),
+            new WarcraftCooldownAbility("Raise Dead", "Summon a horde of undead chicken to fight for you.", 50f)
+        ];
 
         private readonly List<Zombie> _zombies = new();
         private const int _maxZombies = 10;
@@ -33,19 +35,6 @@ namespace WarcraftPlugin.Classes
 
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("life_drain", "Life Drain",
-                i => $"Harness dark magic to siphon health from foes and restore your own vitality."));
-
-            AddAbility(new WarcraftAbility("poison_cloud", "Poison Cloud",
-                i => $"Infuses smoke grenades with potent toxins, damaging enemies over time."));
-
-            AddAbility(new WarcraftAbility("splintered_soul", "Splintered Soul",
-                i => $"Chance to cheat death with a fraction of vitality."));
-
-            AddAbility(new WarcraftCooldownAbility("raise_dead", "Raise Dead",
-                i => $"Summon a horde of undead chicken to fight for you.",
-                50f));
-
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
             HookEvent<EventRoundEnd>(RoundEnd);
             HookEvent<EventRoundStart>(RoundStart);
@@ -68,15 +57,16 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerDeath(EventPlayerDeath death)
         {
+            KillZombies();
             if (WarcraftPlayer.GetAbilityLevel(2) == 0) return;
 
             var pawn = Player.PlayerPawn.Value;
-            if (!_hasCheatedDeath && pawn.Health < 0)
+            if (!_hasCheatedDeath && pawn.Health <= 0)
             {
                 double rolledValue = Random.Shared.NextDouble();
                 float chanceToRespawn = WarcraftPlayer.GetAbilityLevel(2) / 5 * 0.80f;
 
-                if (rolledValue <= chanceToRespawn)
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 80))
                 {
                     _hasCheatedDeath = true;
                     WarcraftPlugin.Instance.AddTimer(2f, () =>
@@ -84,7 +74,7 @@ namespace WarcraftPlugin.Classes
                         Player.PrintToChat(" " + $"{ChatColors.DarkRed}You have cheated death, for now...{ChatColors.Default}");
                         Player.Respawn();
                         Player.SetHp(1);
-                        Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
+                        Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
                         Player.PlayLocalSound("sounds/ambient/atmosphere/cs_cable_rattle02.vsnd");
                     });
                 }
@@ -95,7 +85,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
-                DispatchEffect(new PoisonCloud(Player, new Vector(detonate.X, detonate.Y, detonate.Z), 13));
+                new PoisonCloudEffect(Player, 13, new Vector(detonate.X, detonate.Y, detonate.Z)).Start();
             }
         }
 
@@ -116,14 +106,14 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        private void PlayerHurtOther(EventPlayerHurt hurt)
+        private void PlayerHurtOther(EventPlayerHurtOther hurt)
         {
-            if (!hurt.Userid.IsValid || !hurt.Userid.PawnIsAlive || hurt.Userid.UserId == Player.UserId) return;
+            if (!hurt.Userid.IsAlive() || hurt.Userid.UserId == Player.UserId) return;
 
             if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
             {
-                Utility.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.With().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 10);
-                var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / 5 * 0.3f);
+                Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf");
+                var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / WarcraftPlugin.MaxSkillLevel * 0.3f);
                 var playerCalculatedHealth = Player.PlayerPawn.Value.Health + healthDrained;
                 Player.SetHp((int)Math.Min(playerCalculatedHealth, Player.PlayerPawn.Value.MaxHealth));
             }
@@ -131,10 +121,16 @@ namespace WarcraftPlugin.Classes
 
         private void RoundStart(EventRoundStart start)
         {
+            KillZombies();
             _hasCheatedDeath = false;
         }
 
         private void RoundEnd(EventRoundEnd end)
+        {
+            KillZombies();
+        }
+
+        private void KillZombies()
         {
             _zombieUpdateTimer?.Kill();
 
@@ -198,48 +194,35 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public class PoisonCloud : WarcraftEffect
+        internal class PoisonCloudEffect(CCSPlayerController owner, float duration, Vector cloudPos) : WarcraftEffect(owner, duration)
         {
-            private readonly Box3d _hurtBox;
-
             readonly int _cloudHeight = 100;
             readonly int _cloudWidth = 260;
-
-            public PoisonCloud(CCSPlayerController owner, Vector cloudPos, float duration)
-            : base(owner, duration)
-            {
-                var hurtBoxPoint = cloudPos.With(z: cloudPos.Z + _cloudHeight / 2);
-                _hurtBox = Geometry.CreateBoxAroundPoint(hurtBoxPoint, _cloudWidth, _cloudWidth, _cloudHeight);
-            }
+            private Box3d _hurtBox;
 
             public override void OnStart()
             {
-                //Geometry.DrawVertices(_hurtBox.ComputeVertices(), duration: Duration); //debug
+                var hurtBoxPoint = cloudPos.With(z: cloudPos.Z + _cloudHeight / 2);
+                _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _cloudWidth, _cloudWidth, _cloudHeight);
+                //_hurtBox.Show(duration: Duration); //Debug
             }
 
             public override void OnTick()
             {
-                HurtPlayersInside();
-            }
-
-            private void HurtPlayersInside()
-            {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
+                var playersInHurtZone = players.Where(x => x.PawnIsAlive && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
                 //small hurt
                 if (playersInHurtZone.Any())
                 {
                     foreach (var player in playersInHurtZone)
                     {
-                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Owner);
+                        player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 2, Owner, KillFeedIcon.prop_exploding_barrel);
                     }
                 }
             }
 
-            public override void OnFinish()
-            {
-            }
+            public override void OnFinish(){}
         }
     }
 }

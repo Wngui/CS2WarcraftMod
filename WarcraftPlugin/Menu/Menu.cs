@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace WarcraftPlugin.Menu;
 
-public class Menu
+internal class Menu
 {
-    public string Title { get; set; } = "";
-    public int ResultsBeforePaging { get; set; }
-    public LinkedList<MenuOption> Options { get; set; } = new();
-    public LinkedListNode<MenuOption> Prev { get; set; } = null;
+    internal string Title { get; set; } = "";
+    internal int ResultsBeforePaging { get; set; }
+    internal LinkedList<MenuOption> Options { get; set; } = new();
+    internal LinkedListNode<MenuOption> Prev { get; set; } = null;
 
-    public LinkedListNode<MenuOption> Add(string display, string subDisplay, Action<CCSPlayerController, MenuOption> onChoice, Action<CCSPlayerController, MenuOption> onSelect = null)
+    internal LinkedListNode<MenuOption> Add(string display, string subDisplay, Action<CCSPlayerController, MenuOption> onChoice, Action<CCSPlayerController, MenuOption> onSelect = null)
     {
         if (Options == null)
             Options = new();

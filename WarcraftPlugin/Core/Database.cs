@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    public class Database
+    internal class Database
     {
         private SqliteConnection _connection;
 
-        public void Initialize(string directory)
+        internal void Initialize(string directory)
         {
             _connection =
                 new SqliteConnection(
@@ -22,11 +24,11 @@ namespace WarcraftPlugin.Core
             _connection.Execute(@"
                 CREATE TABLE IF NOT EXISTS `players` (
 	                `steamid` UNSIGNED BIG INT NOT NULL,
-	                `currentRace` VARCHAR(32) NOT NULL DEFAULT 'barbarian',
+	                `currentRace` VARCHAR(32) NOT NULL,
                   `name` VARCHAR(64),
 	                PRIMARY KEY (`steamid`));");
 
-                            _connection.Execute(@"
+            _connection.Execute(@"
                 CREATE TABLE IF NOT EXISTS `raceinformation` (
                   `steamid` UNSIGNED BIG INT NOT NULL,
                   `racename` VARCHAR(32) NOT NULL,
@@ -41,22 +43,23 @@ namespace WarcraftPlugin.Core
                 ");
         }
 
-        public bool PlayerExistsInDatabase(ulong steamid)
+        internal bool PlayerExistsInDatabase(ulong steamid)
         {
             return _connection.ExecuteScalar<int>("select count(*) from players where steamid = @steamid",
                 new { steamid }) > 0;
         }
 
-        public void AddNewPlayerToDatabase(CCSPlayerController player)
+        internal void AddNewPlayerToDatabase(CCSPlayerController player)
         {
+            var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
             Console.WriteLine($"Adding client to database {player.SteamID}");
             _connection.Execute(@"
             INSERT INTO players (`steamid`, `currentRace`)
-	        VALUES(@steamid, 'ranger')",
-                new { steamid = player.SteamID });
+            VALUES(@steamid, @className)",
+                new { steamid = player.SteamID, className = defaultClass.InternalName });
         }
 
-        public WarcraftPlayer LoadPlayerFromDatabase(CCSPlayerController player, XpSystem xpSystem)
+        internal WarcraftPlayer LoadPlayerFromDatabase(CCSPlayerController player, XpSystem xpSystem)
         {
             var dbPlayer = _connection.QueryFirstOrDefault<DatabasePlayer>(@"
             SELECT * FROM `players` WHERE `steamid` = @steamid",
@@ -68,6 +71,14 @@ namespace WarcraftPlugin.Core
                 dbPlayer = _connection.QueryFirstOrDefault<DatabasePlayer>(@"
                     SELECT * FROM `players` WHERE `steamid` = @steamid",
                     new { steamid = player.SteamID });
+            }
+
+            // If the class no longer exists, set it to the default class
+            if (!WarcraftPlugin.Instance.classManager.GetAllClasses().Any(x => x.InternalName == dbPlayer.CurrentRace))
+            {
+                var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
+                dbPlayer.CurrentRace = defaultClass.InternalName;
+                player.PrintToChat($"{ChatColors.Green}Current class is{ChatColors.Red} disabled{ChatColors.Green}! Now playing as {defaultClass.DisplayName}.{ChatColors.Default}");
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"
@@ -83,27 +94,27 @@ namespace WarcraftPlugin.Core
                     new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
             }
 
-            var raceInformation = _connection.QueryFirst<DatabaseClassInformation>(@"
+            var raceInformation = _connection.QueryFirst<ClassInformation>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid AND `racename` = @racename",
                 new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
 
             var wcPlayer = new WarcraftPlayer(player);
-            wcPlayer.LoadFromDatabase(raceInformation, xpSystem);
+            wcPlayer.LoadClassInformation(raceInformation, xpSystem);
             WarcraftPlugin.Instance.SetWcPlayer(player, wcPlayer);
 
             return wcPlayer;
         }
 
-        public List<DatabaseClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
+        internal List<ClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
         {
-            var raceInformation = _connection.Query<DatabaseClassInformation>(@"
+            var raceInformation = _connection.Query<ClassInformation>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid",
                 new { steamid = player.SteamID });
 
             return raceInformation.AsList();
         }
 
-        public void SavePlayerToDatabase(CCSPlayerController player)
+        internal void SavePlayerToDatabase(CCSPlayerController player)
         {
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
             Server.PrintToConsole($"Saving {player.PlayerName} to database...");
@@ -143,7 +154,7 @@ namespace WarcraftPlugin.Core
                 });
         }
 
-        public void SaveClients()
+        internal void SaveClients()
         {
             var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
             foreach (var player in playerEntities)
@@ -157,7 +168,7 @@ namespace WarcraftPlugin.Core
             }
         }
 
-        public void SaveCurrentClass(CCSPlayerController player)
+        internal void SaveCurrentClass(CCSPlayerController player)
         {
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
 
@@ -172,23 +183,23 @@ namespace WarcraftPlugin.Core
         }
     }
 
-    public class DatabasePlayer
+    internal class DatabasePlayer
     {
-        public ulong SteamId { get; set; }
-        public string CurrentRace { get; set; }
-        public string Name { get; set; }
+        internal ulong SteamId { get; set; }
+        internal string CurrentRace { get; set; }
+        internal string Name { get; set; }
     }
 
-    public class DatabaseClassInformation
+    internal class ClassInformation
     {
-        public ulong SteamId { get; set; }
-        public string RaceName { get; set; }
-        public int CurrentXp { get; set; }
-        public int CurrentLevel { get; set; }
-        public int AmountToLevel { get; set; }
-        public int Ability1Level { get; set; }
-        public int Ability2Level { get; set; }
-        public int Ability3Level { get; set; }
-        public int Ability4Level { get; set; }
+        internal ulong SteamId { get; set; }
+        internal string RaceName { get; set; }
+        internal int CurrentXp { get; set; }
+        internal int CurrentLevel { get; set; }
+        internal int AmountToLevel { get; set; }
+        internal int Ability1Level { get; set; }
+        internal int Ability2Level { get; set; }
+        internal int Ability3Level { get; set; }
+        internal int Ability4Level { get; set; }
     }
 }

@@ -9,9 +9,9 @@ using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu
 {
-    public static class ClassMenu
+    internal static class ClassMenu
     {
-        public static void Show(CCSPlayerController? player, List<DatabaseClassInformation> classInformations)
+        internal static void Show(CCSPlayerController player, List<ClassInformation> classInformations)
         {
             var plugin = WarcraftPlugin.Instance;
 
@@ -37,14 +37,14 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
             var totalLevels = warcraftClassInformations.Sum(x => x.CurrentLevel);
 
-            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><font color='darkgrey' class='{FontSizes.FontSizeSm}'> ( </font><font color='darkgrey' class='{FontSizes.FontSizeM}'>!class</font><font color='darkgrey' class='{FontSizes.FontSizeSm}'> )</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
+            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
 
             foreach (var warClassInformation in warcraftClassInformations
                 .OrderByDescending(x => x.CurrentLevel)
                 .ThenByDescending(x => x.CurrentXp)
                 .ThenBy(x => x.DisplayName))
             {
-                if (WarcraftPlugin.Instance.Config.DeactivatedClasses.Contains(warClassInformation.InternalName, StringComparer.InvariantCultureIgnoreCase))
+                if (!WarcraftPlugin.Instance.classManager.GetAllClasses().Any(x => x.InternalName == warClassInformation.InternalName))
                 {
                     continue;
                 }
@@ -53,10 +53,10 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
                 var isCurrentClass = player.GetWarcraftPlayer().className == warClassInformation.InternalName;
 
-                var displayString = @$"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeS}'>(</font>
+                var displayString = @$"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>(</font>
                 <font color='{(isCurrentClass ? Color.Gray.Name : "white")}' class='{FontSizes.FontSizeSm}'>{warClassInformation.DisplayName}</font>
-                <font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeS}'>)</font>
-                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeS}'>- Level {warClassInformation.CurrentLevel}</font>";
+                <font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>)</font>
+                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeSm}'>- level {warClassInformation.CurrentLevel}</font>";
 
                 var classInternalName = warClassInformation.InternalName;
                 classMenu.Add(displayString, null, (p, opt) =>
@@ -90,13 +90,13 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
             MenuManager.OpenMainMenu(player, classMenu);
         }
 
-        public static Color TransitionToGold(float t)
+        internal static Color TransitionToGold(float t)
         {
             // Ensure t is clamped between 0 and 1
             t = Math.Clamp(t, 0.1f, 1.0f);
 
             // Define the light grey and gold colors
-            Color lightGrey = Color.FromArgb(211, 211, 211); // Light grey (211, 211, 211)
+            Color lightGrey = Color.FromArgb(240, 240, 240); // Light grey (211, 211, 211)
             Color gold = Color.FromArgb(255, 215, 0);        // Gold (255, 215, 0)
 
             // Linearly interpolate between the two colors
@@ -111,11 +111,11 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
     internal class WarcraftClassInformation
     {
-        public string DisplayName { get; set; }
-        public string InternalName { get; set; }
-        public int CurrentLevel { get; set; }
-        public float CurrentXp { get; set; }
-        public Color DefaultColor { get; internal set; }
+        internal string DisplayName { get; set; }
+        internal string InternalName { get; set; }
+        internal int CurrentLevel { get; set; }
+        internal float CurrentXp { get; set; }
+        internal Color DefaultColor { get; set; }
     }
 
 }

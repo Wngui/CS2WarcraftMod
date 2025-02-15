@@ -1,0 +1,1 @@
+An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system

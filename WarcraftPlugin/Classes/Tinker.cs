@@ -2,12 +2,13 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
+using g3;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events;
+using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Summons;
@@ -16,7 +17,7 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
-    public class Tinker : WarcraftClass
+    internal class Tinker : WarcraftClass
     {
         private readonly List<Drone> _drones = [];
         private static readonly Vector _droneDefaultPosition = new(70, -70, 90);
@@ -24,34 +25,25 @@ namespace WarcraftPlugin.Classes
         private Timer _ultimateTimer;
         private const int _ultimateTime = 20;
 
-        public override string InternalName => "tinker";
         public override string DisplayName => "Tinker";
-        public override DefaultClassModel DefaultModel => new()
-        {
-            //TModel = "characters/models/tm_phoenix/tm_phoenix_varianti.vmdl",
-            //CTModel = "characters/models/ctm_swat/ctm_swat_variantj.vmdl"
-        };
         public override Color DefaultColor => Color.Teal;
+
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Attack Drone", "Deploy a gun drone that attacks nearby enemies."),
+            new WarcraftAbility("Spare Parts", "Chance to not lose ammo when firing"),
+            new WarcraftAbility("Spring Trap", "Deploy a trap which launches players into the air."),
+            new WarcraftCooldownAbility("Drone Swarm", "Summon a swarm of attack drones that damage all nearby enemies.", 50f)
+        ];
 
         public override void Register()
         {
-            AddAbility(new WarcraftAbility("attack_drone", "Attack Drone",
-                i => $"Deploy a gun drone that attacks nearby enemies."));
-
-            AddAbility(new WarcraftAbility("spare_parts", "Spare Parts",
-                i => $"Chance to not lose ammo when firing "));
-
-            AddAbility(new WarcraftAbility("spring_trap", "Spring Trap",
-                i => $"Deploy a trap which launches players into the air."));
-
-            AddAbility(new WarcraftCooldownAbility("drone_swarm", "Drone Swarm",
-                i => $"Summon a swarm of attack drones that damage all nearby enemies.",
-                50f));
-
             HookEvent<EventPlayerSpawn>(PlayerSpawn);
             HookEvent<EventPlayerDeath>(PlayerDeath);
             HookEvent<EventWeaponFire>(PlayerShoot);
             HookEvent<EventDecoyStarted>(DecoyStart);
+            HookEvent<EventRoundEnd>(RoundEnd);
+            HookEvent<EventRoundStart>(RoundStart);
 
             HookEvent<EventSpottedEnemy>(SpottedPlayer);
 
@@ -71,18 +63,12 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerShoot(EventWeaponFire fire)
         {
-            if (WarcraftPlayer.GetAbilityLevel(1) > 0)
+            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 20))
             {
-                double rolledValue = Random.Shared.NextDouble();
-                float sparePartsChance = WarcraftPlayer.GetAbilityLevel(0) * 0.02f;
-
-                if (rolledValue <= sparePartsChance)
+                var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
+                if (activeWeapon != null && activeWeapon.IsValid)
                 {
-                    var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
-                    if (activeWeapon != null && activeWeapon.IsValid)
-                    {
-                        activeWeapon.Clip1++;
-                    }
+                    activeWeapon.Clip1++;
                 }
             }
         }
@@ -106,7 +92,7 @@ namespace WarcraftPlugin.Classes
             DeactivateDrones();
             for (int i = 0; i < numberOfDrones; i++)
             {
-                _drones.Add(new Drone(Player, _droneDefaultPosition.With()));
+                _drones.Add(new Drone(Player, _droneDefaultPosition.Clone()));
             }
 
             WarcraftPlugin.Instance.RegisterListener<OnTick>(UpdateDrones);
@@ -114,6 +100,12 @@ namespace WarcraftPlugin.Classes
 
         private void UpdateDrones()
         {
+            if (!Player.IsAlive())
+            {
+                DeactivateDrones();
+                return;
+            }
+
             foreach (var drone in _drones)
             {
                 drone.Update();
@@ -125,9 +117,20 @@ namespace WarcraftPlugin.Classes
             DeactivateDrones();
         }
 
+        private void RoundStart(EventRoundStart start)
+        {
+            DeactivateDrones();
+        }
+
+        private void RoundEnd(EventRoundEnd end)
+        {
+            DeactivateDrones();
+        }
+
         public override void PlayerChangingToAnotherRace()
         {
             DeactivateDrones();
+            base.PlayerChangingToAnotherRace();
         }
 
         private void DeactivateDrones()
@@ -149,95 +152,65 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
                 Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
-                SpawnTrap(new Vector(decoy.X, decoy.Y, decoy.Z));
+                new SpringTrapEffect(Player, 120, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
             }
         }
 
-        private void SpawnTrap(Vector vector)
+        internal class SpringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
         {
-            //trap model
-            var trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
-            trap.Teleport(vector.With().Add(z: -7), new QAngle(), new Vector());
-            trap.DispatchSpawn();
-            trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
-            trap.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
+            private CDynamicProp _trap;
+            private Box3d _triggerZone;
 
-            //event prop
-            var trigger = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
-            trigger.SetModel("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
-            trigger.SetColor(Color.FromArgb(0, 255, 255, 255));
-            trigger.Teleport(vector, new QAngle(), new Vector());
-            trigger.DispatchSpawn();
-
-            WarcraftPlugin.Instance.AddTimer(1f, () =>
-            {
-                DispatchEffect(new SpringTrapEffect(Player, trap, trigger, 120));
-            });
-        }
-
-        public class SpringTrapEffect : WarcraftEffect
-        {
-            private readonly CDynamicProp _trap;
-            private readonly CPhysicsPropMultiplayer _trigger;
-
-            private Vector InitialPos { get; set; }
             private bool IsTriggered { get; set; } = false;
-
-            public SpringTrapEffect(CCSPlayerController owner, CDynamicProp trap, CPhysicsPropMultiplayer trigger, float duration)
-                : base(owner, duration)
-            {
-                _trap = trap;
-                _trigger = trigger;
-            }
 
             public override void OnStart()
             {
-                InitialPos = _trigger?.AbsOrigin.With();
+                //trap model
+                _trap = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
+                _trap.Teleport(trapPosition.Clone().Add(z: -7), new QAngle(), new Vector());
+                _trap.DispatchSpawn();
+                _trap.SetModel("models/anubis/structures/pillar02_base01.vmdl");
+                _trap.SetScale(0.5f);
+
+                _triggerZone = Warcraft.CreateBoxAroundPoint(trapPosition, 100, 100, 100);
+                //_triggerZone.Show(duration: Duration); //Debug
             }
 
             public override void OnTick()
             {
-                if (!IsTriggered && _trigger.IsValid && !InitialPos.IsEqual(_trigger.AbsOrigin, true))
+                if (!IsTriggered)
                 {
-                    IsTriggered = true;
-                    _trigger?.Remove();
-
-                    TriggerTrap();
+                    //Find players in trap trigger zone
+                    var players = Utilities.GetPlayers();
+                    var playersInHurtZone = players.Where(x => x.PawnIsAlive && _triggerZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
+                    if (playersInHurtZone.Count != 0)
+                    {
+                        IsTriggered = true;
+                        TriggerTrap(playersInHurtZone);
+                    }
                 }
             }
 
-            private void TriggerTrap()
+            private void TriggerTrap(List<CCSPlayerController> playersInTrap)
             {
-                Utility.SpawnParticle(_trap.AbsOrigin.With().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
+                Warcraft.SpawnParticle(_trap.AbsOrigin.Clone().Add(z: 20), "particles/dev/materials_test_puffs.vpcf", 1);
                 //Show trap
                 _trap.SetColor(Color.FromArgb(255, 255, 255, 255));
 
-                //Create 3D box around trap
-                var dangerzone = Geometry.CreateBoxAroundPoint(_trap.AbsOrigin, 200, 200, 300);
-                //Find players within area
-                var players = Utilities.GetPlayers();
-                var playersInTrap = players.Where(x => dangerzone.Contains(x.PlayerPawn.Value.AbsOrigin.With().Add(z: 20).ToVector3d()));
                 //launch players
-                if (playersInTrap.Any())
+                foreach (var player in playersInTrap)
                 {
-                    foreach (var player in playersInTrap)
-                    {
-                        player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
-                        player.PlayLocalSound("sounds/buttons/lever6.vsnd");
-                    }
+                    player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
+                    player.PlayLocalSound("sounds/buttons/lever6.vsnd");
                 }
 
                 //Clean-up
-                _trap?.RemoveIfValid();
+                this.Destroy();
             }
 
             public override void OnFinish()
             {
-                if (!IsTriggered)
-                {
-                    _trap?.RemoveIfValid();
-                    _trigger?.RemoveIfValid();
-                }
+                _trap?.RemoveIfValid();
             }
         }
         #endregion
@@ -245,13 +218,13 @@ namespace WarcraftPlugin.Classes
         private void Ultimate()
         {
             //Ultimate effect
-            var ultEffect = Utility.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.With().Add(z:40), "particles/ui/ui_experience_award_innerpoint.vpcf");
+            var ultEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ui_experience_award_innerpoint.vpcf");
             ultEffect.SetParent(Player.PlayerPawn.Value);
 
             ActivateDrones(_droneUltimateAmount);
 
             // Define the offset for each drone's angle based on its index
-            float angleOffsetPerDrone = (2*(float)Math.PI) / _drones.Count;
+            float angleOffsetPerDrone = (2 * (float)Math.PI) / _drones.Count;
 
             // Initialize the starting angle for each drone
             for (int i = 0; i < _drones.Count; i++)
@@ -284,9 +257,11 @@ namespace WarcraftPlugin.Classes
             }, TimerFlags.REPEAT);
 
             // End ultimate
-            WarcraftPlugin.Instance.AddTimer(_ultimateTime, () => {
+            WarcraftPlugin.Instance.AddTimer(_ultimateTime, () =>
+            {
                 _ultimateTimer?.Kill();
-                ActivateDrones(1);
+                if (Player.IsAlive())
+                    ActivateDrones(1);
             });
         }
     }

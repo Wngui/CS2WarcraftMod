@@ -13,12 +13,12 @@ using CounterStrikeSharp.API.Modules.Admin;
 using WarcraftPlugin.Adverts;
 using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
-using WarcraftPlugin.Classes;
 using WarcraftPlugin.Menu;
 using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace WarcraftPlugin
 {
@@ -26,13 +26,15 @@ namespace WarcraftPlugin
     {
         [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 2;
 
-        [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
-        [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = false;
+        [JsonPropertyName("DeactivatedClasses")] internal string[] DeactivatedClasses { get; set; } = [];
+        [JsonPropertyName("ShowCommandAdverts")] internal bool ShowCommandAdverts { get; set; } = true;
+        [JsonPropertyName("DefaultClass")] internal string DefaultClass { get; set; }
+        [JsonPropertyName("DisableNamePrefix")] internal bool DisableNamePrefix { get; set; } = false;
     }
 
-    public static class WarcraftPlayerExtensions
+    internal static class WarcraftPlayerExtensions
     {
-        public static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
+        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
         {
             return WarcraftPlugin.Instance.GetWcPlayer(player);
         }
@@ -52,48 +54,47 @@ namespace WarcraftPlugin
 
         private readonly Dictionary<IntPtr, WarcraftPlayer> WarcraftPlayers = [];
         private EventSystem _eventSystem;
-        public XpSystem XpSystem;
-        public ClassManager classManager;
-        public EffectManager EffectManager;
-        public CooldownManager CooldownManager;
-        public AdvertManager AdvertManager;
+        internal XpSystem XpSystem;
+        internal ClassManager classManager;
+        internal EffectManager EffectManager;
+        internal CooldownManager CooldownManager;
+        internal AdvertManager AdvertManager;
         private Database _database;
 
-        public int XpPerKill = 40;
-        public float XpHeadshotModifier = 0.15f;
-        public float XpKnifeModifier = 0.25f;
-
-        public List<WarcraftPlayer> Players => WarcraftPlayers.Values.ToList();
+        internal int XpPerKill = 40;
+        internal float XpHeadshotModifier = 0.15f;
+        internal float XpKnifeModifier = 0.25f;
 
         public Config Config { get; set; } = null!;
 
-        public WarcraftPlayer GetWcPlayer(CCSPlayerController player)
+        internal WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
             if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
 
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
+                wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
+                WarcraftPlayers[player.Handle] = wcPlayer;
             }
 
-            return WarcraftPlayers[player.Handle];
+            return wcPlayer;
         }
 
-        public void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
+        internal void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
         {
             WarcraftPlayers[player.Handle] = wcPlayer;
         }
 
-        public static void RefreshPlayerName(WarcraftPlayer wcPlayer)
+        internal static void RefreshPlayerName(WarcraftPlayer wcPlayer)
         {
             if (wcPlayer == null || !wcPlayer.Player.IsValid) return;
+            if (Instance.Config.DisableNamePrefix) return;
 
-            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"\d+ \[\w+\] ", "");
-            wcPlayer.Player.PlayerName = $"{wcPlayer.currentLevel} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
-            wcPlayer.Player.Clan = "";
+            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"\d+\s\[.*\]\s", "");
+            wcPlayer.Player.PlayerName = $"{wcPlayer.GetLevel()} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
+
             Utilities.SetStateChanged(wcPlayer.Player, "CBasePlayerController", "m_iszPlayerName");
-            Utilities.SetStateChanged(wcPlayer.Player, "CCSPlayerController", "m_szClan");
         }
 
         public override void Load(bool hotReload)
@@ -108,7 +109,7 @@ namespace WarcraftPlugin
 
             _database = new Database();
             classManager = new ClassManager();
-            classManager.Initialize();
+            classManager.Initialize(ModuleDirectory, Config);
 
             EffectManager = new EffectManager();
             EffectManager.Initialize();
@@ -151,9 +152,6 @@ namespace WarcraftPlugin
 
             RegisterListener<Listeners.OnServerPrecacheResources>((manifest) =>
             {
-                //Characters
-                manifest.AddResource("characters/models/nozb1/skeletons_player_model/skeleton_player_model_2/skeleton_nozb2_pm.vmdl");
-
                 //Models
                 manifest.AddResource("models/weapons/w_eq_beartrap_dropped.vmdl");
                 manifest.AddResource("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
@@ -173,9 +171,10 @@ namespace WarcraftPlugin
 
                 //sounds/music/survival_review_victory.vsnd_c // cool track
 
-                foreach (var prop in Shapeshifter.Props)
+                //preload class specific resources
+                foreach (var resources in classManager.GetAllClasses().SelectMany(x => x.PreloadResources).ToList())
                 {
-                    manifest.AddResource(prop);
+                    manifest.AddResource(resources);
                 }
 
                 foreach (var p in Particles.Paths)
@@ -208,7 +207,7 @@ namespace WarcraftPlugin
         }
 
         [RequiresPermissions("@css/addxp")]
-        private void CommandAddXp(CCSPlayerController? client, CommandInfo commandinfo)
+        private void CommandAddXp(CCSPlayerController client, CommandInfo commandinfo)
         {
             if (string.IsNullOrEmpty(commandinfo.ArgByIndex(1))) return;
 
@@ -218,12 +217,12 @@ namespace WarcraftPlugin
             XpSystem.AddXp(client, xpToAdd);
         }
 
-        private void CommandHelp(CCSPlayerController? player, CommandInfo commandinfo)
+        private void CommandHelp(CCSPlayerController player, CommandInfo commandinfo)
         {
             player.PrintToChat($" {ChatColors.Green}Type !class to change classes, !skills to level-up");
         }
 
-        private void CommandResetSkills(CCSPlayerController? client, CommandInfo commandinfo)
+        private void CommandResetSkills(CCSPlayerController client, CommandInfo commandinfo)
         {
             var wcPlayer = GetWcPlayer(client);
 
@@ -267,6 +266,7 @@ namespace WarcraftPlugin
 
         private void OnMapEndHandler()
         {
+            EffectManager.DestroyAllEffects();
             _database.SaveClients();
         }
 
@@ -275,7 +275,7 @@ namespace WarcraftPlugin
             var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
             foreach (var player in playerEntities)
             {
-                if (!player.IsValid) continue;
+                if (!player.IsValid || !player.IsBot || !player.ControllingBot) continue;
 
                 var wcPlayer = GetWcPlayer(player);
 
@@ -302,23 +302,24 @@ namespace WarcraftPlugin
             Console.WriteLine("Player just connected: " + WarcraftPlayers[player.Handle]);
         }
 
-        public void ChangeClass(CCSPlayerController player, string classInternalName)
+        internal WarcraftPlayer ChangeClass(CCSPlayerController player, string classInternalName)
         {
             _database.SavePlayerToDatabase(player);
 
             // Dont do anything if were already that race.
-            if (classInternalName == player.GetWarcraftPlayer().className) return;
+            if (classInternalName == player.GetWarcraftPlayer().className) return player.GetWarcraftPlayer();
 
             player.GetWarcraftPlayer().GetClass().PlayerChangingToAnotherRace();
             player.GetWarcraftPlayer().className = classInternalName;
 
             _database.SaveCurrentClass(player);
-            _database.LoadPlayerFromDatabase(player, XpSystem);
+            var warcraftClass = _database.LoadPlayerFromDatabase(player, XpSystem);
 
             RefreshPlayerName(player.GetWarcraftPlayer());
+            return warcraftClass;
         }
 
-        private void UltimatePressed(CCSPlayerController? client, CommandInfo commandinfo)
+        private void UltimatePressed(CCSPlayerController client, CommandInfo commandinfo)
         {
             var warcraftPlayer = client.GetWarcraftPlayer();
             if (warcraftPlayer.GetAbilityLevel(3) < 1)
@@ -339,6 +340,16 @@ namespace WarcraftPlugin
 
         public override void Unload(bool hotReload)
         {
+            foreach (var player in Utilities.GetPlayers())
+            {
+                if (player.IsAlive())
+                {
+                    //Avoid getting stuck in old menu
+                    player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+                    Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+                    Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+                }
+            }
             base.Unload(hotReload);
         }
 

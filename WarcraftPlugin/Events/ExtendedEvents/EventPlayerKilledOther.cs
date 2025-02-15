@@ -1,8 +1,8 @@
 ﻿using CounterStrikeSharp.API.Core;
 
-namespace WarcraftPlugin.Events
+namespace WarcraftPlugin.Events.ExtendedEvents
 {
-    internal class EventPlayerKilledOther : EventPlayerDeath
+    public class EventPlayerKilledOther : EventPlayerDeath, ICustomGameEvent
     {
         public EventPlayerKilledOther(nint pointer) : base(pointer)
         {

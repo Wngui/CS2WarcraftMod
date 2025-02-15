@@ -5,8 +5,8 @@ using CounterStrikeSharp.API.Modules.Events;
 using System.Drawing;
 using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Utils;
+using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core;
-using System.Linq;
 
 namespace WarcraftPlugin.Models
 {
@@ -14,28 +14,36 @@ namespace WarcraftPlugin.Models
     {
         public string InternalName { get; }
         public string DisplayName { get; }
-        public string Description { get; }
+
+        public string GetDescription(int abilityLevel);
     }
 
     public class WarcraftAbility : IWarcraftAbility
     {
-        public WarcraftAbility(string displayName, string description)
+        private readonly Func<int, string> _descriptionGetter;
+
+        public WarcraftAbility(string internalName, string displayName, Func<int, string> descriptionGetter)
         {
+            InternalName = internalName;
             DisplayName = displayName;
-            Description = description;
+            _descriptionGetter = descriptionGetter;
         }
 
-        public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
+        public string InternalName { get; }
         public string DisplayName { get; }
-        public string Description { get; }
+
+        public string GetDescription(int abilityLevel)
+        {
+            return _descriptionGetter.Invoke(abilityLevel);
+        }
     }
 
     public class WarcraftCooldownAbility : WarcraftAbility
     {
         public float Cooldown { get; set; } = 0f;
 
-        public WarcraftCooldownAbility(string displayName, string description,
-            float cooldown) : base(displayName, description)
+        public WarcraftCooldownAbility(string internalName, string displayName, Func<int, string> descriptionGetter,
+            float cooldown) : base(internalName, displayName, descriptionGetter)
         {
             Cooldown = cooldown;
         }
@@ -43,24 +51,20 @@ namespace WarcraftPlugin.Models
 
     public abstract class WarcraftClass
     {
-        public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
+        public string InternalName => DisplayName.ToLowerInvariant();
         public abstract string DisplayName { get; }
-        public virtual DefaultClassModel DefaultModel { get; } = new DefaultClassModel();
+        public virtual DefaultClassModel DefaultModel { get; }
         public abstract Color DefaultColor { get; }
-        internal WarcraftPlayer WarcraftPlayer { get; set; }
+        public WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
 
-        public abstract List<IWarcraftAbility> Abilities { get; }
-        private readonly Dictionary<string, GameAction> _eventHandlers = [];
+        public readonly List<IWarcraftAbility> Abilities = [];
+        private readonly Dictionary<string, Action<GameEvent>> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
-        private KillFeedIcon? _killFeedIcon;
-        private CCSPlayerController _lastPlayerHit;
 
         public float LastHurtOther { get; set; } = 0;
 
-        public abstract void Register();
-
-        public virtual void PlayerChangingToAnotherRace() { SetDefaultAppearance(); }
+        public virtual void Register() { }
 
         public virtual List<string> PreloadResources { get; } = [];
 
@@ -107,24 +111,24 @@ namespace WarcraftPlugin.Models
             return Abilities[index];
         }
 
-        protected void HookEvent<T>(Action<T> handler, HookMode hookMode = HookMode.Pre) where T : GameEvent
+        protected void AddAbility(IWarcraftAbility ability)
         {
-            _eventHandlers[typeof(T).Name + (hookMode == HookMode.Pre ? "-pre" : "")] = new GameAction
+            Abilities.Add(ability);
+        }
+
+        protected void HookEvent<T>(Action<T> handler) where T : GameEvent
+        {
+            _eventHandlers[typeof(T).Name] = (evt) =>
             {
-                EventType = typeof(T),
-                Handler = (evt) =>
+                if (evt is T typedEvent)
                 {
-                    if (evt is T typedEvent)
-                    {
-                        handler(typedEvent);
-                    }
-                    else
-                    {
-                        handler((T)evt);
-                        Console.WriteLine($"Handler for event expects an event of type {typeof(T).Name}.");
-                    }
-                },
-                HookMode = hookMode
+                    handler(typedEvent);
+                }
+                else
+                {
+                    handler((T)evt);
+                    Console.WriteLine($"Handler for event expects an event of type {typeof(T).Name}.");
+                }
             };
         }
 
@@ -133,18 +137,17 @@ namespace WarcraftPlugin.Models
             _abilityHandlers[abilityIndex] = handler;
         }
 
-        public void InvokeEvent(GameEvent @event, HookMode hookMode = HookMode.Post)
+        public void InvokeEvent(GameEvent @event)
         {
-            //Console.WriteLine($"Invoking event {@event.GetType().Name + (hookMode == HookMode.Pre ? "-pre" : "")}");
-            if (_eventHandlers.TryGetValue(@event.GetType().Name + (hookMode == HookMode.Pre ? "-pre" : ""), out GameAction gameAction))
+            if (_eventHandlers.TryGetValue(@event.GetType().Name, out Action<GameEvent> value))
             {
-                gameAction.Handler.Invoke(@event);
+                value.Invoke(@event);
             }
         }
 
-        internal List<GameAction> GetEventListeners()
+        public virtual void PlayerChangingToAnotherRace()
         {
-            return _eventHandlers.Values.ToList();
+            Player.PlayerPawn.Value.SetColor(Color.White);
         }
 
         public bool IsAbilityReady(int abilityIndex)
@@ -173,34 +176,14 @@ namespace WarcraftPlugin.Models
             }
         }
 
-        public void ResetCooldowns()
+        public static void DispatchEffect(WarcraftEffect effect)
+        {
+            WarcraftPlugin.Instance.EffectManager.AddEffect(effect);
+        }
+
+        internal void ResetCooldowns()
         {
             CooldownManager.ResetCooldowns(WarcraftPlayer);
-        }
-
-        public void SetKillFeedIcon(KillFeedIcon? damageType)
-        {
-            _killFeedIcon = damageType;
-        }
-
-        public KillFeedIcon? GetKillFeedIcon()
-        {
-            return _killFeedIcon;
-        }
-
-        public void ResetKillFeedIcon()
-        {
-            _killFeedIcon = null;
-        }
-
-        public void SetLastPlayerHit(CCSPlayerController player)
-        {
-            _lastPlayerHit = player;
-        }
-
-        public CCSPlayerController GetLastPlayerHit()
-        {
-            return _lastPlayerHit;
         }
     }
 }

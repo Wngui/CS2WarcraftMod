@@ -1,13 +1,13 @@
 ﻿namespace WarcraftPlugin.Menu
 {
-    public static class FontSizes
+    internal static class FontSizes
     {
-        public const string FontSizeXs = "fontSize-xs";   // 8px
-        public const string FontSizeS = "fontSize-s";      // 12px
-        public const string FontSizeSm = "fontSize-sm";     // 16px
-        public const string FontSizeM = "fontSize-m";       // 18px
-        public const string FontSizeL = "fontSize-l";       // 24px
-        public const string FontSizeXl = "fontSize-xl";     // 32px
-        public const string FontSizeXxl = "fontSize-xxl";   // 40px
+        internal const string FontSizeXs = "fontSize-xs";   // 8px
+        internal const string FontSizeS = "fontSize-s";      // 12px
+        internal const string FontSizeSm = "fontSize-sm";     // 16px
+        internal const string FontSizeM = "fontSize-m";       // 18px
+        internal const string FontSizeL = "fontSize-l";       // 24px
+        internal const string FontSizeXl = "fontSize-xl";     // 32px
+        internal const string FontSizeXxl = "fontSize-xxl";   // 40px
     }
 }

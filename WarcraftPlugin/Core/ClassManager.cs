@@ -1,54 +1,176 @@
-﻿using System;
+﻿using CounterStrikeSharp.API.Modules.Timers;
+using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using WarcraftPlugin.Classes;
+using System.Reflection;
+using WarcraftPlugin.Compiler;
 using WarcraftPlugin.Models;
+
 
 namespace WarcraftPlugin.Core
 {
-    public class ClassManager
+    internal class ClassManager
     {
         private readonly Dictionary<string, Type> _classes = [];
         private readonly Dictionary<string, WarcraftClass> _classObjects = [];
 
-        public void Initialize()
+        private DirectoryInfo _customHeroesFolder;
+        private long _customHeroesFilesTimestamp;
+        private bool _checkingCustomHeroFiles;
+        private Config _config;
+
+        internal void Initialize(string moduleDirectory, Config config)
         {
-            RegisterClass<Mage>();
-            RegisterClass<Rogue>();
-            RegisterClass<Barbarian>();
-            RegisterClass<Ranger>();
-            RegisterClass<Paladin>();
-            RegisterClass<Necromancer>();
-            RegisterClass<Shapeshifter>();
-            RegisterClass<Tinker>();
+            _config = config;
+            RegisterDefaultClasses();
+
+            _customHeroesFolder = Directory.CreateDirectory(Path.Combine(moduleDirectory, "CustomHeroes"));
+            RegisterCustomClasses();
+            TrackCustomClassesChanges();
         }
 
-        private void RegisterClass<T>() where T : WarcraftClass, new()
+        private void RegisterCustomClasses()
         {
-            var race = new T();
-            race.Register();
-            _classes[race.InternalName] = typeof(T);
-            _classObjects[race.InternalName] = race;
+            var customHeroFiles = Directory.GetFiles(_customHeroesFolder.FullName, "*.cs");
+            _customHeroesFilesTimestamp = GetLatestTimestamp(customHeroFiles);
+
+            if (customHeroFiles.Length > 0)
+            {
+                var assembly = CustomHero.CompileAndLoadAssemblies(customHeroFiles);
+                RegisterClasses(assembly);
+            }
         }
 
-        public WarcraftClass InstantiateClass(string name)
+        private void RegisterDefaultClasses()
+        {
+            RegisterClasses(Assembly.GetExecutingAssembly());
+        }
+
+        private void RegisterClasses(Assembly assembly)
+        {
+            var heroClasses = assembly.GetTypes()
+                .Where(t =>
+                    t.Namespace == "WarcraftPlugin.Classes" && // Ensure it’s in the right namespace
+                    t.IsClass &&                             // Ensure it's a class
+                    !t.IsAbstract &&                         // Exclude abstract classes
+                    typeof(WarcraftClass).IsAssignableFrom(t) // Ensure it derives from WarcraftClass
+                );
+
+            foreach (var heroClass in heroClasses)
+            {
+                RegisterClass(heroClass);
+            }
+        }
+
+        private void RegisterClass(Type type)
+        {
+            if (_config.DeactivatedClasses.Contains(type.Name, StringComparer.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine($"Skipping deactivated class: {type.Name}");
+                return;
+            }
+
+            WarcraftClass heroClass;
+            try
+            {
+                heroClass = InstantiateClass(type);
+                heroClass.Register();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Error registering class {type.Name}");
+                throw;
+            }
+
+            if (_config.DeactivatedClasses.Contains(heroClass.InternalName, StringComparer.InvariantCultureIgnoreCase) ||
+                _config.DeactivatedClasses.Contains(heroClass.DisplayName, StringComparer.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine($"Skipping deactivated class: {heroClass.DisplayName}");
+                return;
+            }
+
+            Console.WriteLine($"Registered class: {heroClass.DisplayName}");
+            _classes[heroClass.InternalName] = type;
+            _classObjects[heroClass.InternalName] = heroClass;
+        }
+
+        internal WarcraftClass InstantiateClassByName(string name)
         {
             if (!_classes.ContainsKey(name)) throw new Exception("Race not found: " + name);
 
-            var race = (WarcraftClass)Activator.CreateInstance(_classes[name]);
-            race.Register();
+            var heroClass = InstantiateClass(_classes[name]);
+            heroClass.Register();
 
-            return race;
+            return heroClass;
         }
 
-        public WarcraftClass[] GetAllClasses()
+        internal static WarcraftClass InstantiateClass(Type type)
         {
+            WarcraftClass heroClass;
+            heroClass = (WarcraftClass)Activator.CreateInstance(type);
+
+            return heroClass;
+        }
+
+        private void TrackCustomClassesChanges()
+        {
+            WarcraftPlugin.Instance.AddTimer(5, () =>
+            {
+                if (_checkingCustomHeroFiles) return;
+                _checkingCustomHeroFiles = true;
+
+                try
+                {
+                    var customHeroFiles = Directory.GetFiles(_customHeroesFolder.FullName, "*.cs");
+                    if (_customHeroesFilesTimestamp != GetLatestTimestamp(customHeroFiles))
+                    {
+                        Console.WriteLine("Reloading custom hero files...");
+                        _classes.Clear();
+                        _classObjects.Clear();
+                        CustomHero.UnloadAssembly();
+
+                        //Trigger plugin reload
+                        File.SetLastWriteTime(Path.Combine(_customHeroesFolder.Parent.FullName, "WarcraftPlugin.dll"), DateTime.Now);
+                    }
+                }
+                finally
+                {
+                    _checkingCustomHeroFiles = false;
+                }
+            }, TimerFlags.REPEAT);
+        }
+
+        internal WarcraftClass[] GetAllClasses()
+        {
+            if (_classObjects.Count == 0)
+            {
+                throw new Exception("No warcraft classes registered!!!");
+            }
             return _classObjects.Values.ToArray();
         }
 
-        public WarcraftClass GetRace(string name)
+        internal WarcraftClass GetDefaultClass()
         {
-            return _classObjects.TryGetValue(name, out WarcraftClass value) ? value : null;
+            var allClasses = GetAllClasses();
+            WarcraftClass defaultClass = null;
+
+            if (_config.DefaultClass != null)
+            {
+                defaultClass = allClasses.FirstOrDefault(x =>
+                    x.InternalName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase) ||
+                    x.DisplayName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            defaultClass ??= allClasses.First();
+
+            return defaultClass;
+        }
+
+        private static long GetLatestTimestamp(string[] files)
+        {
+            return files.Select(file => File.GetLastWriteTime(file).Ticks).Max();
         }
     }
 }

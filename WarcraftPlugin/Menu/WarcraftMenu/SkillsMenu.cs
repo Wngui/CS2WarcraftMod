@@ -5,16 +5,16 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu
 {
-    public static class SkillsMenu
+    internal static class SkillsMenu
     {
-        public static void Show(WarcraftPlayer wcPlayer, int selectedOptionIndex = 0)
+        internal static void Show(WarcraftPlayer wcPlayer, int selectedOptionIndex = 0)
         {
             var warcraftClass = wcPlayer.GetClass();
 
             var skillsMenu = MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeM}'>{warcraftClass.DisplayName}</font><font color='gold' class='{FontSizes.FontSizeSm}'> - Level {wcPlayer.GetLevel()}</font><br>
                 <font color='#90EE90' class='{FontSizes.FontSizeS}'>Level up skills ({XpSystem.GetFreeSkillPoints(wcPlayer)} available)</font>");
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < warcraftClass.Abilities.Count; i++)
             {
                 var ability = warcraftClass.GetAbility(i);
                 var abilityLevel = wcPlayer.GetAbilityLevel(i);
@@ -55,7 +55,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     }
                 }
 
-                var subDisplayString = $"<font color='#D3D3D3' class='{FontSizes.FontSizeS}'>{ability.GetDescription(i)}</font>";
+                var subDisplayString = $"<font color='#D3D3D3' class='{FontSizes.FontSizeS}'>{ability.Description}</font>";
 
                 var abilityIndex = i;
                 skillsMenu.Add(displayString, subDisplayString, (p, opt) =>

@@ -70,16 +70,17 @@ namespace WarcraftPlugin.Helpers
             foreach (var face in convexHull.Result.Faces)
             {
                 var facecolor = color ?? Color.FromArgb(255, (int)(Math.Sin(frequency * i + 0) * 127 + 128), (int)(Math.Sin(frequency * i + 2) * 127 + 128), (int)(Math.Sin(frequency * i + 4) * 127 + 128));
-                Utility.DrawLaserBetween(new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), facecolor, duration, width);
-                Utility.DrawLaserBetween(new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), facecolor, duration, width);
-                Utility.DrawLaserBetween(new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), facecolor, duration, width);
+                Warcraft.DrawLaserBetween(new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), facecolor, duration, width);
+                Warcraft.DrawLaserBetween(new Vector((float)face.Vertices[1].Position[0], (float)face.Vertices[1].Position[1], (float)face.Vertices[1].Position[2]), new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), facecolor, duration, width);
+                Warcraft.DrawLaserBetween(new Vector((float)face.Vertices[2].Position[0], (float)face.Vertices[2].Position[1], (float)face.Vertices[2].Position[2]), new Vector((float)face.Vertices[0].Position[0], (float)face.Vertices[0].Position[1], (float)face.Vertices[0].Position[2]), facecolor, duration, width);
 
                 i++;
             }
         }
 
-        public static Vector GetRandomPoint(this Box3d box, Random random)
+        public static Vector GetRandomPoint(this Box3d box)
         {
+            var random = Random.Shared;
             // Generate random coordinates within the range [-1, 1]
             double x = (2 * random.NextDouble() - 1) * box.Extent.x;
             double y = (2 * random.NextDouble() - 1) * box.Extent.y;
@@ -91,9 +92,9 @@ namespace WarcraftPlugin.Helpers
             return randomPoint.ToVector();
         }
 
-        public static Box3d ToBox3d(this CCollisionProperty collision, Vector worldPosition)
+        public static Box3d ToBox(this CCollisionProperty collision, Vector worldPosition)
         {
-            Vector worldCenter = worldPosition.With().Add(z: collision.Mins.Z + (collision.Maxs.Z - collision.Mins.Z) / 2);
+            Vector worldCenter = worldPosition.Clone().Add(z: collision.Mins.Z + (collision.Maxs.Z - collision.Mins.Z) / 2);
             return CreateBoxAroundPoint(worldCenter, collision.Maxs.X * 2, collision.Maxs.Y * 2, collision.Maxs.Z);
         }
 
@@ -125,6 +126,14 @@ namespace WarcraftPlugin.Helpers
             {
                 return vector1.X == vector2.X && vector1.Y == vector2.Y && vector1.Z == vector2.Z;
             }
+        }
+
+        /// <summary>
+        /// Returns a copy of the vector with values replaced.
+        /// </summary>
+        public static Vector Clone(this Vector vector)
+        {
+            return vector.With();
         }
     }
 }
