@@ -116,7 +116,8 @@ namespace WarcraftPlugin.Compiler
             var previousAssembly = AppDomain.CurrentDomain.GetAssemblies()
                 .FirstOrDefault(a => a.GetName().Name.Contains("W3CustomHeroes"));
 
-            AssemblyLoadContext.GetLoadContext(previousAssembly)?.Unload();
+            if (previousAssembly != null)
+                AssemblyLoadContext.GetLoadContext(previousAssembly)?.Unload();
         }
 
         internal class CustomLoadContext : AssemblyLoadContext
@@ -126,7 +127,7 @@ namespace WarcraftPlugin.Compiler
             protected override Assembly Load(AssemblyName assemblyName)
             {
                 //Console.WriteLine($"Loading {assemblyName.Name}");
-                if(assemblyName.Name == "WarcraftPlugin")
+                if (assemblyName.Name == "WarcraftPlugin")
                 {
                     //Ensure the latest version of the assembly is loaded
                     return AppDomain.CurrentDomain.GetAssemblies().Reverse().FirstOrDefault(a => a.GetName().Name == assemblyName.Name);

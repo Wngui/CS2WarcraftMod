@@ -78,7 +78,7 @@ namespace WarcraftPlugin.Core
             {
                 var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
                 dbPlayer.CurrentRace = defaultClass.InternalName;
-                player.PrintToChat($"{ChatColors.Green}Current class is{ChatColors.Red} disabled{ChatColors.Green}! Now playing as {defaultClass.DisplayName}.{ChatColors.Default}");
+                player.PrintToChat($"{ChatColors.Green}Current class is{ChatColors.Red} disabled{ChatColors.Green}{ChatColors.Default}! Now playing as {ChatColors.Green}{defaultClass.DisplayName}{ChatColors.Default}.");
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"

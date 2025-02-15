@@ -17,7 +17,7 @@ namespace WarcraftPlugin.Core
         private readonly Dictionary<string, WarcraftClass> _classObjects = [];
 
         private DirectoryInfo _customHeroesFolder;
-        private long _customHeroesFilesTimestamp;
+        private long _customHeroesFilesTimestamp = 0;
         private bool _checkingCustomHeroFiles;
         private Config _config;
 
@@ -34,10 +34,10 @@ namespace WarcraftPlugin.Core
         private void RegisterCustomClasses()
         {
             var customHeroFiles = Directory.GetFiles(_customHeroesFolder.FullName, "*.cs");
-            _customHeroesFilesTimestamp = GetLatestTimestamp(customHeroFiles);
 
             if (customHeroFiles.Length > 0)
             {
+                _customHeroesFilesTimestamp = GetLatestTimestamp(customHeroFiles);
                 var assembly = CustomHero.CompileAndLoadAssemblies(customHeroFiles);
                 RegisterClasses(assembly);
             }
@@ -124,7 +124,7 @@ namespace WarcraftPlugin.Core
                 try
                 {
                     var customHeroFiles = Directory.GetFiles(_customHeroesFolder.FullName, "*.cs");
-                    if (_customHeroesFilesTimestamp != GetLatestTimestamp(customHeroFiles))
+                    if (customHeroFiles.Length > 0 && _customHeroesFilesTimestamp != GetLatestTimestamp(customHeroFiles))
                     {
                         Console.WriteLine("Reloading custom hero files...");
                         _classes.Clear();
