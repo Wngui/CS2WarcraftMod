@@ -57,6 +57,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerDeath(EventPlayerDeath death)
         {
+            KillZombies();
             if (WarcraftPlayer.GetAbilityLevel(2) == 0) return;
 
             var pawn = Player.PlayerPawn.Value;
@@ -111,7 +112,7 @@ namespace WarcraftPlugin.Classes
 
             if (Player.PlayerPawn.Value.Health < Player.PlayerPawn.Value.MaxHealth)
             {
-                Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 10);
+                Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf");
                 var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / WarcraftPlugin.MaxSkillLevel * 0.3f);
                 var playerCalculatedHealth = Player.PlayerPawn.Value.Health + healthDrained;
                 Player.SetHp((int)Math.Min(playerCalculatedHealth, Player.PlayerPawn.Value.MaxHealth));
@@ -120,10 +121,16 @@ namespace WarcraftPlugin.Classes
 
         private void RoundStart(EventRoundStart start)
         {
+            KillZombies();
             _hasCheatedDeath = false;
         }
 
         private void RoundEnd(EventRoundEnd end)
+        {
+            KillZombies();
+        }
+
+        private void KillZombies()
         {
             _zombieUpdateTimer?.Kill();
 

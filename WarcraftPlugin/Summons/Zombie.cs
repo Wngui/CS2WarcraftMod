@@ -69,7 +69,7 @@ namespace WarcraftPlugin.Summons
                     Entity.AbsOrigin.X = chickenResetPoint.X;
                     Entity.AbsOrigin.Y = chickenResetPoint.Y;
                     Entity.AbsOrigin.Z = Owner.PlayerPawn.Value.AbsOrigin.Z+5;
-                    Warcraft.SpawnParticle(Entity.AbsOrigin.Clone().Add(z: 5), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
+                    Warcraft.SpawnParticle(Entity.AbsOrigin.Clone().Add(z: -50), "particles/entity/env_explosion/test_particle_composite_dark_outline_smoke.vpcf");
                     return;
                 }
                 Vector velocity = CircularGetVelocityToPosition(Owner.PlayerPawn.Value.AbsOrigin, Entity.AbsOrigin);
@@ -131,7 +131,6 @@ namespace WarcraftPlugin.Summons
 
         internal void Kill()
         {
-            if (Entity == null || !Entity.IsValid) return;
             Entity.RemoveIfValid();
         }
 

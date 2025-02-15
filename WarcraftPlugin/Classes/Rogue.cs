@@ -13,7 +13,7 @@ namespace WarcraftPlugin.Classes
 {
     internal class Rogue : WarcraftClass
     {
-        private bool _isSmokebomb;
+        private bool _isPlayerInvulnerable;
 
         public override string DisplayName => "Rogue";
         public override Color DefaultColor => Color.DarkViolet;
@@ -36,7 +36,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerHurt(EventPlayerHurt @event)
         {
-            if (_isSmokebomb)
+            if (_isPlayerInvulnerable)
             {
                 Player.SetHp(1);
                 return;
@@ -47,8 +47,11 @@ namespace WarcraftPlugin.Classes
             var pawn = Player.PlayerPawn.Value;
             if (pawn.Health < 0)
             {
-                _isSmokebomb = true;
+                StartCooldown(3);
+                _isPlayerInvulnerable = true;
                 Player.SetHp(1);
+                Player.Speed = 0;
+                new InvisibleEffect(Player, 5).Start();
 
                 //spawn smoke
                 Warcraft.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
@@ -64,15 +67,8 @@ namespace WarcraftPlugin.Classes
                 var smokeEffect = Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 90), "particles/maps/de_house/house_fireplace.vpcf");
                 smokeEffect.SetParent(Player.PlayerPawn.Value);
 
-                StartCooldown(3);
-
-                WarcraftPlugin.Instance.AddTimer(2f, ResetSmokebombCooldown);
+                WarcraftPlugin.Instance.AddTimer(2f, () => _isPlayerInvulnerable = false);
             }
-        }
-
-        private void ResetSmokebombCooldown()
-        {
-            _isSmokebomb = false;
         }
 
         private void PlayerItemEquip(EventItemEquip @event)
@@ -81,7 +77,7 @@ namespace WarcraftPlugin.Classes
             var activeWeaponName = pawn.WeaponServices!.ActiveWeapon.Value.DesignerName;
             if (activeWeaponName == "weapon_knife")
             {
-                pawn.VelocityModifier = 1 + 0.05f * WarcraftPlayer.GetAbilityLevel(2);
+                pawn.VelocityModifier = 1 + 0.1f * WarcraftPlayer.GetAbilityLevel(2);
             }
             else
             {

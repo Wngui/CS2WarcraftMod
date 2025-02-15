@@ -96,7 +96,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
             t = Math.Clamp(t, 0.1f, 1.0f);
 
             // Define the light grey and gold colors
-            Color lightGrey = Color.FromArgb(211, 211, 211); // Light grey (211, 211, 211)
+            Color lightGrey = Color.FromArgb(240, 240, 240); // Light grey (211, 211, 211)
             Color gold = Color.FromArgb(255, 215, 0);        // Gold (255, 215, 0)
 
             // Linearly interpolate between the two colors
