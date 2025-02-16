@@ -7,6 +7,7 @@ using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
 using System.Linq;
+using CounterStrikeSharp.API;
 
 namespace WarcraftPlugin.Models
 {
@@ -53,9 +54,9 @@ namespace WarcraftPlugin.Models
         public abstract List<IWarcraftAbility> Abilities { get; }
         private readonly Dictionary<string, GameAction> _eventHandlers = [];
         private readonly Dictionary<int, Action> _abilityHandlers = [];
-        private KillFeedIcon? _killFeedIcon;
-        private CCSPlayerController _lastPlayerHit;
 
+        private float _killFeedIconTick;
+        private KillFeedIcon? _killFeedIcon;
         public float LastHurtOther { get; set; } = 0;
 
         public abstract void Register();
@@ -180,6 +181,7 @@ namespace WarcraftPlugin.Models
 
         public void SetKillFeedIcon(KillFeedIcon? damageType)
         {
+            _killFeedIconTick = Server.CurrentTime;
             _killFeedIcon = damageType;
         }
 
@@ -193,14 +195,9 @@ namespace WarcraftPlugin.Models
             _killFeedIcon = null;
         }
 
-        public void SetLastPlayerHit(CCSPlayerController player)
+        public float GetKillFeedTick()
         {
-            _lastPlayerHit = player;
-        }
-
-        public CCSPlayerController GetLastPlayerHit()
-        {
-            return _lastPlayerHit;
+            return _killFeedIconTick;
         }
     }
 }

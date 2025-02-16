@@ -26,7 +26,6 @@ namespace WarcraftPlugin.Events.ExtendedEvents
                 @event.DmgArmor += damageArmor;
 
                 var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
-                attackerClass?.SetLastPlayerHit(victim);
                 if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
             }
         }

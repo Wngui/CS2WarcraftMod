@@ -24,12 +24,12 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 2;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 3;
 
-        [JsonPropertyName("DeactivatedClasses")] internal string[] DeactivatedClasses { get; set; } = [];
-        [JsonPropertyName("ShowCommandAdverts")] internal bool ShowCommandAdverts { get; set; } = true;
-        [JsonPropertyName("DefaultClass")] internal string DefaultClass { get; set; }
-        [JsonPropertyName("DisableNamePrefix")] internal bool DisableNamePrefix { get; set; } = false;
+        [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
+        [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
+        [JsonPropertyName("DefaultClass")] public string DefaultClass { get; set; }
+        [JsonPropertyName("DisableNamePrefix")] public bool DisableNamePrefix { get; set; } = false;
     }
 
     internal static class WarcraftPlayerExtensions

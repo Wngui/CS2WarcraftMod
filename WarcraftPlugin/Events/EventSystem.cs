@@ -206,11 +206,8 @@ namespace WarcraftPlugin.Events
 
             if (attackingClass != null)
             {
-                if (attackingClass.GetLastPlayerHit()?.UserId != victim.UserId)
-                {
+                if (attackingClass.GetKillFeedTick() != Server.CurrentTime)
                     attackingClass.ResetKillFeedIcon();
-                    attackingClass.SetLastPlayerHit(victim);
-                }
 
                 //Prevent shotguns, etc from triggering multiple hurt other events
                 if (attackingClass?.LastHurtOther != Server.CurrentTime)
@@ -262,7 +259,7 @@ namespace WarcraftPlugin.Events
             if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot && attacker.PlayerPawn.IsValid && attacker.PawnIsAlive && !attacker.ControllingBot)
             {
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventPlayerKilledOther(@event.Handle), HookMode.Pre);
-                var weaponName = attacker.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value.DesignerName;
+                var weaponName = @event.Weapon;
 
                 int xpToAdd = 0;
                 int xpHeadshot = 0;
@@ -273,7 +270,7 @@ namespace WarcraftPlugin.Events
                 if (headshot)
                     xpHeadshot = Convert.ToInt32(_plugin.XpPerKill * _plugin.XpHeadshotModifier);
 
-                if (weaponName == "weapon_knife")
+                if (weaponName == "knife")
                     xpKnife = Convert.ToInt32(_plugin.XpPerKill * _plugin.XpKnifeModifier);
 
                 xpToAdd += xpHeadshot + xpKnife;
@@ -304,7 +301,6 @@ namespace WarcraftPlugin.Events
                 WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
                 victimClass?.InvokeEvent(@event, HookMode.Pre);
                 @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
-                attackerClass?.ResetKillFeedIcon();
             }
             return HookResult.Continue;
         }

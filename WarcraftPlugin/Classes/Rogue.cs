@@ -111,9 +111,7 @@ namespace WarcraftPlugin.Classes
 
         private void BladeDanceDamage(EventPlayerHurtOther @event)
         {
-            var attackerWeapon = @event.Attacker.PlayerPawn.Value.WeaponServices!.ActiveWeapon.Value.DesignerName;
-
-            if (attackerWeapon == "weapon_knife")
+            if (@event.Weapon == "knife")
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(2) * 12;
                 @event.AddBonusDamage(damageBonus);
@@ -143,7 +141,7 @@ namespace WarcraftPlugin.Classes
 
                 Owner.AdrenalineSurgeEffect(Duration);
             }
-            public override void OnTick(){}
+            public override void OnTick() { }
             public override void OnFinish()
             {
                 Owner.GetWarcraftPlayer().GetClass().SetDefaultAppearance();

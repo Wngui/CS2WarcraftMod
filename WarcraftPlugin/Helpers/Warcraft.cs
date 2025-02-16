@@ -85,7 +85,8 @@ namespace WarcraftPlugin.Helpers
         /// <param name="damage">The damage caused by the explosion.</param>
         /// <param name="radius">The radius of the explosion.</param>
         /// <param name="attacker">The player controller who caused the explosion.</param>
-        public static void SpawnExplosion(Vector pos, float damage, float radius, CCSPlayerController attacker = null)
+        /// <param name="killFeedIcon">The icon to display in the kill feed. Attacker must be set</param>
+        public static void SpawnExplosion(Vector pos, float damage, float radius, CCSPlayerController attacker = null, KillFeedIcon? killFeedIcon = null)
         {
             var heProjectile = Utilities.CreateEntityByName<CHEGrenadeProjectile>("hegrenade_projectile");
             if (heProjectile == null || !heProjectile.IsValid) return;
@@ -98,6 +99,7 @@ namespace WarcraftPlugin.Helpers
             heProjectile.AcceptInput("InitializeSpawnFromWorld", attacker.PlayerPawn.Value, attacker.PlayerPawn.Value, "");
             Schema.SetSchemaValue(heProjectile.Handle, "CBaseGrenade", "m_hThrower", attacker.PlayerPawn.Raw); //Fixes killfeed
             heProjectile.DetonateTime = 0;
+            if (killFeedIcon != null) attacker?.GetWarcraftPlayer()?.GetClass()?.SetKillFeedIcon(killFeedIcon);
         }
 
         /// <summary>
@@ -337,6 +339,10 @@ namespace WarcraftPlugin.Helpers
             return velocityVector;
         }
 
+        /// <summary>
+        /// Disables the movement of the player.
+        /// </summary>
+        /// <param name="player">The player controller whose movement is to be disabled.</param>
         public static void DisableMovement(this CCSPlayerController player)
         {
             if (!player.IsAlive()) return;
@@ -345,6 +351,10 @@ namespace WarcraftPlugin.Helpers
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
         }
 
+        /// <summary>
+        /// Enables the movement of the player.
+        /// </summary>
+        /// <param name="player">The player controller whose movement is to be enabled.</param>
         public static void EnableMovement(this CCSPlayerController player)
         {
             if (!player.IsAlive()) return;
@@ -359,7 +369,9 @@ namespace WarcraftPlugin.Helpers
         /// <param name="victim">The player receiving the damage.</param>
         /// <param name="damage">The amount of damage to inflict.</param>
         /// <param name="attacker">The player causing the damage.</param>
+        /// <param name="killFeedIcon">The icon to display in the kill feed. Attacker must be set</param>
         /// <param name="inflictor">The entity causing the damage, if different from the attacker.</param>
+        /// <param name="penetrationKill">Indicates if the damage was caused by a penetration.</param>
         public static void TakeDamage(this CCSPlayerController victim, float damage, CCSPlayerController attacker, KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false)
         {
             var size = Schema.GetClassSize("CTakeDamageInfo");
@@ -381,7 +393,6 @@ namespace WarcraftPlugin.Helpers
 
             if (!victim.IsAlive() || !victim.Pawn.IsValid) return;
             var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
-            attackerClass?.SetLastPlayerHit(victim);
             if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
 
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);
