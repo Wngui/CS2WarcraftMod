@@ -10,6 +10,7 @@ using System.Linq;
 using g3;
 using System.Collections.Generic;
 using WarcraftPlugin.Models;
+using CounterStrikeSharp.API.Modules.UserMessages;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -364,6 +365,42 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
+        /// Blinds the player by displaying a fade effect with the specified duration and color.
+        /// </summary>
+        /// <param name="player">The player controller to blind.</param>
+        /// <param name="duration">The duration of the fade effect in seconds.</param>
+        /// <param name="color">The color of the fade effect.</param>
+        public static void Blind(this CCSPlayerController player, float duration, Color color)
+        {
+            if (player == null || !player.IsValid) return;
+
+            var fadeMsg = UserMessage.FromPartialName("Fade");
+            fadeMsg.SetInt("duration", Convert.ToInt32(duration * 512));
+            fadeMsg.SetInt("hold_time", Convert.ToInt32(duration * 512));
+
+            int flag = 0x0001 | 0x0010; // FADE_IN with PURGE
+            fadeMsg.SetInt("flags", flag);
+            fadeMsg.SetInt("color", color.R | color.G << 8 | color.B << 16 | color.A << 24);
+            fadeMsg.Send(player);
+        }
+
+        /// <summary>
+        /// Removes the blind effect from the player by displaying a fade-out effect.
+        /// </summary>
+        /// <param name="player">The player controller to unblind.</param>
+        public static void Unblind(this CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid) return;
+
+            var fadeMsg = UserMessage.FromPartialName("Fade");
+            fadeMsg.SetInt("duration", 0);
+            fadeMsg.SetInt("hold_time", 0);
+            fadeMsg.SetInt("flags", 0x0002); // FADE_OUT
+            fadeMsg.SetInt("color", 0);
+            fadeMsg.Send(player);
+        }
+
+        /// <summary>
         /// Inflicts damage to the player from an attacker, with an optional inflictor.
         /// </summary>
         /// <param name="victim">The player receiving the damage.</param>
@@ -393,6 +430,7 @@ namespace WarcraftPlugin.Helpers
 
             if (!victim.IsAlive() || !victim.Pawn.IsValid) return;
             var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
+            if(attackerClass != null) attackerClass.LastHurtOther = Server.CurrentTime;
             if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
 
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);

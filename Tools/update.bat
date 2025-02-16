@@ -42,10 +42,10 @@ echo Updating CounterStrikeSharp...
 set "latestDownload="
 for /f "delims=" %%i in ('curl -s https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/latest ^| findstr "browser_download_url" ^| findstr "with-runtime-build-.*-windows"') do set "latestDownload=%%i"
 set "latestDownload=%latestDownload:*: =%"
-echo Installing CounterStrikeSharp: %latestDownload%
+echo Downloading CounterStrikeSharp: %latestDownload%
 set "zipFile=counterstrikesharp"
 curl -L -o "%DOWNLOAD_DIR%\%zipFile%" "%latestDownload%"
-echo Installing CounterStrikeSharp version %zipFile%...
+echo Installing CounterStrikeSharp version %latestDownload%...
 tar -xf "%DOWNLOAD_DIR%\%zipFile%" -C "%CSGO_PATH%"
 del "%DOWNLOAD_DIR%\%zipFile%"
 
@@ -54,4 +54,3 @@ echo Restoring server.cfg...
 copy /Y "%SERVER_BACKUP_PATH%" "%SERVER_CFG_PATH%"
 
 echo Done!
-pause

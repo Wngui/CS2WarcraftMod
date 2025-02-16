@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 
@@ -42,6 +43,16 @@ namespace WarcraftPlugin.Core.Effects
                     effect.LastTick = elapsedTime;
                 }
             }
+        }
+
+        public List<WarcraftEffect> GetEffects()
+        {
+            return _effects;
+        }
+
+        public List<T> GetEffectsByType<T>() where T : WarcraftEffect
+        {
+            return GetEffects().FindAll(x => x is T).Cast<T>().ToList();
         }
 
         internal void DestroyEffects(CCSPlayerController player, EffectDestroyFlags flag)
