@@ -113,9 +113,11 @@ Ultimate can be activated by binding it in the console, example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
 ```jsonc
 {
+  "ConfigVersion": 3
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
-  "ConfigVersion": 2
+  "DefaultClass": "ranger", //Sets the default class for new players
+  "DisableNamePrefix": true //Removes level and class info from player names
 }
 ```
 
