@@ -128,5 +128,5 @@ By releasing this mod, I sincerely hope it will aid the community in developing 
 ## Credits
 
 Roflmuffin - CounterStrikeSharp & Base plugin</br>
-csportalsk - Testing and bug reporting
+csportalsk - Testing and bug reporting</br>
 pZyk - Bug reporting & feedback
