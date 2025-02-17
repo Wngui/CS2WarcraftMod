@@ -63,9 +63,10 @@ namespace WarcraftPlugin.Core
 
         private static void PerformLevelupEvents(WarcraftPlayer wcPlayer)
         {
-            wcPlayer.GetPlayer().PlayLocalSound("play sounds/ui/achievement_earned.vsnd");
-            Warcraft.SpawnParticle(wcPlayer.GetPlayer().PlayerPawn.Value.AbsOrigin, "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", 1);
-            WarcraftPlugin.RefreshPlayerName(wcPlayer);
+            var player = wcPlayer.GetPlayer();
+            player.PlayLocalSound("play sounds/ui/achievement_earned.vsnd");
+            Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin, "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", 1);
+            WarcraftPlugin.RefreshPlayerName(player);
         }
 
         internal void RecalculateXpForLevel(WarcraftPlayer wcPlayer)

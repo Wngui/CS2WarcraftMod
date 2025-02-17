@@ -240,6 +240,7 @@ namespace WarcraftPlugin.Events
 
                 Server.NextFrame(() =>
                 {
+                    WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
                     warcraftClass?.InvokeEvent(@event, HookMode.Pre);
                 });

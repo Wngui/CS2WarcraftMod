@@ -86,15 +86,27 @@ namespace WarcraftPlugin
             WarcraftPlayers[player.Handle] = wcPlayer;
         }
 
-        internal static void RefreshPlayerName(WarcraftPlayer wcPlayer)
+        internal static void RefreshPlayerName(CCSPlayerController player)
         {
-            if (wcPlayer == null || !wcPlayer.Player.IsValid) return;
+            if (player == null || !player.IsValid) return;
             if (Instance.Config.DisableNamePrefix) return;
 
-            var playerNameClean = Regex.Replace(wcPlayer.Player.PlayerName, @"\d+\s\[.*\]\s", "");
-            wcPlayer.Player.PlayerName = $"{wcPlayer.GetLevel()} [{wcPlayer.GetClass().DisplayName}] {playerNameClean}";
+            var warcraftPlayer = Instance.GetWcPlayer(player);
 
-            Utilities.SetStateChanged(wcPlayer.Player, "CBasePlayerController", "m_iszPlayerName");
+            if (warcraftPlayer == null) return;
+
+            var playerNameClean = Regex.Replace(player.PlayerName, @"\d+\s\[.*\]\s", "");
+            var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().DisplayName}] {playerNameClean}";
+
+            player.PlayerName = playerNameWithPrefix;
+            Utilities.SetStateChanged(player, "CBasePlayerController", "m_iszPlayerName");
+
+            Instance.AddTimer(1, () =>
+            {
+                if (player == null || !player.IsValid) return;
+                player.PlayerName = playerNameWithPrefix;
+                Utilities.SetStateChanged(player, "CBasePlayerController", "m_iszPlayerName");
+            });
         }
 
         public override void Load(bool hotReload)
@@ -258,7 +270,6 @@ namespace WarcraftPlugin
 
         private void OnMapStartHandler(string mapName)
         {
-            AddTimer(60f, StatusUpdate, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
             AddTimer(60.0f, _database.SaveClients, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
 
             Server.PrintToConsole("Map Load Warcraft\n");
@@ -268,21 +279,6 @@ namespace WarcraftPlugin
         {
             EffectManager.DestroyAllEffects();
             _database.SaveClients();
-        }
-
-        private void StatusUpdate()
-        {
-            var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
-            foreach (var player in playerEntities)
-            {
-                if (!player.IsValid || !player.IsBot || !player.ControllingBot) continue;
-
-                var wcPlayer = GetWcPlayer(player);
-
-                if (wcPlayer == null) continue;
-
-                RefreshPlayerName(wcPlayer);
-            }
         }
 
         private void OnClientPutInServerHandler(int slot, string name, string ipAddress)
@@ -315,7 +311,6 @@ namespace WarcraftPlugin
             _database.SaveCurrentClass(player);
             var warcraftClass = _database.LoadPlayerFromDatabase(player, XpSystem);
 
-            RefreshPlayerName(player.GetWarcraftPlayer());
             return warcraftClass;
         }
 
