@@ -3,7 +3,15 @@
 </p>
 
 <p align="center">
-  (https://www.youtube.com/watch?v=Z9HdF47zPss)
+    <a href="https://www.youtube.com/watch?v=Z9HdF47zPss" target="_blank">
+    <img src="https://img.shields.io/badge/Gameplay-Video-red?style=for-the-badge&logo=youtube" alt="Gameplay Video">
+  </a>
+  <a href="https://github.com/Wngui/CS2WarcraftMod/wiki" target="_blank">
+    <img src="https://img.shields.io/badge/Developer-Wiki-blue?style=for-the-badge&logo=github" alt="Developer Wiki">
+  </a>
+  <a href="https://discord.gg/VvD8aUHCNW" target="_blank">
+    <img src="https://img.shields.io/badge/Join-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord">
+  </a>
 </p>
 
 # Warcraft Mod for CS2
