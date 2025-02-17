@@ -3,14 +3,14 @@
     public static class Particles
     {
         public static string[] Paths = {
-            "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", //[X] shock ring
-            "particles/explosions_fx/explosion_child_water_splash03b.vpcf", //[X] green infections
-            "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", //[X] chicken green burst
-            "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf", //[X] Awp flash
-            "particles/maps/de_overpass/chicken_impact_burst2.vpcf", //[X] chicken burst
-            "particles/blood_impact/blood_impact_basic.vpcf", //[X] blood basic
-            "particles/inferno_fx/molotov_fire01.vpcf", //[X] fire trail
-            "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", //[X] drone shoot
+            "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", // shock ring
+            "particles/explosions_fx/explosion_child_water_splash03b.vpcf", // green infections
+            "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", // chicken green burst
+            "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_awp.vpcf", // Awp flash
+            "particles/maps/de_overpass/chicken_impact_burst2.vpcf", // chicken burst
+            "particles/blood_impact/blood_impact_basic.vpcf", // blood basic
+            "particles/inferno_fx/molotov_fire01.vpcf", // fire trail
+            "particles/weapons/cs_weapon_fx/weapon_muzzle_flash_assaultrifle.vpcf", // drone shoot
             "particles/ambient_fx/aircraft_navgreen.vpcf", // little green orb
             "particles/ambient_fx/aircraft_navred.vpcf", // little red orb
             "particles/ambient_fx/ambient_smokestack.vpcf", //light smokestack
@@ -235,11 +235,11 @@
             "particles/generic_fx/fx_electricspark_glow.vpcf", // electric spark
             "particles/burning_fx/gas_cannister_idle_billow.vpcf", //crazy blood spurting
             "particles/burning_fx/gas_cannister_idle_ring_embers.vpcf", //blood curse
-            "particles/survival_fx/gas_cannister_impact.vpcf", //[X] big red explosion
+            "particles/survival_fx/gas_cannister_impact.vpcf", // big red explosion
             "particles/survival_fx/gas_cannister_impact_child_explosion.vpcf", //quick red explosion
             "particles/survival_fx/gas_cannister_impact_child_explosion_sphere.vpcf", // red orb explosion
             "particles/survival_fx/gas_cannister_impact_child_firesmoke.vpcf", // red smoke --
-            "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", //[X] quick flash
+            "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", // quick flash
             "particles/survival_fx/gas_cannister_impact_smokestreak_parent.vpcf", //red smoke falling
             "particles/screen_fx/ghost_screenglow.vpcf", // black cloudy screen
             "particles/screen_fx/ghost_screenglow_warp_loop.vpcf", // black cloudy screen
@@ -273,7 +273,7 @@
             "particles/inferno_fx/molotov_groundfire_00medium.vpcf", //small nuke sized fire with black screen
             "particles/inferno_fx/molotov_groundfire_child_base.vpcf", //2D ground fire puddles
             "particles/inferno_fx/molotov_groundfire_child_base_hcp.vpcf", //2D ground fire puddles
-            "particles/inferno_fx/molotov_groundfire_climbing_debug.vpcf", //cock light?
+            "particles/inferno_fx/molotov_groundfire_climbing_debug.vpcf", //phallic light?
             "particles/inferno_fx/molotov_groundfire_main.vpcf", //low fire
             "particles/maps/de_nuke/nuke_dust_volume_1200_700_low.vpcf", //yellow lazers
             "particles/dev/oit_trans_test_line.vpcf", //black worm smoke
@@ -292,7 +292,7 @@
             "particles/ui/premier_ratings_matchstart_promo.vpcf", //black line with rainbow +'s
             "particles/ui/premier_ratings_promomatch.vpcf", //black U with +'s
             "particles/ui/premier_ratings_relegation.vpcf", //black U with redish squares
-            "particles/overhead_icon_fx/radio_voice_flash.vpcf", //[X] flashing green !
+            "particles/overhead_icon_fx/radio_voice_flash.vpcf", // flashing green !
             "particles/rain_fx/rain_puddle_ripples.vpcf", //floor puddle halfmoons
             "particles/rain_fx/rain_puddle_ripples_large.vpcf", //larger floor puddle halfmoons
             "particles/rain_fx/rain_puddle_ripples_small.vpcf", //small floor puddle halfmoons
@@ -348,7 +348,7 @@
             "particles/maps/de_train/tv_monitor_impact.vpcf", // impact implosion
             "particles/ui/ui_circle_play.vpcf", //big yellow tech rings 
             "particles/ui/hud/ui_effects_tests_falling.vpcf", //sideways bar graph in beigh?
-            "particles/ui/ui_electric_exp_glow.vpcf", //[x] orb of cum
+            "particles/ui/ui_electric_exp_glow.vpcf", // orb of white liquidy light
             "particles/ui/ui_electric_gold.vpcf", //electrical blueish portal lights
             "particles/ui/ui_electric_gold_ends.vpcf", //blueish portal lights
             "particles/ui/ui_element_horiz_star_glitter.vpcf", //crappy square black particles
@@ -386,7 +386,7 @@
             "particles/ui/ui_gold_halo_sparkles.vpcf", //white to shiny animated particles
             "particles/ui/ammohealthcenter/ui_hud_kill_blast_radial.vpcf", //orb contained explosion
             "particles/ui/ammohealthcenter/ui_hud_kill_blast_rays.vpcf", //small whitish rays 
-            "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", //[X] small yellow stars
+            "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", // small yellow stars
             "particles/ui/ammohealthcenter/ui_hud_kill_elec_innerpoint.vpcf", //quick electricity pointed
             "particles/ui/ammohealthcenter/ui_hud_kill_electrocal_innerpoint.vpcf", //electricity pointed
             "particles/ui/ui_hud_kill_lvl_base.vpcf", //green beam, energy
@@ -405,7 +405,7 @@
             "particles/ui/ammohealthcenter/ui_hud_kill_streaks_circleglow.vpcf", //quick blue electric sphere
             "particles/ui/ammohealthcenter/ui_hud_kill_streaks_circlemsk.vpcf", //black orb
             "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow.vpcf", //bottom-up white glow
-            "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", //[x] bigger bottom-up white glow
+            "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", // bigger bottom-up white glow
             "particles/ui/ammohealthcenter/ui_hud_kill_streaks_many.vpcf", //black orb black bar 
             "particles/ui/ammohealthcenter/ui_hud_kill_streaks_many_fast.vpcf", //black orb black bar
             "particles/ui/ammohealthcenter/ui_hud_kill_streaks_spectator_1.vpcf", //black orb black bar

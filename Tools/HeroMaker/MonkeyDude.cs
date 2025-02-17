@@ -8,7 +8,7 @@ namespace WarcraftPlugin.Classes
 {
     public class MonkeyDude : WarcraftClass
     {
-        public override string DisplayName => "MonkeyMan";
+        public override string DisplayName => "MonkeyDude";
 
         public override Color DefaultColor => Color.GreenYellow;
 
@@ -29,12 +29,12 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerSpawn(EventPlayerSpawn spawn)
         {
-            Console.WriteLine("MonkeyMan has spawned!");
+            Console.WriteLine("MonkeyDude has spawned!");
         }
 
         private void Ultimate()
         {
-            Console.WriteLine("MonkeyMan used ultimate!");
+            Console.WriteLine("MonkeyDude used ultimate!");
         }
     }
 }
