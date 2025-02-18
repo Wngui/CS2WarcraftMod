@@ -11,6 +11,7 @@ using g3;
 using System.Collections.Generic;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.UserMessages;
+using System.Text.RegularExpressions;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -484,6 +485,13 @@ namespace WarcraftPlugin.Helpers
         public static bool IsValid(this CCSPlayerController player)
         {
             return player != null && player.IsValid && player.PlayerPawn.IsValid;
+        }
+
+        internal static string GetRealPlayerName(this CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid) return string.Empty;
+            var playerNameClean = Regex.Replace(player.PlayerName, @"\d+\s\[.*\]\s", "");
+            return playerNameClean;
         }
 
         /// <summary>

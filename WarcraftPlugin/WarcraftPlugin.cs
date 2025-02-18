@@ -7,7 +7,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
-using System.Text.RegularExpressions;
 using WarcraftPlugin.Resources;
 using CounterStrikeSharp.API.Modules.Admin;
 using WarcraftPlugin.Adverts;
@@ -95,7 +94,7 @@ namespace WarcraftPlugin
 
             if (warcraftPlayer == null) return;
 
-            var playerNameClean = Regex.Replace(player.PlayerName, @"\d+\s\[.*\]\s", "");
+            var playerNameClean = player.GetRealPlayerName();
             var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().DisplayName}] {playerNameClean}";
 
             player.PlayerName = playerNameWithPrefix;
