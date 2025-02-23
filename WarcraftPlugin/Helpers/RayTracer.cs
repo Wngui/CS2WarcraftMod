@@ -44,7 +44,7 @@ namespace WarcraftPlugin.Helpers
             {
                 _origin.X += _forward.X * d;
                 _origin.Y += _forward.Y * d;
-                _origin.Z += _forward.Z * d + 64;
+                _origin.Z += _forward.Z * d;
             }
 
             return Trace(_origin, _endOrigin, drawResult);

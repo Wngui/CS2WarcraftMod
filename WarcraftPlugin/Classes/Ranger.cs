@@ -224,7 +224,7 @@ namespace WarcraftPlugin.Classes
                     player.TakeDamage(Owner.GetWarcraftPlayer().GetAbilityLevel(1) * 10, Owner, KillFeedIcon.tripwirefire);
                     player.PlayerPawn.Value.VelocityModifier = 0;
                     player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
-                    Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
+                    Warcraft.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 }
 
                 //Clean-up
@@ -288,7 +288,7 @@ namespace WarcraftPlugin.Classes
 
                     player.TakeDamage(4, Owner, KillFeedIcon.flair0);
                     player.PlayerPawn.Value.VelocityModifier = 0;
-                    Warcraft.SpawnParticle(player.CalculatePositionInFront(new Vector(10, 10, 60)), "particles/blood_impact/blood_impact_basic.vpcf");
+                    Warcraft.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 }
             }
 

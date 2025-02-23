@@ -50,14 +50,24 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
+        /// Gets the world eye position of the player.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="offset">Optional offset to add to the eye position.</param>
+        /// <returns>Returns a Vector representing the eye height of the player.</returns>
+        public static Vector EyePosition(this CCSPlayerController player, float offset = 0)
+        {
+            return player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: player.EyeHeight() + offset);
+        }
+
+        /// <summary>
         /// Gets the eye height of the player.
         /// </summary>
         /// <param name="player">The player controller.</param>
-        /// <param name="offset">Optional offset to add to the eye height.</param>
-        /// <returns>Returns a Vector representing the eye height of the player.</returns>
-        public static Vector EyeHeight(this CCSPlayerController player, float offset = 0)
+        /// <returns>Returns the eye height of the player.</returns>
+        public static float EyeHeight(this CCSPlayerController player)
         {
-            return player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: player.PlayerPawn.Value.ViewOffset.Z + offset);
+            return player.PlayerPawn.Value.ViewOffset.Z;
         }
 
         /// <summary>
@@ -281,6 +291,19 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
+        /// Calculates the position in front of the player based on the given distance, height, and horizontal offset.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="distance">The distance in front of the player.</param>
+        /// <param name="height">The height offset from the player's position.</param>
+        /// <param name="horizontalOffset">The horizontal offset from the player's position.</param>
+        /// <returns>Returns a Vector representing the position in front of the player.</returns>
+        public static Vector CalculatePositionInFront(this CCSPlayerController player, float distance, float height, float horizontalOffset = 0)
+        {
+            return player.PlayerPawn.Value.CalculatePositionInFront(new Vector(distance, horizontalOffset, height));
+        }
+
+        /// <summary>
         /// Calculates the position in front of the player based on the given offset.
         /// </summary>
         /// <param name="player">The player controller.</param>
@@ -451,7 +474,7 @@ namespace WarcraftPlugin.Helpers
 
             if (!victim.IsAlive() || !victim.Pawn.IsValid) return;
             var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
-            if(attackerClass != null) attackerClass.LastHurtOther = Server.CurrentTime;
+            if (attackerClass != null) attackerClass.LastHurtOther = Server.CurrentTime;
             if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
 
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);
@@ -663,7 +686,7 @@ namespace WarcraftPlugin.Helpers
         /// <returns>Returns a Vector representing the result of the ray trace.</returns>
         public static Vector RayTrace(this CCSPlayerController player, bool drawResult = false)
         {
-            return RayTracer.Trace(player.EyeHeight(), player.PlayerPawn.Value.EyeAngles, drawResult, true);
+            return RayTracer.Trace(player.EyePosition(), player.PlayerPawn.Value.EyeAngles, drawResult, true);
         }
     }
 }

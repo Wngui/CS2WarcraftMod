@@ -240,7 +240,7 @@ namespace WarcraftPlugin.Classes
                 return;
             }
 
-            _cameraProp.Teleport(Player.CalculatePositionInFront(new Vector(-110, 0, 90)), Player.PlayerPawn.Value.V_angle, new Vector());
+            _cameraProp.Teleport(Player.CalculatePositionInFront(-110, 90), Player.PlayerPawn.Value.V_angle, new Vector());
         }
 
         private void WeaponStrip()
@@ -310,7 +310,8 @@ namespace WarcraftPlugin.Classes
     {
         float _startingTickInterval;
         public override void OnStart() { _startingTickInterval = OnTickInterval; }
-        public override void OnTick() {
+        public override void OnTick()
+        {
             if (Owner.PlayerPawn.Value.EntitySpottedState.Spotted)
             {
                 //chance to notify

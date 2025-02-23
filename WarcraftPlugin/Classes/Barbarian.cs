@@ -95,7 +95,7 @@ namespace WarcraftPlugin.Classes
 
             var rotation = new QAngle(0, Owner.PlayerPawn.Value.EyeAngles.Y + 90, 0);
 
-            _throwingAxe.Teleport(Owner.CalculatePositionInFront(new Vector(10, 10, 60)), rotation, velocity);
+            _throwingAxe.Teleport(Owner.CalculatePositionInFront(10, 60), rotation, velocity);
             _throwingAxe.DispatchSpawn();
             _throwingAxe.SetModel("models/weapons/v_axe.vmdl");
             Schema.SetSchemaValue(_throwingAxe.Handle, "CBaseGrenade", "m_hThrower", Owner.PlayerPawn.Raw); //Fixes killfeed

@@ -85,7 +85,7 @@ namespace WarcraftPlugin.Classes
 
                 //Revive
                 playerToRevive.Respawn();
-                playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), Player.PlayerPawn.Value.EyeAngles, new Vector());
+                playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(10, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
 
                 playerToRevive.PrintToChat(" " + $"{ChatColors.Green}You have been revived!{ChatColors.Default}");
                 Utilities.GetPlayers().ForEach(x =>

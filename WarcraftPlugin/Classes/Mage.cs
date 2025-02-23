@@ -115,7 +115,7 @@ namespace WarcraftPlugin.Classes
                 particle.SetParent(molotov);
 
                 Vector velocity = Player.CalculateVelocityAwayFromPlayer(1800);
-                molotov.Teleport(Player.CalculatePositionInFront(new Vector(10, 10, 60)), molotov.AbsRotation, velocity);
+                molotov.Teleport(Player.CalculatePositionInFront(10, 60), molotov.AbsRotation, velocity);
 
             }
         }
@@ -146,7 +146,7 @@ namespace WarcraftPlugin.Classes
                 Owner.SetArmor(Owner.PlayerPawn.Value.ArmorValue + 1);
             }
         }
-        public override void OnFinish(){}
+        public override void OnFinish() { }
     }
 
     internal class FreezeEffect(CCSPlayerController owner, float duration, CCSPlayerController target) : WarcraftEffect(owner, duration)
@@ -158,7 +158,7 @@ namespace WarcraftPlugin.Classes
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;
 
-            Warcraft.DrawLaserBetween(Owner.EyeHeight(-10), target.EyeHeight(-10), Color.Cyan);
+            Warcraft.DrawLaserBetween(Owner.EyePosition(-10), target.EyePosition(-10), Color.Cyan);
             targetPlayerModel.SetColor(Color.Cyan);
         }
         public override void OnTick() { }
