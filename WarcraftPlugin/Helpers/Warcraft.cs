@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.UserMessages;
 using System.Text.RegularExpressions;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -49,14 +50,14 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
-        /// Gets the center origin of the player.
+        /// Gets the eye height of the player.
         /// </summary>
         /// <param name="player">The player controller.</param>
-        /// <returns>Returns a Vector representing the center origin of the player.</returns>
-        public static Vector ToCenterOrigin(this CCSPlayerController player)
+        /// <param name="offset">Optional offset to add to the eye height.</param>
+        /// <returns>Returns a Vector representing the eye height of the player.</returns>
+        public static Vector EyeHeight(this CCSPlayerController player, float offset = 0)
         {
-            var pawnOrigin = player.PlayerPawn.Value.AbsOrigin;
-            return new Vector(pawnOrigin.X, pawnOrigin.Y, pawnOrigin.Z + 44);
+            return player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: player.PlayerPawn.Value.ViewOffset.Z + offset);
         }
 
         /// <summary>
@@ -246,6 +247,11 @@ namespace WarcraftPlugin.Helpers
             player.ExecuteClientCommand($"play {soundPath}");
         }
 
+        /// <summary>
+        /// Applies an adrenaline surge effect to the player, boosting their health for a specified duration.
+        /// </summary>
+        /// <param name="player">The player controller to apply the effect to.</param>
+        /// <param name="duration">The duration of the adrenaline surge effect in seconds. Default is 5 seconds.</param>
         public static void AdrenalineSurgeEffect(this CCSPlayerController player, float duration = 5f)
         {
             if (!player.IsAlive()) return;
@@ -339,6 +345,20 @@ namespace WarcraftPlugin.Helpers
             Vector velocityVector = directionVector * velocityMagnitude;
 
             return velocityVector;
+        }
+
+        /// <summary>
+        /// Checks if the player is behind another player based on their eye angles.
+        /// </summary>
+        /// <param name="player">The player to check.</param>
+        /// <param name="anotherPlayer">The player to compare against.</param>
+        /// <returns>True if the player is behind another given player, otherwise false.</returns>
+        public static bool IsBehind(this CCSPlayerController player, CCSPlayerController anotherPlayer)
+        {
+            var behindAngle = player.PlayerPawn.Value.EyeAngles.Y;
+            var infrontAngle = anotherPlayer.PlayerPawn.Value.EyeAngles.Y;
+
+            return Math.Abs(behindAngle - infrontAngle) <= 50;
         }
 
         /// <summary>
@@ -643,7 +663,7 @@ namespace WarcraftPlugin.Helpers
         /// <returns>Returns a Vector representing the result of the ray trace.</returns>
         public static Vector RayTrace(this CCSPlayerController player, bool drawResult = false)
         {
-            return RayTracer.Trace(player.PlayerPawn.Value.AbsOrigin, player.PlayerPawn.Value.EyeAngles, drawResult, true);
+            return RayTracer.Trace(player.EyeHeight(), player.PlayerPawn.Value.EyeAngles, drawResult, true);
         }
     }
 }

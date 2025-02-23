@@ -158,7 +158,7 @@ namespace WarcraftPlugin.Classes
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;
 
-            Warcraft.DrawLaserBetween(Owner.ToCenterOrigin(), target.ToCenterOrigin(), Color.Cyan);
+            Warcraft.DrawLaserBetween(Owner.EyeHeight(-10), target.EyeHeight(-10), Color.Cyan);
             targetPlayerModel.SetColor(Color.Cyan);
         }
         public override void OnTick() { }

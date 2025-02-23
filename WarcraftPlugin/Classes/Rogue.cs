@@ -4,7 +4,6 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
-using CounterStrikeSharp.API;
 using WarcraftPlugin.Core.Effects;
 using System.Collections.Generic;
 using WarcraftPlugin.Events.ExtendedEvents;
@@ -54,13 +53,9 @@ namespace WarcraftPlugin.Classes
                 new InvisibleEffect(Player, 5).Start();
 
                 //spawn smoke
-                Warcraft.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
-
-                //spawn molly - hack to trigger smoke faster
-                var molo = Utilities.CreateEntityByName<CMolotovProjectile>("molotov_projectile");
-                molo.Teleport(Player.PlayerPawn.Value.AbsOrigin, new QAngle(0, 0, 0), new Vector(0, 0, 0));
-                molo.DispatchSpawn();
-                molo.AcceptInput("InitializeSpawnFromWorld");
+                var smoke = Warcraft.SpawnSmoke(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 5), Player.PlayerPawn.Value, Color.Black);
+                smoke.SpawnTime = 0;
+                smoke.Teleport(velocity: Vector.Zero);
 
                 Player.ExecuteClientCommand("slot3"); //pull out knife
 
