@@ -85,7 +85,9 @@ namespace WarcraftPlugin.Core
             }
 
             if (_config.DeactivatedClasses.Contains(heroClass.InternalName, StringComparer.InvariantCultureIgnoreCase) ||
-                _config.DeactivatedClasses.Contains(heroClass.DisplayName, StringComparer.InvariantCultureIgnoreCase))
+                _config.DeactivatedClasses.Contains(heroClass.DisplayName, StringComparer.InvariantCultureIgnoreCase) ||
+                _config.DeactivatedClasses.Contains(heroClass.LocalizedDisplayName, StringComparer.InvariantCultureIgnoreCase)
+                )
             {
                 Console.WriteLine($"Skipping deactivated class: {heroClass.DisplayName}");
                 return;
@@ -160,7 +162,8 @@ namespace WarcraftPlugin.Core
             {
                 defaultClass = allClasses.FirstOrDefault(x =>
                     x.InternalName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase) ||
-                    x.DisplayName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase));
+                    x.DisplayName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase) ||
+                    x.LocalizedDisplayName.Equals(_config.DefaultClass, StringComparison.InvariantCultureIgnoreCase));
             }
 
             defaultClass ??= allClasses.First();

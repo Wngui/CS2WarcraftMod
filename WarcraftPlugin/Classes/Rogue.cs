@@ -122,7 +122,7 @@ namespace WarcraftPlugin.Classes
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
                 eventPlayerHurt.AddBonusDamage(damageBonus);
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}", 1);
+                Player.PrintToChat($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}");
                 Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }
         }

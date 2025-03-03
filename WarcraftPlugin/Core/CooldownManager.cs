@@ -62,8 +62,7 @@ namespace WarcraftPlugin.Core
             var ability = wcplayer.GetClass().GetAbility(abilityIndex);
 
             wcplayer.GetPlayer().PlayLocalSound("sounds/weapons/taser/taser_charge_ready.vsnd");
-
-            wcplayer.GetPlayer().PrintToCenter($"{ability.DisplayName} ready");
+            wcplayer.GetPlayer().PrintToCenter(WarcraftPlugin.Instance.Localizer["ability.ready", ability.DisplayName]);
         }
     }
 }

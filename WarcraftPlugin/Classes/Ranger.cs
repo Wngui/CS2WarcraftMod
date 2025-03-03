@@ -107,7 +107,7 @@ namespace WarcraftPlugin.Classes
         {
             if (_dashOnCooldown)
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Dash{ChatColors.Default} on cooldown", 1);
+                Player.PrintToChat($"{ChatColors.Red}Dash{ChatColors.Default} on cooldown");
                 return; // Early exit if dash is on cooldown
             }
 
@@ -149,7 +149,7 @@ namespace WarcraftPlugin.Classes
         private void EndDashCooldown()
         {
             _dashOnCooldown = false;
-            Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Green}Dash{ChatColors.Default} ready", 1);
+            Player.PrintToChat($"{ChatColors.Green}Dash{ChatColors.Default} ready");
         }
         #endregion
         #region Trap

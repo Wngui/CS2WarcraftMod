@@ -1,5 +1,4 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Timers;
 using System.Collections.Generic;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
@@ -21,7 +20,6 @@ namespace WarcraftPlugin.Models
         internal int currentLevel;
         internal int amountToLevel;
         internal string className;
-        internal string statusMessage;
 
         private readonly List<int> _abilityLevels = new(new int[4]);
         internal List<float> AbilityCooldowns = new(new float[4]);
@@ -57,12 +55,6 @@ namespace WarcraftPlugin.Models
             return currentLevel;
         }
 
-        public override string ToString()
-        {
-            return
-                $"[{_playerIndex}]: {{raceName={className}, currentLevel={currentLevel}, currentXp={currentXp}, amountToLevel={amountToLevel}}}";
-        }
-
         internal int GetAbilityLevel(int abilityIndex)
         {
             return _abilityLevels[abilityIndex];
@@ -81,13 +73,6 @@ namespace WarcraftPlugin.Models
         internal WarcraftClass GetClass()
         {
             return _class;
-        }
-
-        internal void SetStatusMessage(string status, float duration = 2f)
-        {
-            statusMessage = status;
-            _ = new Timer(duration, () => statusMessage = null, 0);
-            GetPlayer().PrintToChat(" " + status);
         }
 
         internal void GrantAbilityLevel(int abilityIndex)

@@ -65,7 +65,7 @@ namespace WarcraftPlugin.Classes
             }
             else
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Divine resurrection already used this round.{ChatColors.Default}", 1);
+                Player.PrintToChat($"{ChatColors.Red}Divine resurrection already used this round.{ChatColors.Default}");
             }
         }
 
@@ -93,7 +93,7 @@ namespace WarcraftPlugin.Classes
             }
             else
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}No allies fallen{ChatColors.Default}", 1);
+                Player.PrintToChat($"{ChatColors.Red}No allies fallen{ChatColors.Default}");
             }
         }
 

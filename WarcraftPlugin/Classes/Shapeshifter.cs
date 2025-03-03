@@ -94,14 +94,14 @@ namespace WarcraftPlugin.Classes
 
             if (enemyplayer == null)
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Disguise failed{ChatColors.Default}, no enemies to copy", 1);
+                Player.PrintToChat($"{ChatColors.Red}Disguise failed{ChatColors.Default}, no enemies to copy");
                 return;
             }
 
             Player.PlayerPawn.Value.SetColor(Color.White);
 
             Player.PlayerPawn.Value.SetModel(enemyplayer?.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
-            Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}Disguised{ChatColors.Default} as {teamToDisguise}", 1);
+            Player.PrintToChat($"{ChatColors.Blue}Disguised{ChatColors.Default} as {teamToDisguise}");
             Player.PlayLocalSound("sounds/ui/armsrace_final_kill_knife.vsnd");
             _isDisguised = true;
         }
@@ -150,7 +150,7 @@ namespace WarcraftPlugin.Classes
 
             _isDisguised = false;
 
-            Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Disguise{ChatColors.Default} broken!", 1);
+            Player.PrintToChat($"{ChatColors.Red}Disguise{ChatColors.Default} broken!");
         }
 
         private void UnShapeshift()

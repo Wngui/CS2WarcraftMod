@@ -1,4 +1,4 @@
-﻿namespace WarcraftPlugin.Resources
+﻿namespace WarcraftPlugin.Core.Preload
 {
     public static class Particles
     {

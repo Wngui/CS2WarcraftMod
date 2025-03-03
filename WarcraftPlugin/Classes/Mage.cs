@@ -153,7 +153,7 @@ namespace WarcraftPlugin.Classes
     {
         public override void OnStart()
         {
-            target.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}", Duration);
+            target.PrintToChat($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}");
             var targetPlayerModel = target.PlayerPawn.Value;
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;

@@ -20,6 +20,8 @@ internal class MenuPlayer
     internal static IStringLocalizer Localizer = null;
     internal PlayerButtons Buttons { get; set; }
 
+    private readonly BasePlugin _plugin = WarcraftPlugin.Instance; 
+
     internal void OpenMainMenu(Menu menu, int selectedOptionIndex = 0)
     {
         player.DisableMovement();
@@ -94,9 +96,7 @@ internal class MenuPlayer
         {
             if (player.PlayerPawn.Value != null && player.PlayerPawn.Value.IsValid)
             {
-                player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
-                Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
-                Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+                player.EnableMovement();
             }
 
             return;
@@ -192,8 +192,8 @@ internal class MenuPlayer
             }
         }
 
-        var selectKey = player.IsAlive() ? "Space" : "E";
-        builder.AppendLine($"<center><font color='red' class='fontSize-sm'>Navigate:</font><font color='orange' class='fontSize-s'> W↑ S↓</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Select: </font><font color='orange' class='fontSize-sm'>{selectKey}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>Exit: </font><font color='orange' class='fontSize-sm'>Tab</font></center>");
+        var selectKey = player.IsAlive() ? _plugin.Localizer["menu.option.select"] : _plugin.Localizer["menu.option.select.dead"];
+        builder.AppendLine($"<center><font color='red' class='fontSize-sm'>{_plugin.Localizer["menu.navigate"]}:</font><font color='orange' class='fontSize-s'> {_plugin.Localizer["menu.option.up"]} {_plugin.Localizer["menu.option.down"]}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>{_plugin.Localizer["menu.select"]}: </font><font color='orange' class='fontSize-sm'>{selectKey}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>{_plugin.Localizer["menu.exit"]}: </font><font color='orange' class='fontSize-sm'>{_plugin.Localizer["menu.option.exit"]}</font></center>");
         builder.AppendLine("<br>");
         CenterHtml = builder.ToString();
     }
