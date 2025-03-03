@@ -48,7 +48,7 @@ namespace WarcraftPlugin.Models
         public abstract string DisplayName { get; }
         public virtual DefaultClassModel DefaultModel { get; } = new DefaultClassModel();
         public abstract Color DefaultColor { get; }
-        internal WarcraftPlayer WarcraftPlayer { get; set; }
+        public WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
 
         public abstract List<IWarcraftAbility> Abilities { get; }

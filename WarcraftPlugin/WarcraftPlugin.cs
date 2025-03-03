@@ -31,9 +31,9 @@ namespace WarcraftPlugin
         [JsonPropertyName("DisableNamePrefix")] public bool DisableNamePrefix { get; set; } = false;
     }
 
-    internal static class WarcraftPlayerExtensions
+    public static class WarcraftPlayerExtensions
     {
-        internal static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
+        public static WarcraftPlayer GetWarcraftPlayer(this CCSPlayerController player)
         {
             return WarcraftPlugin.Instance.GetWcPlayer(player);
         }
