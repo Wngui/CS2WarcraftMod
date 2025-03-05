@@ -14,6 +14,7 @@
     <PackageTags>warcraft;cs2;counterstrike;sharp</PackageTags>
     <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

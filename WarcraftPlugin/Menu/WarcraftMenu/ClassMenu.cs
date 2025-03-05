@@ -26,7 +26,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 // Add to warcraftClassInformations with classInformation if found
                 warcraftClassInformations.Add(new WarcraftClassInformation()
                 {
-                    DisplayName = warcraftClass?.DisplayName,
+                    DisplayName = warcraftClass?.LocalizedDisplayName,
                     InternalName = warcraftClass?.InternalName,
                     CurrentLevel = classInformation != null ? classInformation.CurrentLevel : 1,
                     CurrentXp = classInformation?.CurrentXp ?? 0,

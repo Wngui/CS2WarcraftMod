@@ -14,10 +14,23 @@ namespace WarcraftPlugin.lang
 {
     public static class LocalizerMiddleware
     {
-        internal static IStringLocalizer Enable(IStringLocalizer localizer, string moduleDirectory)
+        internal static IStringLocalizer Load(IStringLocalizer localizer, string moduleDirectory)
         {
             var chatColors = GetChatColors();
 
+            List<LocalizedString> customHeroLocalizerStrings = LoadCustomHeroLocalizations(moduleDirectory, chatColors);
+
+            // Process the localizer strings
+            var localizedStrings = localizer.GetAllStrings()
+                .Select(ls => new LocalizedString(ls.Name, ReplaceChatColors(ls.Value, chatColors)))
+                .Concat(customHeroLocalizerStrings)
+                .ToList();
+
+            return new WarcraftLocalizer(localizedStrings);
+        }
+
+        private static List<LocalizedString> LoadCustomHeroLocalizations(string moduleDirectory, Dictionary<string, string> chatColors)
+        {
             var searchPattern = $"*.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}*.json";
 
             var customHeroLocalizations = Directory.EnumerateFiles(Path.Combine(moduleDirectory, "lang"), searchPattern);
@@ -42,14 +55,7 @@ namespace WarcraftPlugin.lang
             // Add the parallel-processed strings to the main list
             var localizerStrings = new List<LocalizedString>();
             localizerStrings.AddRange(concurrentLocalizerStrings);
-
-            // Process the localizer strings
-            var localizedStrings = localizer.GetAllStrings()
-                .Select(ls => new LocalizedString(ls.Name, ReplaceChatColors(ls.Value, chatColors)))
-                .Concat(localizerStrings)
-                .ToList();
-
-            return new ColorLocalizer(localizerStrings);
+            return localizerStrings;
         }
 
         private static Dictionary<string, string> GetChatColors()
@@ -70,7 +76,7 @@ namespace WarcraftPlugin.lang
         }
     }
 
-    public class ColorLocalizer(List<LocalizedString> localizedStrings) : IStringLocalizer
+    public class WarcraftLocalizer(List<LocalizedString> localizedStrings) : IStringLocalizer
     {
         private readonly List<LocalizedString> _localizedStrings = localizedStrings;
 
