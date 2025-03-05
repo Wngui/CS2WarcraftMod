@@ -4,17 +4,50 @@ using System.Collections.Generic;
 using System;
 using CounterStrikeSharp.API.Modules.Utils;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Globalization;
+using System.Text.Json;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace WarcraftPlugin.lang
 {
     public static class LocalizerMiddleware
     {
-        internal static IStringLocalizer Enable(IStringLocalizer localizer)
+        internal static IStringLocalizer Enable(IStringLocalizer localizer, string moduleDirectory)
         {
             var chatColors = GetChatColors();
-            var localizerStrings = localizer.GetAllStrings()
-                         .Select(ls => new LocalizedString(ls.Name, ReplaceChatColors(ls.Value, chatColors)))
-                         .ToList();
+
+            var searchPattern = $"*.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}*.json";
+
+            var customHeroLocalizations = Directory.EnumerateFiles(Path.Combine(moduleDirectory, "lang"), searchPattern);
+
+            // Use a thread-safe collection for parallel processing
+            var concurrentLocalizerStrings = new ConcurrentBag<LocalizedString>();
+
+            Parallel.ForEach(customHeroLocalizations, file =>
+            {
+                var jsonContent = File.ReadAllText(file);
+                var customHeroLocalizations = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
+
+                if (customHeroLocalizations != null)
+                {
+                    foreach (var localization in customHeroLocalizations)
+                    {
+                        concurrentLocalizerStrings.Add(new LocalizedString(localization.Key, ReplaceChatColors(localization.Value, chatColors)));
+                    }
+                }
+            });
+
+            // Add the parallel-processed strings to the main list
+            var localizerStrings = new List<LocalizedString>();
+            localizerStrings.AddRange(concurrentLocalizerStrings);
+
+            // Process the localizer strings
+            var localizedStrings = localizer.GetAllStrings()
+                .Select(ls => new LocalizedString(ls.Name, ReplaceChatColors(ls.Value, chatColors)))
+                .Concat(localizerStrings)
+                .ToList();
 
             return new ColorLocalizer(localizerStrings);
         }
@@ -48,6 +81,6 @@ namespace WarcraftPlugin.lang
 
         public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => _localizedStrings;
 
-        public IStringLocalizer WithCulture(System.Globalization.CultureInfo culture) => this;
+        public IStringLocalizer WithCulture(CultureInfo culture) => this;
     }
 }

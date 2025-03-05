@@ -24,7 +24,7 @@ namespace WarcraftPlugin.Adverts
             foreach (var player in Utilities.GetPlayers())
             {
                 if (!player.IsValid || player.IsBot) continue;
-                player.PrintToChat($" {WarcraftPlugin.Instance.Localizer[$"advert.{_advertIndex+1}"]}");
+                player.PrintToChat($" {WarcraftPlugin.Instance.Localizer[$"advert.{_advertIndex}"]}");
             }
 
             _advertIndex++;

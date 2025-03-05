@@ -153,7 +153,7 @@ namespace WarcraftPlugin.Classes
     {
         public override void OnStart()
         {
-            target.PrintToChat($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}");
+            target.PrintToChat(" "+Localizer["mage.frozen"]);
             var targetPlayerModel = target.PlayerPawn.Value;
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;

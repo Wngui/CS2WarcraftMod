@@ -112,7 +112,7 @@ namespace WarcraftPlugin
         {
             base.Load(hotReload);
 
-            Localizer = LocalizerMiddleware.Enable(Localizer);
+            Localizer = LocalizerMiddleware.Enable(Localizer, ModuleDirectory);
 
             MenuAPI.Load(this, hotReload);
 

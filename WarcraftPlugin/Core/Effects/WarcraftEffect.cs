@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
+using Microsoft.Extensions.Localization;
 using System;
 
 namespace WarcraftPlugin.Core.Effects
@@ -61,6 +62,8 @@ namespace WarcraftPlugin.Core.Effects
                        (destroyOnChangingRace ? EffectDestroyFlags.OnChangingRace : 0) |
                        (destroyOnDisconnect ? EffectDestroyFlags.OnDisconnect : 0) |
                        (destroyOnSpawn ? EffectDestroyFlags.OnSpawn : 0);
+
+        public readonly IStringLocalizer Localizer = WarcraftPlugin.Instance.Localizer;
 
         /// <summary>
         /// Called when the effect starts.

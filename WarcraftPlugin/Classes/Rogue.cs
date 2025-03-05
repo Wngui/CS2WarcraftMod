@@ -122,7 +122,7 @@ namespace WarcraftPlugin.Classes
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
                 eventPlayerHurt.AddBonusDamage(damageBonus);
-                Player.PrintToChat($"{ChatColors.Blue}[Backstab] {damageBonus} bonus damage{ChatColors.Default}");
+                Player.PrintToChat(" " + Localizer["rogue.backstab", damageBonus]);
                 Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }
         }
@@ -131,7 +131,7 @@ namespace WarcraftPlugin.Classes
         {
             public override void OnStart()
             {
-                Owner.PrintToCenter($"[Invisible]");
+                Owner.PrintToCenter(Localizer["rogue.invsible"]);
                 Owner.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
 
                 Owner.AdrenalineSurgeEffect(Duration);
@@ -140,7 +140,7 @@ namespace WarcraftPlugin.Classes
             public override void OnFinish()
             {
                 Owner.GetWarcraftPlayer().GetClass().SetDefaultAppearance();
-                Owner.PrintToCenter($"[Visible]");
+                Owner.PrintToCenter(Localizer["rogue.visible"]);
             }
         }
     }

@@ -109,8 +109,8 @@ namespace WarcraftPlugin.Models
         public IWarcraftAbility GetAbility(int index)
         {
             var ability = Abilities[index];
-            var localizedDisplayName = Localizer[$"{InternalName}.ability.{index + 1}"];
-            var localizedDescription = Localizer[$"{InternalName}.ability.{index + 1}.description"];
+            var localizedDisplayName = Localizer[$"{InternalName}.ability.{index}"];
+            var localizedDescription = Localizer[$"{InternalName}.ability.{index}.description"];
 
             return new WarcraftAbility(
                 string.IsNullOrEmpty(localizedDisplayName) ? ability.DisplayName : localizedDisplayName,

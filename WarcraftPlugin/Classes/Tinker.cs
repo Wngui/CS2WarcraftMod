@@ -83,7 +83,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_decoy"));
-                decoy.AttributeManager.Item.CustomName = "Spring Trap";
+                decoy.AttributeManager.Item.CustomName = Localizer["tinker.ability.2"];
             }
         }
 

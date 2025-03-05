@@ -51,7 +51,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_decoy"));
-                decoy.AttributeManager.Item.CustomName = "Ensnare Trap";
+                decoy.AttributeManager.Item.CustomName = Localizer["ranger.ability.2"];
             }
         }
 
@@ -107,7 +107,7 @@ namespace WarcraftPlugin.Classes
         {
             if (_dashOnCooldown)
             {
-                Player.PrintToChat($"{ChatColors.Red}Dash{ChatColors.Default} on cooldown");
+                Player.PrintToChat(" " + Localizer["ranger.dash.cooldown"]);
                 return; // Early exit if dash is on cooldown
             }
 
@@ -149,7 +149,7 @@ namespace WarcraftPlugin.Classes
         private void EndDashCooldown()
         {
             _dashOnCooldown = false;
-            Player.PrintToChat($"{ChatColors.Green}Dash{ChatColors.Default} ready");
+            Player.PrintToChat(" "+ Localizer["ranger.dash.ready"]);
         }
         #endregion
         #region Trap
