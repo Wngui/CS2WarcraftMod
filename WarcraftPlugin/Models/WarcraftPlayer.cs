@@ -5,7 +5,7 @@ using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Models
 {
-    internal class WarcraftPlayer
+    public class WarcraftPlayer
     {
         private int _playerIndex;
         internal int Index => _playerIndex;
@@ -48,34 +48,40 @@ namespace WarcraftPlugin.Models
             _class.Player = Player;
         }
 
-        internal int GetLevel()
+        public int GetLevel()
         {
             if (currentLevel > WarcraftPlugin.MaxLevel) return WarcraftPlugin.MaxLevel;
 
             return currentLevel;
         }
 
-        internal int GetAbilityLevel(int abilityIndex)
+        public override string ToString()
+        {
+            return
+                $"[{_playerIndex}]: {{raceName={className}, currentLevel={currentLevel}, currentXp={currentXp}, amountToLevel={amountToLevel}}}";
+        }
+
+        public int GetAbilityLevel(int abilityIndex)
         {
             return _abilityLevels[abilityIndex];
         }
 
-        internal static int GetMaxAbilityLevel(int abilityIndex)
+        public static int GetMaxAbilityLevel(int abilityIndex)
         {
             return abilityIndex == 3 ? 1 : WarcraftPlugin.MaxSkillLevel;
         }
 
-        internal void SetAbilityLevel(int abilityIndex, int value)
+        public void SetAbilityLevel(int abilityIndex, int value)
         {
             _abilityLevels[abilityIndex] = value;
         }
 
-        internal WarcraftClass GetClass()
+        public WarcraftClass GetClass()
         {
             return _class;
         }
 
-        internal void GrantAbilityLevel(int abilityIndex)
+        public void GrantAbilityLevel(int abilityIndex)
         {
             Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
