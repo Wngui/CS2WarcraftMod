@@ -8,6 +8,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
 using System.Linq;
 using CounterStrikeSharp.API;
+using Microsoft.Extensions.Localization;
 
 namespace WarcraftPlugin.Models
 {
@@ -46,6 +47,7 @@ namespace WarcraftPlugin.Models
     {
         public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
         public abstract string DisplayName { get; }
+        public string LocalizedDisplayName => string.IsNullOrEmpty(Localizer[InternalName]) ? DisplayName : Localizer[InternalName];
         public virtual DefaultClassModel DefaultModel { get; } = new DefaultClassModel();
         public abstract Color DefaultColor { get; }
         public WarcraftPlayer WarcraftPlayer { get; set; }
@@ -64,6 +66,7 @@ namespace WarcraftPlugin.Models
         public virtual void PlayerChangingToAnotherRace() { SetDefaultAppearance(); }
 
         public virtual List<string> PreloadResources { get; } = [];
+        public readonly IStringLocalizer Localizer = WarcraftPlugin.Instance.Localizer;
 
         public void SetDefaultAppearance()
         {
@@ -105,7 +108,14 @@ namespace WarcraftPlugin.Models
 
         public IWarcraftAbility GetAbility(int index)
         {
-            return Abilities[index];
+            var ability = Abilities[index];
+            var localizedDisplayName = Localizer[$"{InternalName}.ability.{index}"];
+            var localizedDescription = Localizer[$"{InternalName}.ability.{index}.description"];
+
+            return new WarcraftAbility(
+                string.IsNullOrEmpty(localizedDisplayName) ? ability.DisplayName : localizedDisplayName,
+                string.IsNullOrEmpty(localizedDescription) ? ability.Description : localizedDescription
+            );
         }
 
         protected void HookEvent<T>(Action<T> handler, HookMode hookMode = HookMode.Pre) where T : GameEvent

@@ -14,6 +14,7 @@
     <PackageTags>warcraft;cs2;counterstrike;sharp</PackageTags>
     <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,6 +36,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="lang\ru.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="lang\en.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

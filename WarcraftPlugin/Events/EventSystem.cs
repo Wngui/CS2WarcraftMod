@@ -7,7 +7,6 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Timers;
-using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events.ExtendedEvents;
@@ -179,9 +178,8 @@ namespace WarcraftPlugin.Events
                     }
                     else
                     {
-                        var message = $"{warcraftClass.DisplayName} ({warcraftPlayer.currentLevel})\n" +
-                        (warcraftPlayer.IsMaxLevel ? "" : $"Experience: {warcraftPlayer.currentXp}/{warcraftPlayer.amountToLevel}\n") +
-                        $"{warcraftPlayer.statusMessage}";
+                        var message = $"{warcraftClass.LocalizedDisplayName} ({warcraftPlayer.currentLevel})\n" +
+                        (warcraftPlayer.IsMaxLevel ? "" : $"{_plugin.Localizer["xp.current"]}: {warcraftPlayer.currentXp}/{warcraftPlayer.amountToLevel}\n");
 
                         player.PrintToCenter(message);
                     }
@@ -281,16 +279,16 @@ namespace WarcraftPlugin.Events
                 string hsBonus = "";
                 if (xpHeadshot != 0)
                 {
-                    hsBonus = $"(+{xpHeadshot} HS bonus)";
+                    hsBonus = $"(+{xpHeadshot} {_plugin.Localizer["xp.bonus.headshot"]})";
                 }
 
                 string knifeBonus = "";
                 if (xpKnife != 0)
                 {
-                    knifeBonus = $"(+{xpKnife} knife bonus)";
+                    knifeBonus = $"(+{xpKnife} {_plugin.Localizer["xp.bonus.knife"]})";
                 }
 
-                string xpString = $" {ChatColors.Gold}+{xpToAdd} XP {ChatColors.Default}for killing {ChatColors.Green}{victim.PlayerName} {ChatColors.Default}{hsBonus}{knifeBonus}";
+                string xpString = $" {_plugin.Localizer["xp.kill", xpToAdd, victim.PlayerName, hsBonus, knifeBonus]}";
 
                 attacker.PrintToChat(xpString);
             }

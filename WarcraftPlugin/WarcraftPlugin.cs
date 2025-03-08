@@ -7,7 +7,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
-using WarcraftPlugin.Resources;
 using CounterStrikeSharp.API.Modules.Admin;
 using WarcraftPlugin.Adverts;
 using System.Text.Json.Serialization;
@@ -17,7 +16,8 @@ using WarcraftPlugin.Menu.WarcraftMenu;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
-using CounterStrikeSharp.API.Modules.Memory;
+using WarcraftPlugin.Core.Preload;
+using WarcraftPlugin.lang;
 
 namespace WarcraftPlugin
 {
@@ -95,7 +95,7 @@ namespace WarcraftPlugin
             if (warcraftPlayer == null) return;
 
             var playerNameClean = player.GetRealPlayerName();
-            var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().DisplayName}] {playerNameClean}";
+            var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().LocalizedDisplayName}] {playerNameClean}";
 
             player.PlayerName = playerNameWithPrefix;
             Utilities.SetStateChanged(player, "CBasePlayerController", "m_iszPlayerName");
@@ -111,6 +111,9 @@ namespace WarcraftPlugin
         public override void Load(bool hotReload)
         {
             base.Load(hotReload);
+
+            Localizer = LocalizerMiddleware.Load(Localizer, ModuleDirectory);
+
             MenuAPI.Load(this, hotReload);
 
             _instance ??= this;
@@ -135,6 +138,7 @@ namespace WarcraftPlugin
             }
 
             AddCommand("ultimate", "ultimate", UltimatePressed);
+            AddCommand(Localizer["command.ultimate"], "ultimate", UltimatePressed);
 
             AddCommand("changerace", "change class", (player, _) => ShowClassMenu(player));
             AddCommand("changeclass", "change class", (player, _) => ShowClassMenu(player));
@@ -142,19 +146,26 @@ namespace WarcraftPlugin
             AddCommand("class", "change class", (player, _) => ShowClassMenu(player));
             AddCommand("rpg", "change class", (player, _) => ShowClassMenu(player));
             AddCommand("cr", "change class", (player, _) => ShowClassMenu(player));
+            AddCommand(Localizer["command.changeclass"], "change class", (player, _) => ShowClassMenu(player));
 
             AddCommand("reset", "reset skills", CommandResetSkills);
+            AddCommand(Localizer["command.reset"], "reset skills", CommandResetSkills);
+
             AddCommand("factoryreset", "reset levels", CommandFactoryReset);
+            AddCommand(Localizer["command.factoryreset"], "reset levels", CommandFactoryReset);
 
             AddCommand("addxp", "addxp", CommandAddXp);
+            AddCommand(Localizer["command.addxp"], "addxp", CommandAddXp);
 
             AddCommand("skills", "skills", (player, _) => ShowSkillsMenu(player));
             AddCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
+            AddCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
 
             AddCommand("rpg_help", "list all commands", CommandHelp);
             AddCommand("commands", "list all commands", CommandHelp);
             AddCommand("wcs", "list all commands", CommandHelp);
             AddCommand("war3menu", "list all commands", CommandHelp);
+            AddCommand(Localizer["command.help"], "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
             RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
@@ -224,13 +235,13 @@ namespace WarcraftPlugin
 
             var xpToAdd = Convert.ToInt32(commandinfo.ArgByIndex(1));
 
-            Console.WriteLine($"Adding {xpToAdd} xp to player {client.PlayerName}");
+            Console.WriteLine(Localizer["xp.add", xpToAdd, client.PlayerName]);
             XpSystem.AddXp(client, xpToAdd);
         }
 
         private void CommandHelp(CCSPlayerController player, CommandInfo commandinfo)
         {
-            player.PrintToChat($" {ChatColors.Green}Type !class to change classes, !skills to level-up");
+            player.PrintToChat($" {Localizer["command.help.description"]}");
         }
 
         private void CommandResetSkills(CCSPlayerController client, CommandInfo commandinfo)
@@ -318,12 +329,12 @@ namespace WarcraftPlugin
             var warcraftPlayer = client.GetWarcraftPlayer();
             if (warcraftPlayer.GetAbilityLevel(3) < 1)
             {
-                client.PrintToCenter("No levels in ultimate");
+                client.PrintToCenter(" " + Localizer["no.ultimate"]);
                 client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
             }
             else if (!warcraftPlayer.GetClass().IsAbilityReady(3))
             {
-                client.PrintToCenter($"Ultimate ready in {Math.Ceiling(warcraftPlayer.GetClass().AbilityCooldownRemaining(3))}s");
+                client.PrintToCenter(" " + Localizer["ultimate.countdown"]);
                 client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
             }
             else
@@ -332,24 +343,19 @@ namespace WarcraftPlugin
             }
         }
 
+        public void OnConfigParsed(Config config)
+        {
+            Config = config;
+        }
+
         public override void Unload(bool hotReload)
         {
             foreach (var player in Utilities.GetPlayers())
             {
-                if (player.IsAlive())
-                {
-                    //Avoid getting stuck in old menu
-                    player.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
-                    Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
-                    Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
-                }
+                //Avoid getting stuck in old menu
+                player.EnableMovement();
             }
             base.Unload(hotReload);
-        }
-
-        public void OnConfigParsed(Config config)
-        {
-            Config = config;
         }
     }
 }

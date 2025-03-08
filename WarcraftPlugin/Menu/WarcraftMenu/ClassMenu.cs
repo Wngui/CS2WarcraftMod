@@ -1,5 +1,4 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,7 +26,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 // Add to warcraftClassInformations with classInformation if found
                 warcraftClassInformations.Add(new WarcraftClassInformation()
                 {
-                    DisplayName = warcraftClass?.DisplayName,
+                    DisplayName = warcraftClass?.LocalizedDisplayName,
                     InternalName = warcraftClass?.InternalName,
                     CurrentLevel = classInformation != null ? classInformation.CurrentLevel : 1,
                     CurrentXp = classInformation?.CurrentXp ?? 0,
@@ -37,7 +36,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
 
             var totalLevels = warcraftClassInformations.Sum(x => x.CurrentLevel);
 
-            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Warcraft Class Menu</font><br><font color='grey' class='{FontSizes.FontSizeS}'>Total Levels (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
+            var classMenu = MenuManager.CreateMenu(@$"<font color='lightgrey' class='{FontSizes.FontSizeM}'>{plugin.Localizer["menu.class"]}</font><br><font color='grey' class='{FontSizes.FontSizeS}'>{plugin.Localizer["menu.class.total.levels"]} (</font><font color='gold' class='{FontSizes.FontSizeS}'>{totalLevels}</font><font color='grey' class='{FontSizes.FontSizeS}'>)</font>", 5);
 
             foreach (var warClassInformation in warcraftClassInformations
                 .OrderByDescending(x => x.CurrentLevel)
@@ -56,9 +55,10 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 var displayString = @$"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>(</font>
                 <font color='{(isCurrentClass ? Color.Gray.Name : "white")}' class='{FontSizes.FontSizeSm}'>{warClassInformation.DisplayName}</font>
                 <font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>)</font>
-                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeSm}'>- level {warClassInformation.CurrentLevel}</font>";
+                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeSm}'>- {plugin.Localizer["menu.class.level"]} {warClassInformation.CurrentLevel}</font>";
 
                 var classInternalName = warClassInformation.InternalName;
+
                 classMenu.Add(displayString, null, (p, opt) =>
                 {
                     if (!isCurrentClass)
@@ -75,7 +75,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                             else
                             {
                                 player.GetWarcraftPlayer().DesiredClass = classInternalName;
-                                player.PrintToChat($" {ChatColors.Green} You will spawn as {ChatColors.Orange}{warClassInformation.DisplayName}{ChatColors.Green} next round!");
+                                player.PrintToChat($" {plugin.Localizer["class.pending.change", warClassInformation.DisplayName]}");
                             }
                         }
 

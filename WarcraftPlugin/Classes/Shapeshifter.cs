@@ -79,7 +79,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_decoy"));
-                decoy.AttributeManager.Item.CustomName = "Doppelganger decoy";
+                decoy.AttributeManager.Item.CustomName = Localizer["shapeshifter.ability.1"];
             }
 
             //Imposter syndrom
@@ -94,14 +94,15 @@ namespace WarcraftPlugin.Classes
 
             if (enemyplayer == null)
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Disguise failed{ChatColors.Default}, no enemies to copy", 1);
+                Player.PrintToChat(" " + Localizer["shapeshifter.disguise.failed"]);
                 return;
             }
 
             Player.PlayerPawn.Value.SetColor(Color.White);
 
             Player.PlayerPawn.Value.SetModel(enemyplayer?.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
-            Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}Disguised{ChatColors.Default} as {teamToDisguise}", 1);
+            Player.PrintToChat($"{ChatColors.Blue}Disguised{ChatColors.Default} as {teamToDisguise}");
+            Player.PrintToChat(" " + Localizer["shapeshifter.disguise"]);
             Player.PlayLocalSound("sounds/ui/armsrace_final_kill_knife.vsnd");
             _isDisguised = true;
         }
@@ -150,7 +151,7 @@ namespace WarcraftPlugin.Classes
 
             _isDisguised = false;
 
-            Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Disguise{ChatColors.Default} broken!", 1);
+            Player.PrintToChat(" " + Localizer["shapeshifter.disguise.revealed"]);
         }
 
         private void UnShapeshift()
@@ -317,7 +318,7 @@ namespace WarcraftPlugin.Classes
                 //chance to notify
                 if (Warcraft.RollDice(Owner.GetWarcraftPlayer().GetAbilityLevel(2)))
                 {
-                    Owner.PrintToCenter($"[Spotted]");
+                    Owner.PrintToCenter(Localizer["shapeshifter.spotted"]);
                     Owner.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
                     Owner.AdrenalineSurgeEffect(0.2f);
                     OnTickInterval = 5; //Add delay before next check

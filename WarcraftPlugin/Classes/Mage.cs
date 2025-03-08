@@ -67,8 +67,11 @@ namespace WarcraftPlugin.Classes
         private void PlayerSpawn(EventPlayerSpawn @event)
         {
             //Mana shield
-            var regenArmorRate = 5 / WarcraftPlayer.GetAbilityLevel(2);
-            new ManaShieldEffect(Player, regenArmorRate).Start();
+            if (WarcraftPlayer.GetAbilityLevel(2) > 0)
+            {
+                var regenArmorRate = 5 / WarcraftPlayer.GetAbilityLevel(2);
+                new ManaShieldEffect(Player, regenArmorRate).Start();
+            }
 
             //Fireball
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
@@ -153,7 +156,7 @@ namespace WarcraftPlugin.Classes
     {
         public override void OnStart()
         {
-            target.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Blue}[FROZEN]{ChatColors.Default}", Duration);
+            target.PrintToChat(" " + Localizer["mage.frozen"]);
             var targetPlayerModel = target.PlayerPawn.Value;
 
             targetPlayerModel.VelocityModifier = targetPlayerModel.VelocityModifier / 2;

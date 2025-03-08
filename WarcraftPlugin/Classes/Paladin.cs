@@ -65,7 +65,7 @@ namespace WarcraftPlugin.Classes
             }
             else
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}Divine resurrection already used this round.{ChatColors.Default}", 1);
+                Player.PrintToChat($"{ChatColors.Red}Divine resurrection already used this round.{ChatColors.Default}");
             }
         }
 
@@ -87,13 +87,13 @@ namespace WarcraftPlugin.Classes
                 playerToRevive.Respawn();
                 playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(10, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
 
-                playerToRevive.PrintToChat(" " + $"{ChatColors.Green}You have been revived!{ChatColors.Default}");
+                playerToRevive.PrintToChat(" " + Localizer["paladin.revive"]);
                 Utilities.GetPlayers().ForEach(x =>
-                    x.PrintToChat(" " + $"{ChatColors.Green}{playerToRevive.PlayerName}{ChatColors.Default} has been revived by {Player.PlayerName}"));
+                    x.PrintToChat(" " + Localizer["paladin.revive.other", playerToRevive.PlayerName, Player.PlayerName]));
             }
             else
             {
-                Player.GetWarcraftPlayer()?.SetStatusMessage($"{ChatColors.Red}No allies fallen{ChatColors.Default}", 1);
+                Player.PrintToChat(" " + Localizer["paladin.revive.none"]);
             }
         }
 

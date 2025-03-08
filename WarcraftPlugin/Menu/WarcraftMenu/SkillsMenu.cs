@@ -9,10 +9,12 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
     {
         internal static void Show(WarcraftPlayer wcPlayer, int selectedOptionIndex = 0)
         {
+            var plugin = WarcraftPlugin.Instance;
+
             var warcraftClass = wcPlayer.GetClass();
 
-            var skillsMenu = MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeM}'>{warcraftClass.DisplayName}</font><font color='gold' class='{FontSizes.FontSizeSm}'> - Level {wcPlayer.GetLevel()}</font><br>
-                <font color='#90EE90' class='{FontSizes.FontSizeS}'>Level up skills ({XpSystem.GetFreeSkillPoints(wcPlayer)} available)</font>");
+            var skillsMenu = MenuManager.CreateMenu(@$"<font color='{warcraftClass.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeM}'>{warcraftClass.LocalizedDisplayName}</font><font color='gold' class='{FontSizes.FontSizeSm}'> - {plugin.Localizer["menu.skills.level"]} {wcPlayer.GetLevel()}</font><br>
+                <font color='#90EE90' class='{FontSizes.FontSizeS}'>{plugin.Localizer["menu.skills.available", XpSystem.GetFreeSkillPoints(wcPlayer)]}</font>");
 
             for (int i = 0; i < warcraftClass.Abilities.Count; i++)
             {

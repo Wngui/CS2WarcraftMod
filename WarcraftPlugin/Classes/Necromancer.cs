@@ -71,7 +71,7 @@ namespace WarcraftPlugin.Classes
                     _hasCheatedDeath = true;
                     WarcraftPlugin.Instance.AddTimer(2f, () =>
                     {
-                        Player.PrintToChat(" " + $"{ChatColors.DarkRed}You have cheated death, for now...{ChatColors.Default}");
+                        Player.PrintToChat(" " + Localizer["necromancer.cheatdeath"]);
                         Player.Respawn();
                         Player.SetHp(1);
                         Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
