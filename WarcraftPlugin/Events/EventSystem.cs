@@ -260,19 +260,18 @@ namespace WarcraftPlugin.Events
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventPlayerKilledOther(@event.Handle), HookMode.Pre);
                 var weaponName = @event.Weapon;
 
-                int xpToAdd = 0;
-                int xpHeadshot = 0;
-                int xpKnife = 0;
-
-                xpToAdd = _plugin.XpPerKill;
+                var xpHeadshot = 0f;
+                var xpKnife = 0f;
 
                 if (headshot)
-                    xpHeadshot = Convert.ToInt32(_plugin.XpPerKill * _plugin.XpHeadshotModifier);
+                    xpHeadshot = Convert.ToInt32(_config.XpPerKill * _config.XpHeadshotModifier);
 
-                if (weaponName == "knife")
-                    xpKnife = Convert.ToInt32(_plugin.XpPerKill * _plugin.XpKnifeModifier);
+                if (weaponName.StartsWith("knife"))
+                {
+                    xpKnife = Convert.ToInt32(_config.XpPerKill * _config.XpKnifeModifier);
+                }
 
-                xpToAdd += xpHeadshot + xpKnife;
+                var xpToAdd = Convert.ToInt32(_config.XpPerKill + xpHeadshot + xpKnife);
 
                 _plugin.XpSystem.AddXp(attacker, xpToAdd);
 

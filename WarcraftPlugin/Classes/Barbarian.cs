@@ -49,7 +49,9 @@ namespace WarcraftPlugin.Classes
             if (activeWeapon != null && activeWeapon.IsValid)
             {
                 var maxClip = activeWeapon.VData.MaxClip1;
-                var maxChance = 400 / maxClip; //The bigger the mag, the lower the chance, to avoid negev spam
+                if (maxClip == 0) return;
+
+                var maxChance = 400 / maxClip; // The bigger the mag, the lower the chance, to avoid negev spam
 
                 if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), maxChance))
                 {

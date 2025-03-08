@@ -29,6 +29,9 @@ namespace WarcraftPlugin
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
         [JsonPropertyName("DefaultClass")] public string DefaultClass { get; set; }
         [JsonPropertyName("DisableNamePrefix")] public bool DisableNamePrefix { get; set; } = false;
+        [JsonPropertyName("XpPerKill")] public float XpPerKill { get; set; } = 40;
+        [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
+        [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
     }
 
     public static class WarcraftPlayerExtensions
@@ -59,10 +62,6 @@ namespace WarcraftPlugin
         internal CooldownManager CooldownManager;
         internal AdvertManager AdvertManager;
         private Database _database;
-
-        internal int XpPerKill = 40;
-        internal float XpHeadshotModifier = 0.15f;
-        internal float XpKnifeModifier = 0.25f;
 
         public Config Config { get; set; } = null!;
 
