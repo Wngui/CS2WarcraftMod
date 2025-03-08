@@ -119,7 +119,10 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
   "DefaultClass": "ranger", //Sets the default class for new players
-  "DisableNamePrefix": true //Removes level and class info from player names
+  "DisableNamePrefix": true, //Removes level and class info from player names
+  "XpPerKill": 40, // Experience per kill
+  "XpHeadshotModifier": 0.15, // Experience Modifier for headshots
+  "XpKnifeModifier": 0.25 // Experience Modifier for knife kills
 }
 ```
 
