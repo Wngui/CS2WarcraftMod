@@ -9,7 +9,7 @@
   "menu.option.down": "S↓", // S↓
   "menu.exit": "Выход", // Exit
   "menu.select": "Выбрать", // Select
-  "menu.navigate": "Навигация", // Navigate
+  "menu.navigate": "Нави", // Navigate
   "menu.more.options.below": "<center><img src='https://raw.githubusercontent.com/Wngui/CS2WarcraftMod/refs/heads/master/WarcraftPlugin/Resources/arrow-down.gif'></center><br>",
   "menu.class": "Меню классов Warcraft", // Warcraft Class Menu
   "menu.class.total.levels": "Всего уровней", // Total Levels
