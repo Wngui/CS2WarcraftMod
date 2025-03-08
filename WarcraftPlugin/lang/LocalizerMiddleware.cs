@@ -22,7 +22,7 @@ namespace WarcraftPlugin.lang
 
             // Process the localizer strings
             var localizedStrings = localizer.GetAllStrings()
-                .Select(ls => new LocalizedString(ls.Name.ToLower(), ReplaceChatColors(ls.Value.ToLower(), chatColors)))
+                .Select(ls => new LocalizedString(ls.Name, ReplaceChatColors(ls.Value, chatColors)))
                 .Concat(customHeroLocalizerStrings)
                 .ToList();
 
@@ -51,7 +51,7 @@ namespace WarcraftPlugin.lang
                 {
                     foreach (var localization in customHeroLocalizations)
                     {
-                        concurrentLocalizerStrings.Add(new LocalizedString(localization.Key, ReplaceChatColors(localization.Value.ToLower(), chatColors), false, searchedLocation: file));
+                        concurrentLocalizerStrings.Add(new LocalizedString(localization.Key, ReplaceChatColors(localization.Value, chatColors), false, searchedLocation: file));
                     }
                 }
             });

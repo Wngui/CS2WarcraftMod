@@ -9,6 +9,7 @@ using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using System.Collections.Generic;
 using WarcraftPlugin.Events.ExtendedEvents;
+using System;
 
 namespace WarcraftPlugin.Classes
 {
@@ -44,9 +45,16 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerShoot(EventWeaponFire @event)
         {
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 25))
+            var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
+            if (activeWeapon != null && activeWeapon.IsValid)
             {
-                new ThrowingAxeEffect(Player, 2).Start();
+                var maxClip = activeWeapon.VData.MaxClip1;
+                var maxChance = 400 / maxClip; //The bigger the mag, the lower the chance, to avoid negev spam
+
+                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), maxChance))
+                {
+                    new ThrowingAxeEffect(Player, 2).Start();
+                }
             }
         }
 
