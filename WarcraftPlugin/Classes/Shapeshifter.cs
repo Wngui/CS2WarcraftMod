@@ -101,15 +101,15 @@ namespace WarcraftPlugin.Classes
             Player.PlayerPawn.Value.SetColor(Color.White);
 
             Player.PlayerPawn.Value.SetModel(enemyplayer?.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
-            Player.PrintToChat($"{ChatColors.Blue}Disguised{ChatColors.Default} as {teamToDisguise}");
-            Player.PrintToChat(" " + Localizer["shapeshifter.disguise"]);
+            Player.PrintToChat(" " + Localizer["shapeshifter.disguise", teamToDisguise]);
             Player.PlayLocalSound("sounds/ui/armsrace_final_kill_knife.vsnd");
             _isDisguised = true;
         }
 
         private void PlayerHurt(EventPlayerHurt hurt)
         {
-            UnShapeshift();
+            if (_isShapeshifted)
+                UnShapeshift();
         }
 
         private void RoundEnd(EventRoundEnd end)
@@ -156,11 +156,10 @@ namespace WarcraftPlugin.Classes
 
         private void UnShapeshift()
         {
+            _isShapeshifted = false;
             _playerShapeshiftProp?.RemoveIfValid();
 
             SetDefaultAppearance();
-
-            _isShapeshifted = false;
 
             //unattach camera & listener
             UnhookCamera();
@@ -262,9 +261,12 @@ namespace WarcraftPlugin.Classes
         private void WeaponRestore()
         {
             Player.PlayerPawn.Value.WeaponServices!.PreventWeaponPickup = false;
-            foreach (var weapon in _weaponList)
+            if (Player.IsAlive())
             {
-                Player.GiveNamedItem(weapon);
+                foreach (var weapon in _weaponList)
+                {
+                    Player.GiveNamedItem(weapon);
+                }
             }
         }
 
