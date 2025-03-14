@@ -109,6 +109,7 @@ Ultimate can be activated by binding it in the console, example
 ## Setup
 
 **Install the Plugin**
+   - Download the [latest release](https://github.com/Wngui/CS2WarcraftMod/releases/latest)
    - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`.
 
 ## Configuration example
