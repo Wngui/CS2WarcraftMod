@@ -194,7 +194,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public class PoisonCloudEffect(CCSPlayerController owner, float duration, Vector cloudPos) : WarcraftEffect(owner, duration)
+        internal class PoisonCloudEffect(CCSPlayerController owner, float duration, Vector cloudPos) : WarcraftEffect(owner, duration)
         {
             readonly int _cloudHeight = 100;
             readonly int _cloudWidth = 260;

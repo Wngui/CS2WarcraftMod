@@ -127,7 +127,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        public class InvisibleEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
+        internal class InvisibleEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
         {
             public override void OnStart()
             {
