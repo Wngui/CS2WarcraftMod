@@ -9,6 +9,7 @@ using WarcraftPlugin.Core;
 using System.Linq;
 using CounterStrikeSharp.API;
 using Microsoft.Extensions.Localization;
+using WarcraftPlugin.lang;
 
 namespace WarcraftPlugin.Models
 {
@@ -47,7 +48,7 @@ namespace WarcraftPlugin.Models
     {
         public string InternalName => DisplayName.Replace(' ', '_').ToLowerInvariant();
         public abstract string DisplayName { get; }
-        public string LocalizedDisplayName => string.IsNullOrEmpty(Localizer[InternalName]) ? DisplayName : Localizer[InternalName];
+        public string LocalizedDisplayName => Localizer.Exists(InternalName) ? Localizer[InternalName] : DisplayName;
         public virtual DefaultClassModel DefaultModel { get; } = new DefaultClassModel();
         public abstract Color DefaultColor { get; }
         public WarcraftPlayer WarcraftPlayer { get; set; }
@@ -109,12 +110,12 @@ namespace WarcraftPlugin.Models
         public IWarcraftAbility GetAbility(int index)
         {
             var ability = Abilities[index];
-            var localizedDisplayName = Localizer[$"{InternalName}.ability.{index}"];
-            var localizedDescription = Localizer[$"{InternalName}.ability.{index}.description"];
+            var abilityNameKey = $"{InternalName}.ability.{index}";
+            var abilityDescriptionKey = $"{InternalName}.ability.{index}.description";
 
             return new WarcraftAbility(
-                string.IsNullOrEmpty(localizedDisplayName) ? ability.DisplayName : localizedDisplayName,
-                string.IsNullOrEmpty(localizedDescription) ? ability.Description : localizedDescription
+                Localizer.Exists(abilityNameKey) ? Localizer[abilityNameKey] : ability.DisplayName,
+                Localizer.Exists(abilityDescriptionKey) ? Localizer[abilityDescriptionKey] : ability.Description
             );
         }
 

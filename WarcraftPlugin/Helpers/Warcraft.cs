@@ -228,6 +228,17 @@ namespace WarcraftPlugin.Helpers
         }
 
         /// <summary>
+        /// Checks if the player is an ally of another player based on their team numbers.
+        /// </summary>
+        /// <param name="player">The player controller.</param>
+        /// <param name="otherPlayer">The other player controller to compare against.</param>
+        /// <returns>True if the player is an ally of the other player, otherwise false.</returns>
+        public static bool AllyOf(this CCSPlayerController player, CCSPlayerController otherPlayer)
+        {
+            return player.PlayerPawn.Value.TeamNum == otherPlayer.PlayerPawn.Value.TeamNum;
+        }
+
+        /// <summary>
         /// Sets the scale of the skeleton instance of the entity's body component.
         /// </summary>
         /// <param name="entity">The entity whose skeleton instance scale is to be set.</param>

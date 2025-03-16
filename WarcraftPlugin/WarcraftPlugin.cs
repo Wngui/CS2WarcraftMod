@@ -333,7 +333,7 @@ namespace WarcraftPlugin
             }
             else if (!warcraftPlayer.GetClass().IsAbilityReady(3))
             {
-                client.PrintToCenter(" " + Localizer["ultimate.countdown"]);
+                client.PrintToCenter(" " + Localizer["ultimate.countdown", Math.Ceiling(warcraftPlayer.GetClass().AbilityCooldownRemaining(3))]);
                 client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
             }
             else

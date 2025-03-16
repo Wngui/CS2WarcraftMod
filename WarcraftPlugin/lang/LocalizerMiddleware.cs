@@ -96,4 +96,12 @@ namespace WarcraftPlugin.lang
 
         public IStringLocalizer WithCulture(CultureInfo culture) => this;
     }
+
+    public static class StringLocalizerExtensions
+    {
+        public static bool Exists(this IStringLocalizer localizer, string name)
+        {
+            return localizer.GetAllStrings().Any(ls => ls.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+        }
+    }
 }

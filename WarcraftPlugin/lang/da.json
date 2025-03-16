@@ -2,8 +2,8 @@
   //Menu + Core
   "menu.selection.left": "<font color='red' class='fontSize-s'>▶ </font>", // <font color='red' class='fontSize-s'>▶ </font>
   "menu.selection.right": "<font color='red' class='fontSize-s'> ◀</font>", // <font color='red' class='fontSize-s'> ◀</font>
-  "menu.option.select": "E", // E
-  "menu.option.select.dead": "Mellemrum", // Space
+  "menu.option.select": "Mellemrum", // E
+  "menu.option.select.dead": "E", // Space
   "menu.option.exit": "Tab", // Tab
   "menu.option.up": "W↑", // W↑
   "menu.option.down": "S↓", // S↓
