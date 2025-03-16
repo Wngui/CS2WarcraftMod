@@ -111,7 +111,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        internal class HealingAuraEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
+        public class HealingAuraEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
         {
             public override void OnStart() {}
             public override void OnTick()

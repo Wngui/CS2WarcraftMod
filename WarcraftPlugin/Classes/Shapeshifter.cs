@@ -309,7 +309,7 @@ namespace WarcraftPlugin.Classes
         ];
     }
 
-    internal class ImposterSyndromEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
+    public class ImposterSyndromEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
     {
         float _startingTickInterval;
         public override void OnStart() { _startingTickInterval = OnTickInterval; }
@@ -335,7 +335,7 @@ namespace WarcraftPlugin.Classes
         public override void OnFinish() { }
     }
 
-    internal class CloneDecoyEffect(CCSPlayerController owner, float duration, Vector decoyVector) : WarcraftEffect(owner, duration)
+    public class CloneDecoyEffect(CCSPlayerController owner, float duration, Vector decoyVector) : WarcraftEffect(owner, duration)
     {
         private readonly Vector _decoyVector = decoyVector;
         private CPhysicsPropMultiplayer _clone;

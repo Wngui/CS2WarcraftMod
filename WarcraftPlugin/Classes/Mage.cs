@@ -132,7 +132,7 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
+    public class ManaShieldEffect(CCSPlayerController owner, float onTickInterval) : WarcraftEffect(owner, onTickInterval: onTickInterval)
     {
         public override void OnStart()
         {
@@ -152,7 +152,7 @@ namespace WarcraftPlugin.Classes
         public override void OnFinish() { }
     }
 
-    internal class FreezeEffect(CCSPlayerController owner, float duration, CCSPlayerController target) : WarcraftEffect(owner, duration)
+    public class FreezeEffect(CCSPlayerController owner, float duration, CCSPlayerController target) : WarcraftEffect(owner, duration)
     {
         public override void OnStart()
         {

@@ -93,7 +93,7 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class ThrowingAxeEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
+    public class ThrowingAxeEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
     {
         private CHEGrenadeProjectile _throwingAxe;
 

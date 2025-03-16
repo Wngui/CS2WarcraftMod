@@ -156,7 +156,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        internal class SpringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
+        public class SpringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)
         {
             private CDynamicProp _trap;
             private Box3d _triggerZone;

@@ -245,7 +245,7 @@ namespace WarcraftPlugin.Classes
             }
         }
 
-        internal class ArrowStormEffect(CCSPlayerController owner, float duration, Vector stormpos) : WarcraftEffect(owner, duration)
+        public class ArrowStormEffect(CCSPlayerController owner, float duration, Vector stormpos) : WarcraftEffect(owner, duration)
         {
             private readonly int _stormHeight = 150;
             private readonly int _stormArea = 280;
