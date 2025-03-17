@@ -74,7 +74,8 @@ namespace WarcraftPlugin.Compiler
             }
 
             // Compilation options
-            var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+               .WithGeneralDiagnosticOption(ReportDiagnostic.Suppress);
 
             // Create the compilation
             var compilation = CSharpCompilation.Create(

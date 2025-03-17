@@ -38,8 +38,24 @@ namespace WarcraftPlugin.Core
             if (customHeroFiles.Length > 0)
             {
                 _customHeroesFilesTimestamp = GetLatestTimestamp(customHeroFiles);
-                var assembly = CustomHero.CompileAndLoadAssemblies(customHeroFiles);
-                RegisterClasses(assembly);
+
+                try
+                {
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    var assembly = CustomHero.CompileAndLoadAssemblies(customHeroFiles);
+                    RegisterClasses(assembly);
+                }
+                catch
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Error.WriteLine($"Error compiling and loading custom heroes");
+                }
+                finally
+                {
+                    Console.WriteLine();
+                    Console.ResetColor();
+                }
             }
         }
 
