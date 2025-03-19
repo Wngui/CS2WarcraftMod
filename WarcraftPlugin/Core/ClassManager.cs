@@ -44,6 +44,7 @@ namespace WarcraftPlugin.Core
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.Red;
                     var assembly = CustomHero.CompileAndLoadAssemblies(customHeroFiles);
+                    Console.ResetColor();
                     RegisterClasses(assembly);
                 }
                 catch

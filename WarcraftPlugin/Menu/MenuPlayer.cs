@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using CounterStrikeSharp.API;
@@ -17,10 +18,8 @@ internal class MenuPlayer
     internal LinkedListNode<MenuOption> MenuStart = null;
     internal string CenterHtml = "";
     internal int VisibleOptions = 5;
-    internal static IStringLocalizer Localizer = null;
+    internal static IStringLocalizer Localizer = WarcraftPlugin.Instance.Localizer;
     internal PlayerButtons Buttons { get; set; }
-
-    private readonly BasePlugin _plugin = WarcraftPlugin.Instance; 
 
     internal void OpenMainMenu(Menu menu, int selectedOptionIndex = 0)
     {
@@ -192,8 +191,8 @@ internal class MenuPlayer
             }
         }
 
-        var selectKey = player.IsAlive() ? _plugin.Localizer["menu.option.select"] : _plugin.Localizer["menu.option.select.dead"];
-        builder.AppendLine($"<center><font color='red' class='fontSize-sm'>{_plugin.Localizer["menu.navigate"]}:</font><font color='orange' class='fontSize-s'> {_plugin.Localizer["menu.option.up"]} {_plugin.Localizer["menu.option.down"]}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>{_plugin.Localizer["menu.select"]}: </font><font color='orange' class='fontSize-sm'>{selectKey}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>{_plugin.Localizer["menu.exit"]}: </font><font color='orange' class='fontSize-sm'>{_plugin.Localizer["menu.option.exit"]}</font></center>");
+        var selectKey = player.IsAlive() ? Localizer["menu.option.select"] : Localizer["menu.option.select.dead"];
+        builder.AppendLine($"<center><font color='red' class='fontSize-sm'>{Localizer["menu.navigate"]}:</font><font color='orange' class='fontSize-s'> {Localizer["menu.option.up"]} {Localizer["menu.option.down"]}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>{Localizer["menu.select"]}: </font><font color='orange' class='fontSize-sm'>{selectKey}</font><font color='white' class='fontSize-sm'> | </font><font color='red' class='fontSize-sm'>{Localizer["menu.exit"]}: </font><font color='orange' class='fontSize-sm'>{Localizer["menu.option.exit"]}</font></center>");
         builder.AppendLine("<br>");
         CenterHtml = builder.ToString();
     }

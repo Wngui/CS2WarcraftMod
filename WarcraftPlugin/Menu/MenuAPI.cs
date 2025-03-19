@@ -12,8 +12,6 @@ internal static class MenuAPI
 
     internal static void Load(BasePlugin plugin, bool hotReload)
     {
-        MenuPlayer.Localizer = plugin.Localizer;
-
         plugin.RegisterEventHandler<EventPlayerActivate>((@event, info) =>
         {
             if (@event.Userid != null)
