@@ -7,6 +7,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events.ExtendedEvents;
@@ -236,11 +237,13 @@ namespace WarcraftPlugin.Events
                     warcraftClass = warcraftPlayer.GetClass();
                 }
 
+                if (player.Team is CsTeam.Terrorist or CsTeam.CounterTerrorist)
+                    warcraftClass?.InvokeEvent(@event, HookMode.Pre);
+
                 Server.NextFrame(() =>
                 {
                     WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
-                    warcraftClass?.InvokeEvent(@event, HookMode.Pre);
                 });
             }
 
