@@ -10,7 +10,7 @@
 
 # Warcraft Mod for CS2
 
-An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system.
+An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system.</br>
 Try the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
 
 ## Features
