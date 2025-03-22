@@ -1,0 +1,2 @@
+STEAMCMD_PATH=C:\cs2-server\steamcmd.exe
+BASE_PATH=C:\cs2-server\cs2-ds-test

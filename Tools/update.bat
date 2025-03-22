@@ -1,9 +1,10 @@
 @echo off
-:: Paths
+:: Read paths from config.txt
+for /f "tokens=1,* delims==" %%A in (config.txt) do set "%%A=%%B"
 
-set "STEAMCMD_PATH=C:\cs2-server\steamcmd.exe" & :: <-- Change path
-set "BASE_PATH=C:\cs2-server\cs2-ds" & :: <-- Change path
-
+:: Display variables (for testing)
+echo STEAMCMD_PATH=%STEAMCMD_PATH%
+echo BASE_PATH=%BASE_PATH%
 
 set "CSGO_PATH=%BASE_PATH%\game\csgo"
 set "CFG_PATH=%CSGO_PATH%\cfg"
@@ -52,5 +53,17 @@ del "%DOWNLOAD_DIR%\%zipFile%"
 :: Restore server.cfg
 echo Restoring server.cfg...
 copy /Y "%SERVER_BACKUP_PATH%" "%SERVER_CFG_PATH%"
+
+:: Updating Warcraft
+echo Updating Warcraft...
+set "latestDownload="
+for /f "delims=" %%i in ('curl -s https://api.github.com/repos/Wngui/CS2WarcraftMod/releases/latest ^| findstr "browser_download_url" ^| findstr "warcraft-plugin-.* "') do set "latestDownload=%%i"
+set "latestDownload=%latestDownload:*: =%"
+echo Downloading Warcraft: %latestDownload%
+set "zipFile=warcraft"
+curl -L -o "%DOWNLOAD_DIR%\%zipFile%" "%latestDownload%"
+echo Installing Warcraft version %latestDownload%...
+tar -xf "%DOWNLOAD_DIR%\%zipFile%" -C "%CSGO_PATH%\addons\counterstrikesharp\plugins"
+del "%DOWNLOAD_DIR%\%zipFile%"
 
 echo Done!

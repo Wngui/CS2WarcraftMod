@@ -286,11 +286,11 @@
             "particles/inferno_fx/perf_test_separate_childc.vpcf", //road of fire
             "particles/overhead_icon_fx/player_ping_top_rings.vpcf", //white square
             "particles/ui/premier_ratings_bg.vpcf", //black U shape
-            "particles/ui/premier_ratings_matchstakes_promo.vpcf", //black line with yellow +'s
+            "particles/ui/premier_ratings_matchstakes_promo.vpcf", //black line with yellow +s
             "particles/ui/premier_ratings_matchstakes_relegation.vpcf", //black line with redish squares
             "particles/ui/premier_ratings_matchstart.vpcf", //black line with rainbow lines
-            "particles/ui/premier_ratings_matchstart_promo.vpcf", //black line with rainbow +'s
-            "particles/ui/premier_ratings_promomatch.vpcf", //black U with +'s
+            "particles/ui/premier_ratings_matchstart_promo.vpcf", //black line with rainbow +s
+            "particles/ui/premier_ratings_promomatch.vpcf", //black U with +s
             "particles/ui/premier_ratings_relegation.vpcf", //black U with redish squares
             "particles/overhead_icon_fx/radio_voice_flash.vpcf", // flashing green !
             "particles/rain_fx/rain_puddle_ripples.vpcf", //floor puddle halfmoons
