@@ -10,8 +10,8 @@
 
 # Warcraft Mod for CS2
 
-An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system, based on Roflmuffin's Warcraft example plugin.
-You can try out the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
+An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system.</br>
+Try the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
 
 ## Features
 
@@ -116,7 +116,7 @@ Ultimate can be activated by binding it in the console, example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
 ```jsonc
 {
-  "ConfigVersion": 3
+  "ConfigVersion": 3,
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
   "DefaultClass": "ranger", //Sets the default class for new players
@@ -127,12 +127,9 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 }
 ```
 
-## Author Notes
-
-By releasing this mod, I sincerely hope it will aid the community in developing RPG mods and support aspiring plugin authors. This project involved significant effort and the discovery of new techniques. Please consider contributing back to the community. Special thanks to the knowledgeable members on Discord for their invaluable assistance.
-
 ## Credits
 
 Roflmuffin - CounterStrikeSharp & Base plugin</br>
 csportalsk - Testing and bug reporting</br>
 pZyk - Bug reporting & feedback
+Poisoned - Bug reporting</br>
