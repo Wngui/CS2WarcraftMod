@@ -35,3 +35,4 @@ jobs:
         ARGS: "-rlgoDzvc -i"
         SCRIPT_AFTER: |
           sudo chown -R steam:steam /home/steam/steamcmd/
+          cs2 update
