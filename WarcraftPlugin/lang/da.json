@@ -58,8 +58,8 @@
   "barbarian.ability.0.description": "Øger skaden med haglbøsser.", // Increase damage dealt with shotguns.
   "barbarian.ability.1": "Kamphærdet", // Battle-Hardened
   "barbarian.ability.1.description": "Øger dit helbred med 20/40/60/80/100.", // Increase your health by 20/40/60/80/100.
-  "barbarian.ability.2": "Kasteøkse", // Throwing Axe
-  "barbarian.ability.2.description": "Chance for at kaste en eksploderende kasteøkse, når du skyder.", // Chance to hurl an exploding throwing axe when firing.
+  "barbarian.ability.2": "Sprængtønde", // Throwing Axe
+  "barbarian.ability.2.description": "Chance for at kaste en eksploderende tønde, når du skyder.", // Chance to hurl an exploding barrel when firing.
   "barbarian.ability.3": "Blodtørst", // Bloodlust
   "barbarian.ability.3.description": "Giver uendelig ammunition, bevægelseshastighed og helbredsregeneration.", // Grants infinite ammo, movement speed & health regeneration.
 

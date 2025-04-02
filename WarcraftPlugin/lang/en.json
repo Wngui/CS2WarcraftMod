@@ -58,8 +58,8 @@
   "barbarian.ability.0.description": "Increase damage dealt with shotguns.",
   "barbarian.ability.1": "Battle-Hardened",
   "barbarian.ability.1.description": "Increase your health by 20/40/60/80/100.",
-  "barbarian.ability.2": "Throwing Axe",
-  "barbarian.ability.2.description": "Chance to hurl an exploding throwing axe when firing.",
+  "barbarian.ability.2": "Exploding Barrel",
+  "barbarian.ability.2.description": "Chance to throw an exploding barrel when firing.",
   "barbarian.ability.3": "Bloodlust",
   "barbarian.ability.3.description": "Grants infinite ammo, movement speed & health regeneration.",
 

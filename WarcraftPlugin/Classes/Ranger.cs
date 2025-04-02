@@ -27,6 +27,11 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Ranger";
         public override Color DefaultColor => Color.Green;
 
+        public override List<string> PreloadResources =>
+        [
+            "models/generic/street_trashcan_03/street_trashcan_03_lid_a.vmdl"
+        ];
+
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Light footed", "Nimbly perform a dash in midair, by pressing jump"),
@@ -51,7 +56,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_decoy"));
-                decoy.AttributeManager.Item.CustomName = Localizer["ranger.ability.2"];
+                decoy.AttributeManager.Item.CustomName = Localizer["ranger.ability.1"];
             }
         }
 
@@ -191,7 +196,7 @@ namespace WarcraftPlugin.Classes
                 _trap = Utilities.CreateEntityByName<CPhysicsPropMultiplayer>("prop_physics_multiplayer");
                 _trap.Teleport(trapPosition, new QAngle(), new Vector());
                 _trap.DispatchSpawn();
-                _trap.SetModel("models/weapons/w_eq_beartrap_dropped.vmdl");
+                _trap.SetModel("models/generic/street_trashcan_03/street_trashcan_03_lid_a.vmdl");
                 _trap.SetColor(Color.FromArgb(60, 255, 255, 255));
 
                 _triggerZone = Warcraft.CreateBoxAroundPoint(trapPosition, 100, 100, 100);

@@ -58,8 +58,8 @@
   "barbarian.ability.0.description": "Увеличивает урон, наносимый дробовиками.", // Increase damage dealt with shotguns.
   "barbarian.ability.1": "Закаленный в боях", // Battle-Hardened
   "barbarian.ability.1.description": "Увеличивает ваше здоровье на 20/40/60/80/100.", // Increase your health by 20/40/60/80/100.
-  "barbarian.ability.2": "Метательный топор", // Throwing Axe
-  "barbarian.ability.2.description": "Шанс бросить взрывающийся метательный топор при стрельбе.", // Chance to hurl an exploding throwing axe when firing.
+  "barbarian.ability.2": "Бочка с взрывчаткой", // Exploding barrel  
+  "barbarian.ability.2.description": "Шанс бросить взрывающуюся бочку при атаке.", // Chance to hurl an exploding barrel when attacking.  
   "barbarian.ability.3": "Жажда крови", // Bloodlust
   "barbarian.ability.3.description": "Дает бесконечные патроны, скорость передвижения и регенерацию здоровья.", // Grants infinite ammo, movement speed & health regeneration.
 

@@ -50,7 +50,8 @@ namespace WarcraftPlugin.Summons
 
             //Create drone body
             _model = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
-            _model.SetModel("models/weapons/w_eq_bumpmine.vmdl");
+            _model.SetModel("models/props/de_dust/hr_dust/dust_soccerball/dust_soccer_ball001.vmdl");
+            _model.SetColor(Color.FromArgb(255, 0, 0, 0));
             _model.DispatchSpawn();
 
             //Create drone turret
@@ -60,12 +61,12 @@ namespace WarcraftPlugin.Summons
 
             //Attach drone turret to body
             _turret.SetParent(_model, offset: new Vector(2, 2, 2), rotation: new QAngle(0, 310, 0));
-            _turret.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.5f;
+            _turret.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.8f;
             _turret.SetColor(Color.FromArgb(255, 0, 0, 0));
 
             //Attach drone body to physics object
             _model.SetParent(_drone, rotation: new QAngle(175, 30, 0));
-            _model.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 2;
+            _model.CBodyComponent.SceneNode.GetSkeletonInstance().Scale = 0.8f;
 
             _drone.Teleport(_owner.CalculatePositionInFront(Position), _owner.PlayerPawn.Value.V_angle, new Vector(nint.Zero));
         }

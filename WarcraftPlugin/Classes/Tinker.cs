@@ -28,6 +28,11 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Tinker";
         public override Color DefaultColor => Color.Teal;
 
+        public override List<string> PreloadResources =>
+        [
+            "models/props/de_nuke/hr_nuke/transformer_fan/transformer_fan_static.vmdl"
+        ];
+
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Attack Drone", "Deploy a gun drone that attacks nearby enemies."),
@@ -43,7 +48,6 @@ namespace WarcraftPlugin.Classes
             HookEvent<EventWeaponFire>(PlayerShoot);
             HookEvent<EventDecoyStarted>(DecoyStart);
             HookEvent<EventRoundEnd>(RoundEnd);
-            HookEvent<EventRoundStart>(RoundStart);
 
             HookEvent<EventSpottedEnemy>(SpottedPlayer);
 
@@ -113,11 +117,6 @@ namespace WarcraftPlugin.Classes
         }
 
         private void PlayerDeath(EventPlayerDeath death)
-        {
-            DeactivateDrones();
-        }
-
-        private void RoundStart(EventRoundStart start)
         {
             DeactivateDrones();
         }
