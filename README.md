@@ -131,5 +131,5 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 
 Roflmuffin - CounterStrikeSharp & Base plugin</br>
 csportalsk - Testing and bug reporting</br>
-pZyk - Bug reporting & feedback
-Poisoned - Bug reporting</br>
+pZyk - Bug reporting & feedback</br>
+Poisoned - Bug reporting
