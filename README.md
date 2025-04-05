@@ -129,7 +129,7 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 
 ## Credits
 
-Roflmuffin - CounterStrikeSharp & Base plugin</br>
-csportalsk - Testing and bug reporting</br>
-pZyk - Bug reporting & feedback</br>
-Poisoned - Bug reporting
+**Roflmuffin** - CounterStrikeSharp & Base plugin</br>
+**csportalsk** - Testing and bug reporting</br>
+**pZyk** - Bug reporting & feedback</br>
+**Poisoned** - Bug reporting
