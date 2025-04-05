@@ -25,6 +25,7 @@ Eight unique classes:
 - **Rogue**
 - **Shapeshifter**
 - **Tinker**
+- **More in the [Discord](https://discord.gg/VvD8aUHCNW)**!
 
 Each class has 3 passive abilities and an ultimate which is unlocked at max level 16.
 
@@ -34,7 +35,6 @@ Ultimate can be activated by binding it in the console, example
      ```
      bind x ultimate
      ```
-
 
 ## Commands
 ```!class``` - Change current class
