@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,8 +11,20 @@ internal static class MenuAPI
 
     internal static readonly Dictionary<int, MenuPlayer> Players = [];
 
-    internal static void Load(BasePlugin plugin, bool hotReload)
+    internal static void Load(BasePlugin plugin)
     {
+        Server.NextFrame(() =>
+        {
+            foreach (var pl in Utilities.GetPlayers())
+            {
+                Players[pl.Slot] = new MenuPlayer
+                {
+                    player = pl,
+                    Buttons = pl.Buttons
+                };
+            }
+        });
+
         plugin.RegisterEventHandler<EventPlayerActivate>((@event, info) =>
         {
             if (@event.Userid != null)
@@ -30,16 +43,6 @@ internal static class MenuAPI
         });
 
         plugin.RegisterListener<Listeners.OnTick>(OnTick);
-
-        if (hotReload)
-            foreach (var pl in Utilities.GetPlayers())
-            {
-                Players[pl.Slot] = new MenuPlayer
-                {
-                    player = pl,
-                    Buttons = pl.Buttons
-                };
-            }
     }
 
     internal static void OnTick()

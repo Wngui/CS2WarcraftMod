@@ -62,6 +62,7 @@ namespace WarcraftPlugin
         internal CooldownManager CooldownManager;
         internal AdvertManager AdvertManager;
         private Database _database;
+        private Timer _saveClientsTimer;
 
         public Config Config { get; set; } = null!;
 
@@ -110,10 +111,9 @@ namespace WarcraftPlugin
         public override void Load(bool hotReload)
         {
             base.Load(hotReload);
-
             Localizer = LocalizerMiddleware.Load(Localizer, ModuleDirectory);
 
-            MenuAPI.Load(this, hotReload);
+            MenuAPI.Load(this);
 
             _instance ??= this;
 
@@ -167,19 +167,19 @@ namespace WarcraftPlugin
             AddCommand(Localizer["command.help"], "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
-            RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
+            RegisterListener<Listeners.OnMapStart>((string mapName) => StartSaveClientsTimer());
             RegisterListener<Listeners.OnMapEnd>(OnMapEndHandler);
             RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnectHandler);
 
             RegisterListener<Listeners.OnServerPrecacheResources>((manifest) =>
             {
                 //Models
-                manifest.AddResource("models/weapons/w_eq_beartrap_dropped.vmdl");
+                //manifest.AddResource("models/weapons/w_eq_beartrap_dropped.vmdl");
                 manifest.AddResource("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
                 manifest.AddResource("models/tools/bullet_hit_marker.vmdl");
                 manifest.AddResource("models/generic/bust_02/bust_02_a.vmdl"); //destructable prop
                 manifest.AddResource("models/weapons/w_muzzlefireshape.vmdl"); //fireball
-                manifest.AddResource("models/weapons/w_eq_bumpmine.vmdl"); //drone
+                //manifest.AddResource("models/weapons/w_eq_bumpmine.vmdl"); //drone
                 manifest.AddResource("models/anubis/structures/pillar02_base01.vmdl"); //spring trap
 
                 //manifest.AddResource("models/weapons/w_eq_tablet_dropped.vmdl");
@@ -205,10 +205,7 @@ namespace WarcraftPlugin
 
             });
 
-            if (hotReload)
-            {
-                OnMapStartHandler(null);
-            }
+            StartSaveClientsTimer();
 
             _eventSystem = new EventSystem(this, Config);
             _eventSystem.Initialize();
@@ -273,15 +270,15 @@ namespace WarcraftPlugin
             // No bots, invalid clients or non-existent clients.
             // TODO: If player controls a bot while disconnecting, progress is not saved
             if (!player.IsValid || player.IsBot || player.ControllingBot) return;
-            SetWcPlayer(player, null);
+
             _database.SavePlayerToDatabase(player);
+            SetWcPlayer(player, null);
         }
 
-        private void OnMapStartHandler(string mapName)
+        private void StartSaveClientsTimer()
         {
-            AddTimer(60.0f, _database.SaveClients, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-
-            Server.PrintToConsole("Map Load Warcraft\n");
+            _saveClientsTimer?.Kill();
+            _saveClientsTimer = AddTimer(60.0f, _database.SaveClients, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
         }
 
         private void OnMapEndHandler()
@@ -354,6 +351,7 @@ namespace WarcraftPlugin
                 //Avoid getting stuck in old menu
                 player.EnableMovement();
             }
+            _database.SaveClients();
             base.Unload(hotReload);
         }
     }

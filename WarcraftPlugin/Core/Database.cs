@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using WarcraftPlugin.Models;
@@ -156,8 +155,7 @@ namespace WarcraftPlugin.Core
 
         internal void SaveClients()
         {
-            var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
-            foreach (var player in playerEntities)
+            foreach (var player in Utilities.GetPlayers())
             {
                 if (!player.IsValid) continue;
 
