@@ -55,7 +55,7 @@ Ultimate can be activated by binding it in the console, example
 
 - **Carnage**: Increase damage dealt with shotguns.
 - **Battle-Hardened**: Increase your health by 20/40/60/80/100.
-- **Throwing Axe**: Chance to hurl an exploding throwing axe when firing.
+- **Exploding Barrel**: Chance to hurl an exploding barrel when firing.
 - **Bloodlust**: Grants infinite ammo, movement speed, and health regeneration. 
 
 ### Mage
