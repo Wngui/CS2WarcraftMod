@@ -5,7 +5,6 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
-using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API.Modules.Admin;
 using WarcraftPlugin.Adverts;
@@ -18,6 +17,7 @@ using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core.Preload;
 using WarcraftPlugin.lang;
+using CounterStrikeSharp.API.Modules.Utils;
 
 namespace WarcraftPlugin
 {
@@ -111,6 +111,13 @@ namespace WarcraftPlugin
         public override void Load(bool hotReload)
         {
             base.Load(hotReload);
+
+            if(!string.IsNullOrEmpty(Server.MapName) && !hotReload)
+            {
+                //Plugin loaded using 'css_plugins load', resources potentially not precached
+                Server.PrintToChatAll($" {ChatColors.Green}Warcraft {ChatColors.Red}loaded after map start, {ChatColors.Orange}reload the map {ChatColors.Red}to avoid errors.");
+            }
+
             Localizer = LocalizerMiddleware.Load(Localizer, ModuleDirectory);
 
             MenuAPI.Load(this);
