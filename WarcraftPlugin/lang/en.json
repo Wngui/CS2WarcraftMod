@@ -24,7 +24,7 @@
   "xp.kill": "{Gold}+{0} XP {Default}for killing {Green}{1} {Default}{2}{3}",
   "xp.add": "Adding {0} xp to player {1}",
   "ability.ready": "{0} is ready!",
-  "ultimate.missing": "No levels in ultimate",
+  "ultimate.no": "No levels in ultimate",
   "ultimate.countdown": "Ultimate ready in {0}s",
 
   //Commands, used in-game by typing !<command>
