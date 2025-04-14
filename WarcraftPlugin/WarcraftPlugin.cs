@@ -333,12 +333,12 @@ namespace WarcraftPlugin
             if (warcraftPlayer.GetAbilityLevel(3) < 1)
             {
                 client.PrintToCenter(" " + Localizer["no.ultimate"]);
-                client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
+                client.PlayLocalSound("sounds/common/talk.vsnd");
             }
             else if (!warcraftPlayer.GetClass().IsAbilityReady(3))
             {
                 client.PrintToCenter(" " + Localizer["ultimate.countdown", Math.Ceiling(warcraftPlayer.GetClass().AbilityCooldownRemaining(3))]);
-                client.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
+                client.PlayLocalSound("sounds/common/talk.vsnd");
             }
             else
             {

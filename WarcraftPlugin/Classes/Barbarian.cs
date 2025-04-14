@@ -70,8 +70,11 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
-                Player.SetHp(100 + WarcraftPlayer.GetAbilityLevel(1) * _battleHardenedHealthMultiplier);
-                Player.PlayerPawn.Value.MaxHealth = Player.PlayerPawn.Value.Health;
+                Server.NextFrame(() =>
+                {
+                    Player.SetHp(100 + WarcraftPlayer.GetAbilityLevel(1) * _battleHardenedHealthMultiplier);
+                    Player.PlayerPawn.Value.MaxHealth = Player.PlayerPawn.Value.Health;
+                });
             }
         }
 

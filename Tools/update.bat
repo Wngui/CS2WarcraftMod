@@ -41,7 +41,7 @@ del "%DOWNLOAD_DIR%\%latestDownload%"
 :: Update CounterStrikeSharp
 echo Updating CounterStrikeSharp...
 set "latestDownload="
-for /f "delims=" %%i in ('curl -s https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/latest ^| findstr "browser_download_url" ^| findstr "with-runtime-build-.*-windows"') do set "latestDownload=%%i"
+for /f "delims=" %%i in ('curl -s https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/latest ^| findstr "browser_download_url" ^| findstr "with-runtime-windows"') do set "latestDownload=%%i"
 set "latestDownload=%latestDownload:*: =%"
 echo Downloading CounterStrikeSharp: %latestDownload%
 set "zipFile=counterstrikesharp"
