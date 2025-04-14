@@ -540,7 +540,7 @@ namespace WarcraftPlugin.Helpers
             return player != null && player.IsValid && player.PlayerPawn.IsValid;
         }
 
-        internal static string GetRealPlayerName(this CCSPlayerController player)
+        public static string GetRealPlayerName(this CCSPlayerController player)
         {
             if (player == null || !player.IsValid) return string.Empty;
             var playerNameClean = Regex.Replace(player.PlayerName, @"\d+\s\[.*\]\s", "");

@@ -9,7 +9,6 @@ using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using System.Collections.Generic;
 using WarcraftPlugin.Events.ExtendedEvents;
-using System;
 
 namespace WarcraftPlugin.Classes
 {

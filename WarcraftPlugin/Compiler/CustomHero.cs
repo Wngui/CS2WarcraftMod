@@ -21,7 +21,7 @@ namespace WarcraftPlugin.Compiler
             {
                 try
                 {
-                    var syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(heroFile));
+                    var syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(heroFile), path: heroFile);
                     syntaxTrees.Add(syntaxTree);
                 }
                 catch (Exception ex)
@@ -90,12 +90,23 @@ namespace WarcraftPlugin.Compiler
 
             if (!result.Success)
             {
-                // Compilation failed, print errors
                 foreach (var diagnostic in result.Diagnostics)
                 {
-                    Console.WriteLine(diagnostic.ToString());
+                    // Check if the diagnostic is associated with source code
+                    if (diagnostic.Location.IsInSource)
+                    {
+                        var lineSpan = diagnostic.Location.GetLineSpan();
+                        var fileName = lineSpan.Path; // This is the file name (or path) associated with the error.
+                        Console.WriteLine($"{fileName}({lineSpan.StartLinePosition.Line + 1},{lineSpan.StartLinePosition.Character + 1}):");
+                        Console.WriteLine($"{diagnostic.GetMessage()}");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        // For diagnostics without a source location, just output the message.
+                        Console.WriteLine(diagnostic.GetMessage());
+                    }
                 }
-                return null;
             }
 
             Console.WriteLine("Loading custom heroes...");

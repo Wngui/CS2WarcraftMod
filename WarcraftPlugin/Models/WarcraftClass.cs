@@ -169,12 +169,12 @@ namespace WarcraftPlugin.Models
             return CooldownManager.Remaining(WarcraftPlayer, abilityIndex);
         }
 
-        public void StartCooldown(int abilityIndex)
+        public void StartCooldown(int abilityIndex, float? customCooldown = null)
         {
             var ability = Abilities[abilityIndex];
 
             if (ability is WarcraftCooldownAbility cooldownAbility)
-                CooldownManager.StartCooldown(WarcraftPlayer, abilityIndex, cooldownAbility.Cooldown);
+                CooldownManager.StartCooldown(WarcraftPlayer, abilityIndex, customCooldown ?? cooldownAbility.Cooldown);
         }
 
         public void InvokeAbility(int abilityIndex)

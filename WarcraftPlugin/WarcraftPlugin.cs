@@ -58,7 +58,7 @@ namespace WarcraftPlugin
         private EventSystem _eventSystem;
         internal XpSystem XpSystem;
         internal ClassManager classManager;
-        internal EffectManager EffectManager;
+        public EffectManager EffectManager;
         internal CooldownManager CooldownManager;
         internal AdvertManager AdvertManager;
         private Database _database;
