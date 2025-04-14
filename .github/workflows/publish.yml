@@ -11,6 +11,10 @@ on:
           - patch
           - minor
           - major
+      body:
+        description: 'Release notes'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -91,6 +95,7 @@ jobs:
       with:
         tag_name: ${{ env.new_version }}
         release_name: Release ${{ env.new_version }}
+        body: ${{ github.event.inputs.body }}
         draft: false
         prerelease: false
       env:
@@ -111,3 +116,17 @@ jobs:
 
     - name: Publish to NuGet
       run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      
+    - name: Github Releases To Discord
+      uses: SethCohen/github-releases-to-discord@v1
+      with:
+        webhook_url: ${{ secrets.WEBHOOK_URL }}
+        color: "2105893"
+        username: "Release Changelog"
+        avatar_url: "https://github.com/Wngui/CS2WarcraftMod/blob/master/WarcraftPlugin/Resources/nuget/wc-icon.png?raw=true"
+        content: ""
+        footer_title: "Changelog"
+        footer_icon_url: "https://github.com/Wngui/CS2WarcraftMod/blob/master/WarcraftPlugin/Resources/nuget/wc-icon.png?raw=true"
+        footer_timestamp: true
+        max_description: '4096'
+        reduce_headings: true
