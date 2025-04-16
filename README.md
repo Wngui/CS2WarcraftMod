@@ -45,7 +45,7 @@ Ultimate can be activated by binding it in the console, example
 
 ```!factoryreset``` - Completely resets progress for current class
 
-```!addxp <amount>``` - Admin only, adds x amount of xp to current class
+```!addxp <amount> [player]``` - Admin only, adds x amount of xp to current class. Player name/#steamid is optional
 
 ```!commands``` - Lists all commands
 
