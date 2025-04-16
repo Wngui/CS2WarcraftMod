@@ -18,6 +18,12 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Mage";
         public override Color DefaultColor => Color.Blue;
 
+        public override List<string> PreloadResources =>
+        [
+            "models/weapons/w_muzzlefireshape.vmdl",
+            "models/anubis/structures/pillar02_base01.vmdl"
+        ];
+
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Fireball", "Infuses molotovs with fire magic, causing a huge explosion on impact."),

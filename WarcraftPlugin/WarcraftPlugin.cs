@@ -143,35 +143,38 @@ namespace WarcraftPlugin
                 AdvertManager.Initialize();
             }
 
-            AddCommand("ultimate", "ultimate", UltimatePressed);
-            AddCommand(Localizer["command.ultimate"], "ultimate", UltimatePressed);
+            AddUniqueCommand("ultimate", "ultimate", UltimatePressed);
+            AddUniqueCommand(Localizer["command.ultimate"], "ultimate", UltimatePressed);
 
-            AddCommand("changerace", "change class", (player, _) => ShowClassMenu(player));
-            AddCommand("changeclass", "change class", (player, _) => ShowClassMenu(player));
-            AddCommand("race", "change class", (player, _) => ShowClassMenu(player));
-            AddCommand("class", "change class", (player, _) => ShowClassMenu(player));
-            AddCommand("rpg", "change class", (player, _) => ShowClassMenu(player));
-            AddCommand("cr", "change class", (player, _) => ShowClassMenu(player));
-            AddCommand(Localizer["command.changeclass"], "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand("changerace", "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand("changeclass", "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand("race", "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand("class", "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand("rpg", "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand("cr", "change class", (player, _) => ShowClassMenu(player));
+            AddUniqueCommand(Localizer["command.changeclass"], "change class", (player, _) => ShowClassMenu(player));
 
-            AddCommand("reset", "reset skills", CommandResetSkills);
-            AddCommand(Localizer["command.reset"], "reset skills", CommandResetSkills);
+            AddUniqueCommand("reset", "reset skills", CommandResetSkills);
+            AddUniqueCommand(Localizer["command.reset"], "reset skills", CommandResetSkills);
 
-            AddCommand("factoryreset", "reset levels", CommandFactoryReset);
-            AddCommand(Localizer["command.factoryreset"], "reset levels", CommandFactoryReset);
+            AddUniqueCommand("factoryreset", "reset levels", CommandFactoryReset);
+            AddUniqueCommand(Localizer["command.factoryreset"], "reset levels", CommandFactoryReset);
 
-            AddCommand("addxp", "addxp", CommandAddXp);
-            AddCommand(Localizer["command.addxp"], "addxp", CommandAddXp);
+            AddUniqueCommand("addxp", "addxp", CommandAddXp);
+            AddUniqueCommand(Localizer["command.addxp"], "addxp", CommandAddXp);
 
-            AddCommand("skills", "skills", (player, _) => ShowSkillsMenu(player));
-            AddCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
-            AddCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
+            //AddUniqueCommand("setlevel", "set level", CommandSetLevel);
+            //AddUniqueCommand(Localizer["command.setlevel"], "set level", CommandSetLevel);
 
-            AddCommand("rpg_help", "list all commands", CommandHelp);
-            AddCommand("commands", "list all commands", CommandHelp);
-            AddCommand("wcs", "list all commands", CommandHelp);
-            AddCommand("war3menu", "list all commands", CommandHelp);
-            AddCommand(Localizer["command.help"], "list all commands", CommandHelp);
+            AddUniqueCommand("skills", "skills", (player, _) => ShowSkillsMenu(player));
+            AddUniqueCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
+            AddUniqueCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
+
+            AddUniqueCommand("rpg_help", "list all commands", CommandHelp);
+            AddUniqueCommand("commands", "list all commands", CommandHelp);
+            AddUniqueCommand("wcs", "list all commands", CommandHelp);
+            AddUniqueCommand("war3menu", "list all commands", CommandHelp);
+            AddUniqueCommand(Localizer["command.help"], "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
             RegisterListener<Listeners.OnMapStart>((string mapName) => StartSaveClientsTimer());
@@ -180,24 +183,13 @@ namespace WarcraftPlugin
 
             RegisterListener<Listeners.OnServerPrecacheResources>((manifest) =>
             {
-                //Models
-                //manifest.AddResource("models/weapons/w_eq_beartrap_dropped.vmdl");
+                //Models - kept here for backwards compatibility
                 manifest.AddResource("models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl");
                 manifest.AddResource("models/tools/bullet_hit_marker.vmdl");
                 manifest.AddResource("models/generic/bust_02/bust_02_a.vmdl"); //destructable prop
                 manifest.AddResource("models/weapons/w_muzzlefireshape.vmdl"); //fireball
-                //manifest.AddResource("models/weapons/w_eq_bumpmine.vmdl"); //drone
                 manifest.AddResource("models/anubis/structures/pillar02_base01.vmdl"); //spring trap
-
-                //manifest.AddResource("models/weapons/w_eq_tablet_dropped.vmdl");
-                //manifest.AddResource("models/weapons/w_eq_tablet.vmdl");
-                //manifest.AddResource("models/generic/conveyor_control_panel_01/conveyor_control_screen_01.vmdl");
-                //"models/props/crates/csgo_drop_crate_community_22.vmdl", shop???
-                //sounds/ui/panorama/claim_gift_01.vsnd_c // shop sound??
-                //sounds/physics/metal/playertag_pickup_01.vsnd_c //shop sound
                 manifest.AddResource("sounds/physics/body/body_medium_break3.vsnd");
-
-                //sounds/music/survival_review_victory.vsnd_c // cool track
 
                 //preload class specific resources
                 foreach (var resources in classManager.GetAllClasses().SelectMany(x => x.PreloadResources).ToList())
@@ -220,6 +212,14 @@ namespace WarcraftPlugin
             _database.Initialize(ModuleDirectory);
         }
 
+        private void AddUniqueCommand(string name, string description, CommandInfo.CommandCallback method)
+        {
+            if(!CommandDefinitions.Any(x => x.Name == name))
+            {
+                AddCommand(name, description, method);
+            }
+        }
+
         private void ShowSkillsMenu(CCSPlayerController player)
         {
             SkillsMenu.Show(GetWcPlayer(player));
@@ -232,14 +232,72 @@ namespace WarcraftPlugin
         }
 
         [RequiresPermissions("@css/addxp")]
-        private void CommandAddXp(CCSPlayerController client, CommandInfo commandinfo)
+        private void CommandAddXp(CCSPlayerController admin, CommandInfo commandInfo)
         {
-            if (string.IsNullOrEmpty(commandinfo.ArgByIndex(1))) return;
+            var xpArg = commandInfo.ArgByIndex(1);
+            if (string.IsNullOrWhiteSpace(xpArg) || !int.TryParse(xpArg, out var xpToAdd))
+            {
+                admin.PrintToChat("Missing XP amount. Correct usage: !addxp <amount> [target]");
+                return;
+            }
 
-            var xpToAdd = Convert.ToInt32(commandinfo.ArgByIndex(1));
+            var target = admin;
 
-            Console.WriteLine(Localizer["xp.add", xpToAdd, client.PlayerName]);
-            XpSystem.AddXp(client, xpToAdd);
+            var targetArg = commandInfo.ArgByIndex(2);
+            if (!string.IsNullOrWhiteSpace(targetArg))
+            {
+                var resolvedTarget = GetTarget(commandInfo, 2);
+                if (resolvedTarget == null) return;
+
+                target = resolvedTarget;
+            }
+
+            commandInfo.ReplyToCommand(Localizer["xp.add", xpToAdd, target.PlayerName]);
+            XpSystem.AddXp(target, xpToAdd);
+        }
+
+        //[RequiresPermissions("@css/setlevel")]
+        //private void CommandSetLevel(CCSPlayerController admin, CommandInfo commandInfo)
+        //{
+        //    var levelArg = commandInfo.ArgByIndex(1);
+        //    if (string.IsNullOrWhiteSpace(levelArg) || !int.TryParse(levelArg, out var level))
+        //    {
+        //        admin.PrintToChat("Missing level. Correct usage: !setlevel <level> [target]");
+        //        return;
+        //    }
+
+        //    var target = admin;
+
+        //    var targetArg = commandInfo.ArgByIndex(2);
+        //    if (!string.IsNullOrWhiteSpace(targetArg))
+        //    {
+        //        var resolvedTarget = GetTarget(commandInfo, 2);
+        //        if (resolvedTarget == null) return;
+
+        //        target = resolvedTarget;
+        //    }
+
+        //    TODO set level
+        //}
+
+        private static CCSPlayerController GetTarget(CommandInfo command, int argIndex)
+        {
+            var matches = command.GetArgTargetResult(argIndex).ToList();
+            var arg = command.GetArg(argIndex);
+
+            switch (matches.Count)
+            {
+                case 0:
+                    command.ReplyToCommand($"Target \"{arg}\" not found.");
+                    return null;
+
+                case 1:
+                    return matches[0];
+
+                default:
+                    command.ReplyToCommand($"Multiple targets found for \"{arg}\".");
+                    return null;
+            }
         }
 
         private void CommandHelp(CCSPlayerController player, CommandInfo commandinfo)

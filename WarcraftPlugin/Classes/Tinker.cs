@@ -30,7 +30,8 @@ namespace WarcraftPlugin.Classes
 
         public override List<string> PreloadResources =>
         [
-            "models/props/de_nuke/hr_nuke/transformer_fan/transformer_fan_static.vmdl"
+            "models/props/de_dust/hr_dust/dust_soccerball/dust_soccer_ball001.vmdl",
+            "models/anubis/structures/pillar02_base01.vmdl"
         ];
 
         public override List<IWarcraftAbility> Abilities =>
