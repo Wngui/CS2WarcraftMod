@@ -61,6 +61,7 @@ namespace WarcraftPlugin
         public EffectManager EffectManager;
         internal CooldownManager CooldownManager;
         internal AdvertManager AdvertManager;
+        internal ShopMenu _shopMenu;
         private Database _database;
         private Timer _saveClientsTimer;
 
@@ -210,6 +211,8 @@ namespace WarcraftPlugin
             _eventSystem.Initialize();
 
             _database.Initialize(ModuleDirectory);
+
+            _shopMenu = new ShopMenu(this);
         }
 
         private void AddUniqueCommand(string name, string description, CommandInfo.CommandCallback method)
