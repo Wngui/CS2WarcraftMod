@@ -4,7 +4,6 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using WarcraftPlugin.Helpers;
-using CounterStrikeSharp.API.Modules.Timers;
 using System.Drawing;
 using System.Linq;
 using CounterStrikeSharp.API.Modules.Memory;
@@ -19,10 +18,7 @@ namespace WarcraftPlugin.Classes
 {
     internal class Ranger : WarcraftClass
     {
-        private Timer _jumpTimer;
-        private Timer _dashCooldownTimer;
-        private bool _jumpedLastTick = false;
-        private bool _dashOnCooldown = false;
+        private DashEffect _dashEffect;
 
         public override string DisplayName => "Ranger";
         public override Color DefaultColor => Color.Green;
@@ -34,7 +30,7 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Light footed", "Nimbly perform a dash in midair, by pressing jump"),
+            new WarcraftCooldownAbility("Light footed", "Nimbly perform a dash in midair, by pressing jump", () => 10 / WarcraftPlayer.GetAbilityLevel(0)),
             new WarcraftAbility("Ensnare trap", "Place a trap by throwing a decoy"),
             new WarcraftAbility("Marksman", "Additional damage with scoped weapons"),
             new WarcraftCooldownAbility("Arrowstorm", "Call down a deadly volley of arrows using the ultimate key", 50f)
@@ -77,85 +73,14 @@ namespace WarcraftPlugin.Classes
         #region Dash
         private void PlayerJump(EventPlayerJump @event)
         {
-            if (WarcraftPlayer.GetAbilityLevel(0) > 0)
+            if (WarcraftPlayer.GetAbilityLevel(0) > 0 && IsAbilityReady(0))
             {
-                _jumpTimer?.Kill();
-                _jumpedLastTick = true;
-                _jumpTimer = WarcraftPlugin.Instance.AddTimer(0.1f, ExtraJump, TimerFlags.REPEAT);
+                _dashEffect?.Destroy();
+                _dashEffect = new DashEffect(Player);
+                _dashEffect.Start();
             }
         }
 
-        private void ExtraJump()
-        {
-            var isOnground = (Player.PlayerPawn.Value.Flags & (uint)PlayerFlags.FL_ONGROUND) == 1;
-
-            if (isOnground)
-            {
-                _jumpTimer?.Kill();
-                return; // Early exit if the player is on the ground
-            }
-
-            ulong buttonState = Player.PlayerPawn.Value.MovementServices.Buttons.ButtonStates[0];
-
-            if (!_jumpedLastTick && (buttonState & (ulong)PlayerButtons.Jump) != 0)
-            {
-                Dash();
-                _jumpTimer?.Kill();
-            }
-            else
-            {
-                _jumpedLastTick = false;
-            }
-        }
-
-        private void Dash()
-        {
-            if (_dashOnCooldown)
-            {
-                Player.PrintToChat(" " + Localizer["ranger.dash.cooldown"]);
-                return; // Early exit if dash is on cooldown
-            }
-
-            BeginDashCooldown();
-
-            ulong buttonState = Player.PlayerPawn.Value.MovementServices.Buttons.ButtonStates[0];
-            var directionAngle = Player.PlayerPawn.Value.EyeAngles;
-
-            directionAngle.Y +=
-                        (buttonState & (ulong)PlayerButtons.Back) != 0 ? 180 :
-                        (buttonState & (ulong)PlayerButtons.Moveleft) != 0 ? 90 :
-                        (buttonState & (ulong)PlayerButtons.Moveright) != 0 ? -90 : 0;
-
-            var directionVec = new Vector();
-            NativeAPI.AngleVectors(directionAngle.Handle, directionVec.Handle, nint.Zero, nint.Zero);
-
-            // Always shoot us up a little bit if were on the ground and not aiming up.
-            if (directionVec.Z < 0.275)
-            {
-                directionVec.Z = 0.275f;
-            }
-
-            directionVec *= 700;
-
-            Player.PlayerPawn.Value.AbsVelocity.X = directionVec.X;
-            Player.PlayerPawn.Value.AbsVelocity.Y = directionVec.Y;
-            Player.PlayerPawn.Value.AbsVelocity.Z = directionVec.Z;
-
-            Player.PlayLocalSound("sounds/player/footsteps/jump_launch_01.vsnd");
-        }
-
-        private void BeginDashCooldown()
-        {
-            _dashOnCooldown = true;
-            _dashCooldownTimer?.Kill();
-            _dashCooldownTimer = WarcraftPlugin.Instance.AddTimer(10 / WarcraftPlayer.GetAbilityLevel(0), EndDashCooldown);
-        }
-
-        private void EndDashCooldown()
-        {
-            _dashOnCooldown = false;
-            Player.PrintToChat(" "+ Localizer["ranger.dash.ready"]);
-        }
         #endregion
         #region Trap
         private void DecoyStart(EventDecoyStarted decoy)
@@ -181,6 +106,66 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
             StartCooldown(3);
             new ArrowStormEffect(Player, 10, new Vector(ping.X, ping.Y, ping.Z)).Start();
+        }
+
+        internal class DashEffect(CCSPlayerController owner) : WarcraftEffect(owner, onTickInterval: 0.1f)
+        {
+            private readonly float _extraJumpDelay = 0.2f;
+            private float _extraJumpDelayTick;
+
+            public override void OnStart()
+            {
+                _extraJumpDelayTick = Server.CurrentTime + _extraJumpDelay;
+            }
+
+            public override void OnTick()
+            {
+                //Effect is destroyed if player is on the ground
+                if (!Owner.IsAlive() || (Owner.PlayerPawn.Value.Flags & (uint)PlayerFlags.FL_ONGROUND) == 1)
+                {
+                    this.Destroy();
+                    return;
+                }
+
+                ulong buttonState = Owner.PlayerPawn.Value.MovementServices.Buttons.ButtonStates[0];
+
+                if (Server.CurrentTime > _extraJumpDelayTick && (buttonState & (ulong)PlayerButtons.Jump) != 0)
+                {
+                    Dash();
+                    Owner.GetWarcraftPlayer().GetClass().StartCooldown(0);
+                    this.Destroy();
+                }
+            }
+
+            private void Dash()
+            {
+                ulong buttonState = Owner.PlayerPawn.Value.MovementServices.Buttons.ButtonStates[0];
+                var directionAngle = Owner.PlayerPawn.Value.EyeAngles;
+
+                directionAngle.Y +=
+                            (buttonState & (ulong)PlayerButtons.Back) != 0 ? 180 :
+                            (buttonState & (ulong)PlayerButtons.Moveleft) != 0 ? 90 :
+                            (buttonState & (ulong)PlayerButtons.Moveright) != 0 ? -90 : 0;
+
+                var directionVec = new Vector();
+                NativeAPI.AngleVectors(directionAngle.Handle, directionVec.Handle, nint.Zero, nint.Zero);
+
+                // Always shoot us up a little bit if were on the ground and not aiming up.
+                if (directionVec.Z < 0.275)
+                {
+                    directionVec.Z = 0.275f;
+                }
+
+                directionVec *= 700;
+
+                Owner.PlayerPawn.Value.AbsVelocity.X = directionVec.X;
+                Owner.PlayerPawn.Value.AbsVelocity.Y = directionVec.Y;
+                Owner.PlayerPawn.Value.AbsVelocity.Z = directionVec.Z;
+
+                Owner.PlayLocalSound("sounds/player/footsteps/jump_launch_01.vsnd");
+            }
+
+            public override void OnFinish() { }
         }
 
         internal class EnsnaringTrapEffect(CCSPlayerController owner, float duration, Vector trapPosition) : WarcraftEffect(owner, duration)

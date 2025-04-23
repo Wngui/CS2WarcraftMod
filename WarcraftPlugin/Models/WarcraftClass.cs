@@ -35,14 +35,26 @@ namespace WarcraftPlugin.Models
 
     public class WarcraftCooldownAbility : WarcraftAbility
     {
-        public float Cooldown { get; set; } = 0f;
+        private readonly Func<float> _cooldownProvider;
 
+        public float Cooldown => _cooldownProvider();
+
+        // Constructor for dynamic cooldown
         public WarcraftCooldownAbility(string displayName, string description,
-            float cooldown) : base(displayName, description)
+            Func<float> cooldownProvider)
+            : base(displayName, description)
         {
-            Cooldown = cooldown;
+            _cooldownProvider = cooldownProvider ?? (() => 0f);
+        }
+
+        // Constructor for static cooldown
+        public WarcraftCooldownAbility(string displayName, string description,
+            float cooldown)
+            : this(displayName, description, () => cooldown)
+        {
         }
     }
+
 
     public abstract class WarcraftClass
     {
