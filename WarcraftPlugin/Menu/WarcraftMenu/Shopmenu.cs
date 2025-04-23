@@ -13,26 +13,6 @@ using WarcraftPlugin.Menu;
 
 namespace WarcraftPlugin.Core
 {
-    public static class ShopItemRestrictions // TO DO: Update this with the correct races for each item
-    {
-        public static readonly Dictionary<Type, HashSet<string>> RaceBlacklist = new()
-        {
-            { typeof(BootsOfSpeed), new() { "undead_scourge", "laser_light_show" } },
-            { typeof(RingOfRegen), new() { "undead_scourge" } },
-            { typeof(NecklaceOfImmunity), new() { "undead_scourge" } },
-            { typeof(FeatherBoots), new() { "undead_scourge" } },
-            { typeof(LongjumpBoots), new() { "undead_scourge" } },
-            { typeof(CloakOfInvisibility), new() { "undead_scourge" } },
-            { typeof(OrbOfSlow), new() { "undead_scourge" } },
-            { typeof(DisguiseKit), new() { "undead_scourge" } },
-            { typeof(GlovesOfWarmth), new() { "undead_scourge" } },
-            { typeof(MaskOfDeath), new() { "undead_scourge" } },
-            { typeof(HelmOfExcellence), new() { "undead_scourge" } },
-            { typeof(OrbOfReflection), new() { "undead_scourge" } },
-            { typeof(FmjBullets), new() { "undead_scourge" } },
-        };
-    }
-
     public static class InventoryManagement
     {
         public static readonly Dictionary<CCSPlayerController, List<IShopItem>> Inventories = [];
@@ -59,27 +39,25 @@ namespace WarcraftPlugin.Core
                 inventory.RemoveAll(existingItem => existingItem.GetType() == item.GetType());
             }
         }
+
+        public static void ClearInventory(this CCSPlayerController player)
+        {
+            if (Inventories.TryGetValue(player, out var inventory))
+            {
+                foreach (var item in inventory)
+                {
+                    item.ResetEffect(player);
+                }
+                Inventories.Remove(player);
+            }
+        }
     }
 
     public class ShopMenu
     {
-        private readonly WarcraftPlugin _plugin;
-
-        public ShopMenu(WarcraftPlugin plugin)
+        public ShopMenu()
         {
-            _plugin = plugin;
-            _plugin.AddCommandListener("say", OnPlayerChat);
-
-            _plugin.RegisterEventHandler<EventRoundEnd>((@event, info) =>
-            {
-                foreach (var (player, items) in InventoryManagement.Inventories)
-                {
-                    foreach (var item in items)
-                        item.ResetEffect(player);
-                }
-
-                return HookResult.Continue;
-            });
+            WarcraftPlugin.Instance.AddCommandListener("say", OnPlayerChat);
         }
 
         private HookResult OnPlayerChat(CCSPlayerController? player, CommandInfo info)
@@ -96,7 +74,7 @@ namespace WarcraftPlugin.Core
             return HookResult.Continue;
         }
 
-        private void OpenShopMenu(CCSPlayerController player)
+        private static void OpenShopMenu(CCSPlayerController player)
         {
             //List<Menu.Menu> pages = [];
 
@@ -106,7 +84,7 @@ namespace WarcraftPlugin.Core
             var menu = MenuManager.CreateMenu("Shop Menu", 6);
             //menu.Category = "Shop";
 
-            foreach (var item in ShopItemRegistry.GetAllItems())
+            foreach (var item in Shop.GetAllItems())
             {
                 string itemName = $"{item.Name} - ${item.Cost}";
 
@@ -123,7 +101,7 @@ namespace WarcraftPlugin.Core
                         return;
                     }
 
-                    if (ShopItemRestrictions.RaceBlacklist.TryGetValue(item.GetType(), out var blacklist)
+                    if (Shop.ItemRaceRestrictions.TryGetValue(item.GetType(), out var blacklist)
                         && blacklist.Contains(player?.GetWarcraftPlayer()?.GetClass()?.InternalName))
                     {
                         player.PrintToChat($" {ChatColors.Red}✖ Your race ({pl.GetWarcraftPlayer().GetClass().DisplayName}) cannot use this item.");
@@ -172,7 +150,7 @@ namespace WarcraftPlugin.Core
         void ResetEffect(CCSPlayerController player); // make reset optional?
     }
 
-    public static class ShopItemRegistry
+    public static class Shop
     {
         public static List<IShopItem> GetAllItems() =>
         [
@@ -197,6 +175,23 @@ namespace WarcraftPlugin.Core
             new HelmOfExcellence(),
             new OrbOfReflection()
         ];
+
+        public static readonly Dictionary<Type, HashSet<string>> ItemRaceRestrictions = new()
+        {
+            { typeof(BootsOfSpeed), new() { "undead_scourge", "laser_light_show" } },
+            { typeof(RingOfRegen), new() { "undead_scourge" } },
+            { typeof(NecklaceOfImmunity), new() { "undead_scourge" } },
+            { typeof(FeatherBoots), new() { "undead_scourge" } },
+            { typeof(LongjumpBoots), new() { "undead_scourge" } },
+            { typeof(CloakOfInvisibility), new() { "undead_scourge" } },
+            { typeof(OrbOfSlow), new() { "undead_scourge" } },
+            { typeof(DisguiseKit), new() { "undead_scourge" } },
+            { typeof(GlovesOfWarmth), new() { "undead_scourge" } },
+            { typeof(MaskOfDeath), new() { "undead_scourge" } },
+            { typeof(HelmOfExcellence), new() { "undead_scourge" } },
+            { typeof(OrbOfReflection), new() { "undead_scourge" } },
+            { typeof(FmjBullets), new() { "undead_scourge" } },
+        };
     }
 
     public class PeriaptOfHealth : IShopItem
@@ -209,8 +204,6 @@ namespace WarcraftPlugin.Core
             if (player.PlayerPawn?.Value == null) return false;
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
             if (wcPlayer?.GetClass() == null) return false;
-
-            string race = wcPlayer.GetClass().InternalName;
 
             Warcraft.SetHp(player, player.PlayerPawn.Value.Health + 50);
             player.PrintToChat($" {ChatColors.Green}+50 Health granted.");
@@ -303,15 +296,6 @@ namespace WarcraftPlugin.Core
             return false; // Disabling Necklace of Immunity for now
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
             if (wcPlayer?.GetClass() == null) return false;
-
-            string race = wcPlayer.GetClass().InternalName;
-
-            if (ShopItemRestrictions.RaceBlacklist.TryGetValue(GetType(), out var blacklist) &&
-                blacklist.Contains(race))
-            {
-                player.PrintToChat($" {ChatColors.Red}✖ Your race ({wcPlayer.GetClass().DisplayName}) cannot use this item.");
-                return false;
-            }
 
 
             //wcPlayer.HasUltimateImmunity = true;
@@ -727,7 +711,6 @@ namespace WarcraftPlugin.Core
         public void ResetEffect(CCSPlayerController player) { }
     }
 
-
     public class HelmOfExcellence : IShopItem
     {
         public string Name => "Helm of Excellence";
@@ -774,8 +757,6 @@ namespace WarcraftPlugin.Core
         {
             var wcPlayer = WarcraftPlugin.Instance.GetWcPlayer(player);
             if (wcPlayer?.GetClass() == null) return false;
-
-            string race = wcPlayer.GetClass().InternalName;
 
             player.PrintToChat($" {ChatColors.Green}✔ FMJ Bullets equipped! Bonus armor-piercing damage enabled.");
             return true;
@@ -937,32 +918,14 @@ namespace WarcraftPlugin.Core
                                 {
                                     victim.PlayerPawn.Value.Teleport(respawnLocation);
                                     victim.PrintToChat($"{ChatColors.Green}✔ You have been resurrected!");
-                                    if (InventoryManagement.Inventories.TryGetValue(victim, out var persistentItems))
-                                    {
-                                        var scroll = persistentItems.FirstOrDefault(i => i is ScrollOfResurrection);
-                                        if (scroll != null)
-                                        {
-                                            persistentItems.Remove(scroll);
-                                        }
-                                    }
+                                    victim.RemoveItem(typeof(ScrollOfResurrection));
                                 }
                             });
                         });
                     }
                 }
 
-                // Clear inventories after death (delayed to allow resurrection to use them if needed)
-                plugin.AddTimer(1.0f, () =>
-                {
-                    InventoryManagement.Inventories.Remove(victim);
-
-                    // Only clear persistent inventory if no scroll is pending
-                    if (victim.UserId.HasValue &&
-                        !ResurrectionTracker.ResurrectionUserIds.Contains((uint)victim.UserId.Value))
-                    {
-                        InventoryManagement.Inventories.Remove(victim);
-                    }
-                });
+                victim.ClearInventory();
 
                 return HookResult.Continue;
             });
@@ -1038,6 +1001,17 @@ namespace WarcraftPlugin.Core
                         });
                     });
                 }
+                return HookResult.Continue;
+            });
+
+            WarcraftPlugin.Instance.RegisterEventHandler<EventRoundEnd>((@event, info) =>
+            {
+                foreach (var (player, items) in InventoryManagement.Inventories)
+                {
+                    foreach (var item in items)
+                        item.ResetEffect(player);
+                }
+
                 return HookResult.Continue;
             });
         }
