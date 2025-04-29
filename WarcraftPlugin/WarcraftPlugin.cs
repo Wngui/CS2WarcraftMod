@@ -23,7 +23,7 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 3;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 4;
 
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
@@ -32,6 +32,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpPerKill")] public float XpPerKill { get; set; } = 40;
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
+        [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
     }
 
     public static class WarcraftPlayerExtensions
@@ -177,7 +178,7 @@ namespace WarcraftPlugin
             AddUniqueCommand(Localizer["command.help"], "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
-            RegisterListener<Listeners.OnMapStart>((string mapName) => StartSaveClientsTimer());
+            RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
             RegisterListener<Listeners.OnMapEnd>(OnMapEndHandler);
             RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnectHandler);
 
@@ -349,7 +350,23 @@ namespace WarcraftPlugin
         private void OnMapEndHandler()
         {
             EffectManager.DestroyAllEffects();
-            _database.SaveClients();
+            if (Config.MatchReset)
+            {
+                _database.ResetClients();
+            }
+            else
+            {
+                _database.SaveClients();
+            }
+        }
+
+        private void OnMapStartHandler(string mapName)
+        {
+            if (Config.MatchReset)
+            {
+                _database.ResetClients();
+            }
+            StartSaveClientsTimer();
         }
 
         private void OnClientPutInServerHandler(int slot, string name, string ipAddress)

@@ -179,6 +179,15 @@ namespace WarcraftPlugin.Core
                     steamid = player.SteamID
                 });
         }
+
+        internal void ResetClients()
+        {
+            _connection.Execute(@"
+                DELETE FROM `players` WHERE 1;");
+
+            _connection.Execute(@"
+                DELETE FROM `raceinformation` WHERE 1;");
+        }
     }
 
     internal class DatabasePlayer
