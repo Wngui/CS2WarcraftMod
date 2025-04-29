@@ -186,7 +186,7 @@ namespace WarcraftPlugin.Core
                 DELETE FROM `players`;");
 
             _connection.Execute(@"
-                DELETE FROM `raceinformation` WHERE 1;");
+                DELETE FROM `raceinformation`;");
         }
     }
 
