@@ -183,7 +183,7 @@ namespace WarcraftPlugin.Core
         internal void ResetClients()
         {
             _connection.Execute(@"
-                DELETE FROM `players` WHERE 1;");
+                DELETE FROM `players`;");
 
             _connection.Execute(@"
                 DELETE FROM `raceinformation` WHERE 1;");
