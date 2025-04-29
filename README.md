@@ -123,7 +123,8 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "DisableNamePrefix": true, //Removes level and class info from player names
   "XpPerKill": 40, // Experience per kill
   "XpHeadshotModifier": 0.15, // Experience Modifier for headshots
-  "XpKnifeModifier": 0.25 // Experience Modifier for knife kills
+  "XpKnifeModifier": 0.25, // Experience Modifier for knife kills
+  "MatchReset": true // Reset all character progress at map start/end
 }
 ```
 
