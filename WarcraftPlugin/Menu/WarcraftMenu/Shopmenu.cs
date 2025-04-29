@@ -53,105 +53,11 @@ namespace WarcraftPlugin.Core
         }
     }
 
-    public class ShopMenu
+    public class ShopSystem(WarcraftPlugin plugin)
     {
-        public ShopMenu()
-        {
-            WarcraftPlugin.Instance.AddCommandListener("say", OnPlayerChat);
-        }
+        internal readonly ShopMenu ShopMenu = new(plugin);
+        internal readonly ItemEvents ItemEvents = new(plugin);
 
-        private HookResult OnPlayerChat(CCSPlayerController? player, CommandInfo info)
-        {
-            var message = info.GetArg(1).ToLower();
-            if (player == null) return HookResult.Continue;
-
-            if (message == "shop" || message == "shopmenu")
-            {
-                OpenShopMenu(player);
-                return HookResult.Handled;
-            }
-
-            return HookResult.Continue;
-        }
-
-        private static void OpenShopMenu(CCSPlayerController player)
-        {
-            //List<Menu.Menu> pages = [];
-
-            //for (int i = 0; i < 4; i++)
-            //{
-            //var menu = MenuManagerExtra.CreateMenu($"Shop Page {i + 1}/4", 6);
-            var menu = MenuManager.CreateMenu("Shop Menu", 6);
-            //menu.Category = "Shop";
-
-            foreach (var item in Shop.GetAllItems())
-            {
-                string itemName = $"{item.Name} - ${item.Cost}";
-
-                menu.Add(itemName, null, (pl, opt) =>
-                {
-                    var money = pl.InGameMoneyServices;
-                    if (money == null || !pl.IsValid()) return;
-
-                    int currentMoney = money.Account;
-
-                    if (pl.HasItem(item.GetType()))
-                    {
-                        pl.PrintToChat($" {ChatColors.Red}✖ You already own {item.Name}{(item.IsPersistent ? " permanently" : " this round")}.");
-                        return;
-                    }
-
-                    if (Shop.ItemRaceRestrictions.TryGetValue(item.GetType(), out var blacklist)
-                        && blacklist.Contains(player?.GetWarcraftPlayer()?.GetClass()?.InternalName))
-                    {
-                        player.PrintToChat($" {ChatColors.Red}✖ Your race ({pl.GetWarcraftPlayer().GetClass().DisplayName}) cannot use this item.");
-                        return;
-                    }
-
-                    if (currentMoney < item.Cost)
-                    {
-                        pl.PrintToChat($" {ChatColors.Red}✖ Not enough money for {item.Name} (${item.Cost}).");
-                        return;
-                    }
-
-                    if (!item.Apply(pl))
-                    {
-                        Console.WriteLine("Item failed to apply");
-                        return;
-                    }
-
-                    money.Account -= item.Cost; //TODO warcraft helper function
-                    Utilities.SetStateChanged(pl, "CCSPlayerController", "m_pInGameMoneyServices");
-
-                    if (item.IsPersistent)
-                    {
-                        pl.AddItem(item);
-                    }
-
-                    pl.PlayLocalSound("sounds/common/talk.vsnd");
-                    pl.PrintToChat($" {ChatColors.Green}✔ You bought {item.Name} for ${item.Cost}!");
-                });
-            }
-
-            //pages.Add(menu);
-            //}
-
-            //MenuManagerExtra.OpenMainMenuExtra(player, pages);
-            MenuManager.OpenMainMenu(player, menu);
-        }
-    }
-
-    public interface IShopItem
-    {
-        string Name { get; }
-        int Cost { get; }
-        bool IsPersistent { get; }
-        bool Apply(CCSPlayerController player); //apply should have base logic
-        void ResetEffect(CCSPlayerController player); // make reset optional?
-    }
-
-    public static class Shop
-    {
         public static List<IShopItem> GetAllItems() =>
         [
             new BootsOfSpeed(),
@@ -192,6 +98,102 @@ namespace WarcraftPlugin.Core
             { typeof(OrbOfReflection), new() { "undead_scourge" } },
             { typeof(FmjBullets), new() { "undead_scourge" } },
         };
+    }
+
+    public class ShopMenu
+    {
+        public ShopMenu(WarcraftPlugin plugin)
+        {
+            plugin.AddCommandListener("say", OnPlayerChat);
+        }
+
+        private HookResult OnPlayerChat(CCSPlayerController? player, CommandInfo info)
+        {
+            var message = info.GetArg(1).ToLower();
+            if (player == null) return HookResult.Continue;
+
+            if (message == "shop" || message == "shopmenu")
+            {
+                OpenShopMenu(player);
+                return HookResult.Handled;
+            }
+
+            return HookResult.Continue;
+        }
+
+        private static void OpenShopMenu(CCSPlayerController player)
+        {
+            //List<Menu.Menu> pages = [];
+
+            //for (int i = 0; i < 4; i++)
+            //{
+            //var menu = MenuManagerExtra.CreateMenu($"Shop Page {i + 1}/4", 6);
+            var menu = MenuManager.CreateMenu("Shop Menu", 6);
+            //menu.Category = "Shop";
+
+            foreach (var item in ShopSystem.GetAllItems())
+            {
+                string itemName = $"{item.Name} - ${item.Cost}";
+
+                menu.Add(itemName, null, (pl, opt) =>
+                {
+                    var money = pl.InGameMoneyServices;
+                    if (money == null || !pl.IsValid()) return;
+
+                    int currentMoney = money.Account;
+
+                    if (pl.HasItem(item.GetType()))
+                    {
+                        pl.PrintToChat($" {ChatColors.Red}✖ You already own {item.Name}{(item.IsPersistent ? " permanently" : " this round")}.");
+                        return;
+                    }
+
+                    if (ShopSystem.ItemRaceRestrictions.TryGetValue(item.GetType(), out var blacklist)
+                        && blacklist.Contains(player?.GetWarcraftPlayer()?.GetClass()?.InternalName))
+                    {
+                        player.PrintToChat($" {ChatColors.Red}✖ Your race ({pl.GetWarcraftPlayer().GetClass().DisplayName}) cannot use this item.");
+                        return;
+                    }
+
+                    if (currentMoney < item.Cost)
+                    {
+                        pl.PrintToChat($" {ChatColors.Red}✖ Not enough money for {item.Name} (${item.Cost}).");
+                        return;
+                    }
+
+                    pl.PlayLocalSound("sounds/common/talk.vsnd");
+                    pl.PrintToChat($" {ChatColors.Green}✔ You bought {item.Name} for ${item.Cost}!");
+                    money.Account -= item.Cost;
+                    Utilities.SetStateChanged(pl, "CCSPlayerController", "m_pInGameMoneyServices");
+
+                    if (!item.Apply(pl))
+                    {
+                        Console.WriteLine("Item failed to apply");
+                        return;
+                    }
+
+                    if (item.IsPersistent)
+                    {
+                        pl.AddItem(item);
+                    }
+                });
+            }
+
+            //pages.Add(menu);
+            //}
+
+            //MenuManagerExtra.OpenMainMenuExtra(player, pages);
+            MenuManager.OpenMainMenu(player, menu);
+        }
+    }
+
+    public interface IShopItem
+    {
+        string Name { get; }
+        int Cost { get; }
+        bool IsPersistent { get; }
+        bool Apply(CCSPlayerController player); //apply should have base logic
+        void ResetEffect(CCSPlayerController player); // make reset optional?
     }
 
     public class PeriaptOfHealth : IShopItem
@@ -322,7 +324,7 @@ namespace WarcraftPlugin.Core
 
         public bool Apply(CCSPlayerController player)
         {
-            player.PrintToChat($" {ChatColors.Gold}✔ Scroll of Resurrection purchased. It will trigger automatically on death!");
+            player.PrintToChat($" {ChatColors.Gold}✔ Scroll of Resurrection active. It will trigger automatically on death!");
             return true;
         }
 
@@ -767,9 +769,11 @@ namespace WarcraftPlugin.Core
 
     public class ItemEvents
     {
-        public static void Register(WarcraftPlugin plugin) //ideally a one-liner from warcraft to bootstrap shop system
+        //Some 'extended events', such as EventPlayerHurtOther, EventPlayerKilledOther, will not be triggered here
+        //Any considerations which have been made in EventSystem.cs, would have to be implemented here as well
+        //Nice to have, would be to possibly move item logic into the items themselves, much in the same way warcraft classes work.
+        public ItemEvents(WarcraftPlugin plugin)
         {
-            //Rather than handling item logic here, why not keep it in the item class?
             plugin.RegisterEventHandler<EventPlayerHurt>((@event, info) =>
             {
                 var attacker = @event.Attacker;
@@ -868,23 +872,24 @@ namespace WarcraftPlugin.Core
                 return HookResult.Continue;
             });
 
-            plugin.RegisterEventHandler<EventPlayerHurtOther>((@event, info) =>
-            {
-                var attacker = @event.Attacker;
-                var victim = @event.Userid;
+            //EventPlayerHurtOther is a custom event I made, it won't be triggered here
+            //plugin.RegisterEventHandler<EventPlayerHurtOther>((@event, info) =>
+            //{
+            //    var attacker = @event.Attacker;
+            //    var victim = @event.Userid;
 
-                if (attacker == null || victim == null || attacker == victim)
-                    return HookResult.Continue;
+            //    if (attacker == null || victim == null || attacker == victim)
+            //        return HookResult.Continue;
 
-                InventoryManagement.Inventories.TryGetValue(attacker, out var attackerItems);
+            //    InventoryManagement.Inventories.TryGetValue(attacker, out var attackerItems);
 
-                if (attackerItems != null && attackerItems.Any(item => item is FmjBullets))
-                {
-                    @event.AddBonusDamage(5);
-                    attacker.PrintToCenter("You dealt 5 additional damage with FMJ bullets!");
-                }
-                return HookResult.Continue;
-            });
+            //    if (attackerItems != null && attackerItems.Any(item => item is FmjBullets))
+            //    {
+            //        @event.AddBonusDamage(5);
+            //        attacker.PrintToCenter("You dealt 5 additional damage with FMJ bullets!");
+            //    }
+            //    return HookResult.Continue;
+            //});
 
             plugin.RegisterEventHandler<EventPlayerDeath>((@event, info) =>
             {
@@ -901,7 +906,7 @@ namespace WarcraftPlugin.Core
 
                     if (teammates.Count > 0)
                     {
-                        var anchor = teammates[Random.Shared.Next(teammates.Count-1)];
+                        var anchor = teammates[Random.Shared.Next(teammates.Count - 1)];
                         var respawnLocation = anchor.PlayerPawn.Value.AbsOrigin;
 
                         victim.PrintToChat($"{ChatColors.Gold}⏳ Resurrection scroll activated! Respawning in 3 seconds...");
@@ -1004,7 +1009,7 @@ namespace WarcraftPlugin.Core
                 return HookResult.Continue;
             });
 
-            WarcraftPlugin.Instance.RegisterEventHandler<EventRoundEnd>((@event, info) =>
+            plugin.RegisterEventHandler<EventRoundEnd>((@event, info) =>
             {
                 foreach (var (player, items) in InventoryManagement.Inventories)
                 {
