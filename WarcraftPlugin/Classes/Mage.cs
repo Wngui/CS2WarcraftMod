@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API;
 using WarcraftPlugin.Helpers;
@@ -61,7 +60,7 @@ namespace WarcraftPlugin.Classes
                 float newY = ping.Y + deltaY / distance * offset;
                 float newZ = ping.Z + deltaZ / distance * offset;
 
-                Player.PlayLocalSound("sounds/weapons/fx/nearmiss/bulletltor06.vsnd");
+                Player.EmitSound("UIPanorama.equip_musicKit", volume: 0.5f);
                 Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20), "particles/ui/ui_electric_exp_glow.vpcf", 3);
                 Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_distort.vpcf", 2);
                 Player.PlayerPawn.Value.Teleport(new Vector(newX, newY, newZ), Player.PlayerPawn.Value.AbsRotation, new Vector());

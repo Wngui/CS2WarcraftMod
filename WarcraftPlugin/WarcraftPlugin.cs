@@ -113,7 +113,7 @@ namespace WarcraftPlugin
         {
             base.Load(hotReload);
 
-            if(!string.IsNullOrEmpty(Server.MapName) && !hotReload)
+            if (!string.IsNullOrEmpty(Server.MapName) && !hotReload)
             {
                 //Plugin loaded using 'css_plugins load', resources potentially not precached
                 Server.PrintToChatAll($" {ChatColors.Green}Warcraft {ChatColors.Red}loaded after map start, {ChatColors.Orange}reload the map {ChatColors.Red}to avoid errors.");
@@ -209,6 +209,8 @@ namespace WarcraftPlugin
 
             _eventSystem = new EventSystem(this, Config);
             _eventSystem.Initialize();
+
+            VolumeFix.Load();
 
             _database.Initialize(ModuleDirectory);
         }
@@ -434,6 +436,7 @@ namespace WarcraftPlugin
                 player.EnableMovement();
             }
             _database.SaveClients();
+            VolumeFix.Unload();
             base.Unload(hotReload);
         }
     }

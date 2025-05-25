@@ -107,7 +107,7 @@ namespace WarcraftPlugin.Classes
             {
                 @event.AddBonusDamage(0, WarcraftPlayer.GetAbilityLevel(2) * 5);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
-                Player.PlayLocalSound("sounds/weapons/taser/taser_hit.vsnd");
+                victim.EmitSound("Weapon_Taser.Hit", volume: 0.1f);
             }
         }
 
@@ -121,7 +121,7 @@ namespace WarcraftPlugin.Classes
                 var healingZone = Warcraft.CreateBoxAroundPoint(Owner.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
                 //healingZone.Show(duration: 2); //Debug
                 //Find players within area
-                var playersToHeal = Utilities.GetPlayers().Where(x => x.Team == Owner.Team && x.PawnIsAlive && Owner.IsValid &&
+                var playersToHeal = Utilities.GetPlayers().Where(x => x.AllyOf(Owner) && x.PawnIsAlive && Owner.IsValid &&
                 healingZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
 
                 if (playersToHeal.Any())

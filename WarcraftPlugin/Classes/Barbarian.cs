@@ -96,7 +96,7 @@ namespace WarcraftPlugin.Classes
                 var victim = @event.Userid;
                 @event.AddBonusDamage(carnageLevel * 5);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
-                Player.PlayLocalSound("sounds/physics/body/body_medium_break3.vsnd");
+                victim.EmitSound("Flesh.ImpactHard", volume:0.5f);
             }
         }
     }
@@ -123,7 +123,7 @@ namespace WarcraftPlugin.Classes
             _throwingAxe.DmgRadius = 180;
             _throwingAxe.DetonateTime = float.MaxValue;
 
-            Owner.PlayLocalSound("sounds/player/effort_m_09.vsnd");
+            Owner.EmitSound("Door.wood_full_open", volume: 0.5f);
         }
 
         public override void OnTick()
@@ -159,7 +159,7 @@ namespace WarcraftPlugin.Classes
             Owner.AdrenalineSurgeEffect(Duration);
             Owner.PlayerPawn.Value.VelocityModifier = 1.3f;
             Owner.PlayerPawn.Value.SetColor(Color.IndianRed);
-            Owner.PlayLocalSound("sounds/vo/agents/balkan/t_death03.vsnd");
+            Owner.EmitSound("BaseGrenade.JumpThrowM", volume: 0.5f);
         }
 
         public override void OnTick()

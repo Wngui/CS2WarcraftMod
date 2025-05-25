@@ -121,6 +121,7 @@ namespace WarcraftPlugin.Summons
             {
                 //dodamage to target
                 Target.TakeDamage(_damage, Owner, KillFeedIcon.fists);
+                Entity.EmitSound("SprayCan.ShakeGhost", volume: 0.1f);
                 InterestScore = _interestMax;
             }
             else

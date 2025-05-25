@@ -102,7 +102,7 @@ namespace WarcraftPlugin.Classes
 
             Player.PlayerPawn.Value.SetModel(enemyplayer?.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName);
             Player.PrintToChat(" " + Localizer["shapeshifter.disguise", teamToDisguise]);
-            Player.PlayLocalSound("sounds/ui/armsrace_final_kill_knife.vsnd");
+            Player.EmitSound("UI.ArmsRace.FinalKill_Tone", volume: 0.5f);
             _isDisguised = true;
         }
 
@@ -218,7 +218,7 @@ namespace WarcraftPlugin.Classes
 
             Player.PlayerPawn.Value.CameraServices.ViewEntity.Raw = _cameraProp.EntityHandle.Raw;
             Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBasePlayerPawn", "m_pCameraServices");
-            Player.PlayLocalSound("sounds/player/footsteps/water_exit_01.vsnd");
+            Player.EmitSound("Player.SnowballEquip", volume: 0.5f);
 
             WarcraftPlugin.Instance.RegisterListener<OnTick>(UpdateCamera);
 
@@ -321,7 +321,7 @@ namespace WarcraftPlugin.Classes
                 if (Warcraft.RollDice(Owner.GetWarcraftPlayer().GetAbilityLevel(2)))
                 {
                     Owner.PrintToCenter(Localizer["shapeshifter.spotted"]);
-                    Owner.PlayLocalSound("sounds/ui/panorama/ping_alert_01.vsnd");
+                    Owner.EmitSound("UI.PlayerPingUrgent", volume: 0.2f);
                     Owner.AdrenalineSurgeEffect(0.2f);
                     OnTickInterval = 5; //Add delay before next check
                 }

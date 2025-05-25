@@ -183,7 +183,7 @@ namespace WarcraftPlugin.Summons
 
             //Rocket popping out the tube
             Warcraft.SpawnParticle(rocket.AbsOrigin, "particles/explosions_fx/explosion_hegrenade_smoketrails.vpcf", 1);
-            rocket.EmitSound("Weapon_Nova.Pump");
+            rocket.EmitSound("Weapon_Nova.Pump", volume: 0.5f);
 
             rocket.AcceptInput("InitializeSpawnFromWorld");
 

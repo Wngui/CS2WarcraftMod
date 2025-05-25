@@ -75,7 +75,7 @@ namespace WarcraftPlugin.Classes
                         Player.Respawn();
                         Player.SetHp(1);
                         Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
-                        Player.PlayLocalSound("sounds/ambient/atmosphere/cs_cable_rattle02.vsnd");
+                        Player.EmitSound("Player.BecomeGhost", volume: 0.5f);
                     });
                 }
             }
@@ -152,7 +152,7 @@ namespace WarcraftPlugin.Classes
 
         private void RaiseDead()
         {
-            Player.PlayLocalSound("sounds/ui/armsrace_become_leader_team.vsnd");
+            Player.EmitSound("Player.BecomeGhost", volume: 0.5f);
 
             for (int i = 0; i < _maxZombies; i++)
             {
@@ -211,7 +211,7 @@ namespace WarcraftPlugin.Classes
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => x.PawnIsAlive && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
+                var playersInHurtZone = players.Where(x => x.PawnIsAlive && !x.AllyOf(Owner) && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20)));
                 //small hurt
                 if (playersInHurtZone.Any())
                 {

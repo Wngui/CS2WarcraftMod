@@ -201,8 +201,9 @@ namespace WarcraftPlugin.Classes
                 foreach (var player in playersInTrap)
                 {
                     player.PlayerPawn.Value.AbsVelocity.Add(z: Owner.GetWarcraftPlayer().GetAbilityLevel(2) * 500);
-                    player.PlayLocalSound("sounds/buttons/lever6.vsnd");
                 }
+
+                _trap.EmitSound("security_door.open", volume: 0.7f);
 
                 //Clean-up
                 this.Destroy();

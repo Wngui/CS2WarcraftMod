@@ -14,6 +14,11 @@ namespace WarcraftPlugin.Helpers
             : @"\x48\x8B\xC4\x48\x89\x58\x10\x48\x89\x70\x18\x55\x57\x41\x56\x48\x8D\xA8\x08\xFF\xFF\xFF"
         );
 
+        internal static MemoryFunctionWithReturn<nint, nint, nint, uint, nint, uint, uint, byte> CSoundOpGameSystem_SetSoundEventParam_Windows =
+            new("48 89 5C 24 08 48 89 6C 24 10 56 57 41 56 48 83 EC 40 48 8B B4 24 80 00 00 00");
+        internal static MemoryFunctionWithReturn<int, int, nint, uint, nint, short, uint, nint> CSoundOpGameSystem_SetSoundEventParam_Linux =
+            new("55 48 89 E5 41 57 41 56 49 89 F6 48 89 D6 41 55 41 89 CD");
+
         internal static MemoryFunctionVoid<CBaseEntity, CBaseEntity, CUtlStringToken, matrix3x4_t> CBaseEntity_SetParent = new(
             Environment.OSVersion.Platform == PlatformID.Unix
                 ? @"\x48\x85\xF6\x74\x2A\x48\x8B\x47\x10\xF6\x40\x31\x02\x75\x2A\x48\x8B\x46\x10\xF6\x40\x31\x02\x75\x2A\xB8\x2A\x2A\x2A\x2A"

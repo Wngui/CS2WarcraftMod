@@ -162,7 +162,7 @@ namespace WarcraftPlugin.Classes
                 Owner.PlayerPawn.Value.AbsVelocity.Y = directionVec.Y;
                 Owner.PlayerPawn.Value.AbsVelocity.Z = directionVec.Z;
 
-                Owner.PlayLocalSound("sounds/player/footsteps/jump_launch_01.vsnd");
+                Owner.EmitSound("Default.WalkJump", volume: 0.5f);
             }
 
             public override void OnFinish() { }
@@ -194,7 +194,7 @@ namespace WarcraftPlugin.Classes
                 {
                     //Find players in trap trigger zone
                     var players = Utilities.GetPlayers();
-                    var playersInHurtZone = players.Where(x => x.PawnIsAlive && _triggerZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
+                    var playersInHurtZone = players.Where(x => x.PawnIsAlive && !x.AllyOf(Owner) && _triggerZone.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
                     if (playersInHurtZone.Count != 0)
                     {
                         IsTriggered = true;
@@ -251,7 +251,7 @@ namespace WarcraftPlugin.Classes
                 var hurtBoxPoint = stormpos.With(z: stormpos.Z + _stormHeight / 2);
                 _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _stormArea, _stormArea, _stormHeight);
                 //_hurtBox.Show(duration: Duration); //Debug
-                Owner.PlayLocalSound("sounds/music/damjanmravunac_01/deathcam.vsnd");
+                Owner.EmitSound("UI.DeathMatch.Dominating", volume: 0.5f);
             }
 
             public override void OnTick()
@@ -270,7 +270,7 @@ namespace WarcraftPlugin.Classes
             {
                 //Find players within area
                 var players = Utilities.GetPlayers();
-                var playersInHurtZone = players.Where(x => x.IsAlive() && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
+                var playersInHurtZone = players.Where(x => x.IsAlive() && !x.AllyOf(Owner) && _hurtBox.Contains(x.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 20))).ToList();
                 //Set movement speed + small hurt
                 foreach (var player in playersInHurtZone)
                 {

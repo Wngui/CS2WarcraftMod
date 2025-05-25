@@ -110,6 +110,7 @@ namespace WarcraftPlugin.Classes
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(2) * 12;
                 @event.AddBonusDamage(damageBonus);
+                Player.EmitSound("Player.GhostKnifeSwish", volume: 0.2f);
             }
         }
 
