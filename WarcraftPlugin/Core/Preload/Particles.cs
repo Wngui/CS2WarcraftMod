@@ -62,7 +62,7 @@
             "particles/explosions_fx/c4_train_ground_primary_01.vpcf", // ground sparks big
             "particles/ambient_fx/cbbl_movie_fog.vpcf", // horizonal smoke large
             "particles/impact_fx/chamber_cube_spark.vpcf", //focused sparks
-            "particles/critters/chicken/chicken_crumble_death.vpcf", //crumble and green blood rain
+            "particles/critters/chicken/chicken_crumble_death.vpcf", //CRASHES CLIENT!! crumble and green blood rain
             "particles/critters/chicken/chicken_gone_feathers_fire.vpcf", //fire feathers
             "particles/critters/chicken/chicken_impact_burst2.vpcf", //quick wind burst
             "particles/critters/chicken/chicken_roasted.vpcf", //makes a roasted chicken
