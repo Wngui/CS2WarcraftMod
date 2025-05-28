@@ -127,7 +127,7 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "MatchReset": true, // Reset all character progress at map start/end
   "TotalLevelRequired": { // Total level required to unlock class
     "shadowblade": 48, // Unlocks when you have 48 levels in total 
-	  "tinker": 60 // Unlocks when you have 60 levels in total 
+    "tinker": 60 // Unlocks when you have 60 levels in total 
   }
 }
 ```
