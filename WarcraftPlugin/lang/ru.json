@@ -14,6 +14,7 @@
   "menu.class": "Меню классов Warcraft", // Warcraft Class Menu
   "menu.class.total.levels": "Всего уровней", // Total Levels
   "menu.class.level": "уровень", // level
+  "menu.class.locked": "Закрыто (ур. {0})", // Locked (lvl {0})
   "menu.skills.level": "Уровень", // Level
   "menu.skills.available": "Улучшить навыки ({0} доступно)", // Level up skills ({0} available)
   "class.pending.change": "{Green} Вы появитесь как {Orange}{0}{Green} в следующем раунде!", // {Green} You will spawn as {Orange}{0}{Green} next round!

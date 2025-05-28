@@ -31,6 +31,10 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     CurrentLevel = classInformation != null ? classInformation.CurrentLevel : 1,
                     CurrentXp = classInformation?.CurrentXp ?? 0,
                     DefaultColor = warcraftClass.DefaultColor,
+                    TotalLevelRequired = WarcraftPlugin.Instance.Config.TotalLevelRequired
+                    .FirstOrDefault(x => x.Key.Equals(warcraftClass.InternalName, StringComparison.OrdinalIgnoreCase)
+                        || x.Key.Equals(warcraftClass.DisplayName, StringComparison.OrdinalIgnoreCase)
+                        || x.Key.Equals(warcraftClass.LocalizedDisplayName, StringComparison.OrdinalIgnoreCase)).Value
                 });
             }
 
@@ -41,6 +45,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
             foreach (var warClassInformation in warcraftClassInformations
                 .OrderByDescending(x => x.CurrentLevel)
                 .ThenByDescending(x => x.CurrentXp)
+                .ThenBy(x => x.TotalLevelRequired)
                 .ThenBy(x => x.DisplayName))
             {
                 if (!WarcraftPlugin.Instance.classManager.GetAllClasses().Any(x => x.InternalName == warClassInformation.InternalName))
@@ -51,17 +56,30 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 var levelColor = TransitionToGold(warClassInformation.CurrentLevel / WarcraftPlugin.MaxLevel);
 
                 var isCurrentClass = player.GetWarcraftPlayer().className == warClassInformation.InternalName;
+                // Check if the class is locked based on total levels required
+                var isLocked = warClassInformation.TotalLevelRequired >= totalLevels;
+                var classDisplayColor = isLocked || isCurrentClass ? Color.Gray.Name : "white";
 
-                var displayString = @$"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>(</font>
-                <font color='{(isCurrentClass ? Color.Gray.Name : "white")}' class='{FontSizes.FontSizeSm}'>{warClassInformation.DisplayName}</font>
-                <font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>)</font>
-                <font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeSm}'>- {plugin.Localizer["menu.class.level"]} {warClassInformation.CurrentLevel}</font>";
+                var sb = new System.Text.StringBuilder();
+                // Class colored bracket [
+                sb.Append($"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>(</font>");
+                // Class colored name
+                sb.Append($"<font color='{classDisplayColor}' class='{FontSizes.FontSizeSm}'>{warClassInformation.DisplayName}</font>");
+                // Class colored bracket ]
+                sb.Append($"<font color='{warClassInformation.DefaultColor.AdjustBrightness(1.3f).ToHex()}' class='{FontSizes.FontSizeSm}'>)</font>");
+                // Level information
+                if (isLocked)
+                    sb.Append($"<font color='{Color.Gray.Name}' class='{FontSizes.FontSizeSm}'> - {plugin.Localizer["menu.class.locked", $"<font color='{Color.Gold.Name}' class='{FontSizes.FontSizeSm}'>{warClassInformation.TotalLevelRequired}</font>"]}</font>");
+                else
+                    sb.Append($"<font color='{levelColor.ToHex()}' class='{FontSizes.FontSizeSm}'> - {plugin.Localizer["menu.class.level"]} {warClassInformation.CurrentLevel}</font>");
+
+                var displayString = sb.ToString();
 
                 var classInternalName = warClassInformation.InternalName;
 
                 classMenu.Add(displayString, null, (p, opt) =>
                 {
-                    if (!isCurrentClass)
+                    if (!isCurrentClass && !isLocked)
                     {
                         p.PlayLocalSound("sounds/buttons/button9.vsnd");
                         MenuManager.CloseMenu(player);
@@ -116,6 +134,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
         internal int CurrentLevel { get; set; }
         internal float CurrentXp { get; set; }
         internal Color DefaultColor { get; set; }
+        public int TotalLevelRequired { get; set; }
     }
 
 }

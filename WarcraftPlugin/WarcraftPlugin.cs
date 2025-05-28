@@ -33,6 +33,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
+        [JsonPropertyName("TotalLevelRequired")] public Dictionary<string, int> TotalLevelRequired { get; set; } = new() { { "shadowblade", 48 } };
     }
 
     public static class WarcraftPlayerExtensions
