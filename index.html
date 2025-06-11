@@ -4,8 +4,43 @@
   <meta charset="UTF-8">
   <meta http-equiv="refresh" content="0; URL='https://github.com/Wngui/CS2WarcraftMod'" />
   <title>Redirecting...</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    .spinner {
+      margin-top: 20px;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #c9d1d9;
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    a {
+      color: #c9d1d9;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <p>If you are not redirected automatically, follow this <a href="https://github.com/Wngui/CS2WarcraftMod">link</a>.</p>
+  <div>
+    <p>Redirecting to <a href="https://github.com/Wngui/CS2WarcraftMod">CS2WarcraftMod</a>...</p>
+    <center><div class="spinner"></div></center>
+  </div>
 </body>
 </html>
