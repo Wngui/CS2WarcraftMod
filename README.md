@@ -15,7 +15,7 @@ Try the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:270
 
 ## Features
 
-Numerous unique classes:
+Many unique classes:
 
 - **Barbarian**
 - **Mage**
