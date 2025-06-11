@@ -15,7 +15,7 @@ Try the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:270
 
 ## Features
 
-Eight unique classes:
+Numerous unique classes:
 
 - **Barbarian**
 - **Mage**
@@ -25,6 +25,7 @@ Eight unique classes:
 - **Rogue**
 - **Shapeshifter**
 - **Tinker**
+- **ShadowBlade**
 - **More in the [Discord](https://discord.gg/VvD8aUHCNW)**!
 
 Each class has 3 passive abilities and an ultimate which is unlocked at max level 16.
