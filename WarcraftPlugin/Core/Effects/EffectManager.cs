@@ -1,18 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
+using static CounterStrikeSharp.API.Core.Listeners;
 
 namespace WarcraftPlugin.Core.Effects
 {
     public class EffectManager
     {
         private readonly List<WarcraftEffect> _effects = [];
-        public static readonly float _tickRate = 0.1f; //Lowest possible interval for native timer
+        public static readonly float _tickRate = Server.TickInterval; //Lowest possible interval
 
         internal void Initialize()
         {
-            WarcraftPlugin.Instance.AddTimer(_tickRate, EffectTick, TimerFlags.REPEAT);
+            WarcraftPlugin.Instance.RegisterListener<OnTick>(EffectTick);
         }
 
         internal void AddEffect(WarcraftEffect effect)

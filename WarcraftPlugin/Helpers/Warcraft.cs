@@ -250,8 +250,12 @@ namespace WarcraftPlugin.Helpers
             var skeletonInstance = entity.CBodyComponent.SceneNode.GetSkeletonInstance();
             if (skeletonInstance != null)
             {
+                entity.AcceptInput("SetScale", null, null, scale.ToString());
                 skeletonInstance.Scale = scale;
-                Utilities.SetStateChanged(entity, "CBaseEntity", "m_CBodyComponent");
+                Server.NextFrame(() =>
+                {
+                    Utilities.SetStateChanged(entity, "CBaseEntity", "m_CBodyComponent");
+                });
             }
         }
 
@@ -506,6 +510,76 @@ namespace WarcraftPlugin.Helpers
                 player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Raw = matchedWeapon.Raw;
                 player.DropActiveWeapon();
             }
+        }
+
+        /// <summary>
+        /// Gets, drops, or removes the weapon in the specified gear slot from the player's inventory.
+        /// </summary>
+        /// <param name="player">The player whose weapon will be manipulated.</param>
+        /// <param name="slot">The gear slot to target. If null, no specific slot is targeted.</param>
+        /// <param name="action">The action to perform: "get", "drop", or "remove".</param>
+        /// <returns>The CCSWeaponBase if action is "get", otherwise null.</returns>
+        private static CCSWeaponBase HandleWeaponBySlot(this CCSPlayerController player, gear_slot_t? slot, string action)
+        {
+            var weaponServices = player.PlayerPawn.Value?.WeaponServices;
+            if (weaponServices is null) return null;
+
+            foreach (var weapon in weaponServices.MyWeapons)
+            {
+                if (weapon.IsValid && weapon.Value is { } w)
+                {
+                    var ccsWeapon = w.As<CCSWeaponBase>();
+                    if (ccsWeapon?.IsValid == true && ccsWeapon.VData?.GearSlot == slot)
+                    {
+                        switch (action)
+                        {
+                            case "get":
+                                return ccsWeapon;
+                            case "drop":
+                                weaponServices.ActiveWeapon.Raw = weapon.Raw;
+                                player.DropActiveWeapon();
+                                return ccsWeapon;
+                            case "remove":
+                                weaponServices.ActiveWeapon.Raw = weapon.Raw;
+                                player.DropActiveWeapon();
+                                ccsWeapon.RemoveIfValid();
+                                return null;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Drops the weapon in the specified gear slot from the player's inventory.
+        /// </summary>
+        /// <param name="player">The player whose weapon will be dropped.</param>
+        /// <param name="slot">The gear slot to drop the weapon from. If null, no specific slot is targeted.</param>
+        public static void DropWeaponBySlot(this CCSPlayerController player, gear_slot_t? slot = null)
+        {
+            player.HandleWeaponBySlot(slot, "drop");
+        }
+
+        /// <summary>
+        /// Removes the weapon in the specified gear slot from the player's inventory.
+        /// </summary>
+        /// <param name="player">The player whose weapon will have a weapon removed.</param>
+        /// <param name="slot">The gear slot to remove the weapon from. If null, no specific slot is targeted.</param>
+        public static void RemoveWeaponBySlot(this CCSPlayerController player, gear_slot_t? slot = null)
+        {
+            player.HandleWeaponBySlot(slot, "remove");
+        }
+
+        /// <summary>
+        /// Gets the weapon in the specified gear slot from the player's inventory.
+        /// </summary>
+        /// <param name="player">The player whose weapon will be retrieved.</param>
+        /// <param name="slot">The gear slot to get the weapon from. If null, no specific slot is targeted.</param>
+        /// <returns>The CCSWeaponBase if found, otherwise null.</returns>
+        public static CCSWeaponBase GetWeaponBySlot(this CCSPlayerController player, gear_slot_t? slot = null)
+        {
+            return player.HandleWeaponBySlot(slot, "get");
         }
 
         /// <summary>

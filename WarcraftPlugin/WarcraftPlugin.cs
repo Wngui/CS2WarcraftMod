@@ -23,17 +23,20 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 4;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 5;
 
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
         [JsonPropertyName("DefaultClass")] public string DefaultClass { get; set; }
         [JsonPropertyName("DisableNamePrefix")] public bool DisableNamePrefix { get; set; } = false;
-        [JsonPropertyName("XpPerKill")] public float XpPerKill { get; set; } = 40;
+        [JsonPropertyName("XpPerKill")] public float XpPerKill { get; set; } = 10;
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
-        [JsonPropertyName("TotalLevelRequired")] public Dictionary<string, int> TotalLevelRequired { get; set; } = new() { { "shadowblade", 48 } };
+        [JsonPropertyName("TotalLevelRequired")]
+        public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
+            { { "shadowblade", 50 } , { "dwarf_engineer", 60 }
+        };
     }
 
     public static class WarcraftPlayerExtensions
@@ -218,7 +221,7 @@ namespace WarcraftPlugin
 
         private void AddUniqueCommand(string name, string description, CommandInfo.CommandCallback method)
         {
-            if(!CommandDefinitions.Any(x => x.Name == name))
+            if (!CommandDefinitions.Any(x => x.Name == name))
             {
                 AddCommand(name, description, method);
             }

@@ -106,7 +106,7 @@ namespace WarcraftPlugin.Classes
         }
     }
 
-    internal class VenomStrikeEffect(CCSPlayerController owner, CCSPlayerController victim, float duration, int level) : WarcraftEffect(owner, duration, onTickInterval: 1f)
+    internal class VenomStrikeEffect(CCSPlayerController owner, CCSPlayerController victim, float duration, int damage) : WarcraftEffect(owner, duration, onTickInterval: 1f)
     {
         public CCSPlayerController Victim = victim;
 
@@ -121,9 +121,9 @@ namespace WarcraftPlugin.Classes
             if (!Victim.IsAlive()) return;
             Warcraft.SpawnParticle(Victim.EyePosition(-10), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf", 1);
             Victim.PlayerPawn.Value.EmitSound("Player.DamageFall.Fem", volume: 0.2f);
-            Victim.TakeDamage(level, Owner, KillFeedIcon.bayonet);
-            Owner.PrintToChat(" " + Localizer["shadowblade.venomstrike.victim", level]);
-            Owner.PrintToChat(" " + Localizer["shadowblade.venomstrike", Victim.GetRealPlayerName(), level]);
+            Victim.TakeDamage(damage, Owner, KillFeedIcon.bayonet);
+            Victim.PrintToChat(" " + Localizer["shadowblade.venomstrike.victim", damage]);
+            Owner.PrintToChat(" " + Localizer["shadowblade.venomstrike", Victim.GetRealPlayerName(), damage]);
         }
 
         public override void OnFinish()

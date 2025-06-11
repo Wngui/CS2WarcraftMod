@@ -45,6 +45,9 @@
     <None Update="lang\en.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="lang\tr.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\nuget\Readme.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
