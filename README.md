@@ -110,8 +110,9 @@ Ultimate can be activated by binding it in the console, example
 ## Setup
 
 **Install the Plugin**
-   - Download the [latest release](https://github.com/Wngui/CS2WarcraftMod/releases/latest)
-   - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`.
+   - Install [CounterStrikeSharp](https://docs.cssharp.dev/docs/guides/getting-started.html)
+   - Download the latest [Warcraft release](https://github.com/Wngui/CS2WarcraftMod/releases/latest)
+   - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`
 
 ## Configuration example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
