@@ -59,6 +59,7 @@ namespace WarcraftPlugin.Classes
         {
             //Set default model in case transformation effects are broken
             var initialPlayerModel = Player.PlayerPawn.Value.CBodyComponent.SceneNode.GetSkeletonInstance().ModelState.ModelName;
+
             if (Player.Team == CsTeam.CounterTerrorist)
                 DefaultModel.CTModel = initialPlayerModel;
             else

@@ -1,0 +1,4 @@
+Changing from custom modelled class to non custom moddel, keeps model
+Undead and Orcish horde bugs
+Chatcolors supported by default?
+Paramters injection in custom classes

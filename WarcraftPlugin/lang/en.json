@@ -53,6 +53,8 @@
   "rogue": "Rogue",
   "shapeshifter": "Shapeshifter",
   "tinker": "Tinker",
+  "shadowblade": "Shadowblade",
+  "dwarf_engineer": "Dwarf Engineer",
 
   //Stock class abilities
   "barbarian.ability.0": "Carnage",

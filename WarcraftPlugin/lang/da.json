@@ -53,6 +53,8 @@
   "rogue": "Røver", // Rogue
   "shapeshifter": "Skabeskifter", // Shapeshifter
   "tinker": "Opfinder", // Tinker
+  "shadowblade": "Skyggesværd", // Shadowblade
+  "dwarf_engineer": "Dværg Ingeniør", // Dwarf Engineer
 
   //Stock class abilities
   "barbarian.ability.0": "Blodbad", // Carnage

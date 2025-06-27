@@ -53,6 +53,8 @@
   "rogue": "Разбойник", // Rogue
   "shapeshifter": "Оборотень", // Shapeshifter
   "tinker": "Механик", // Tinker
+  "shadowblade": "Теневой клинок", // Shadowblade
+  "dwarf_engineer": "Гном-инженер", // Dwarf Engineer
 
   //Stock class abilities
   "barbarian.ability.0": "Резня", // Carnage

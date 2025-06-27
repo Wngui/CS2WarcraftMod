@@ -40,7 +40,7 @@ namespace WarcraftPlugin.lang
             // Use a thread-safe collection for parallel processing
             var concurrentLocalizerStrings = new ConcurrentBag<LocalizedString>();
 
-            var jsonOptions = new JsonSerializerOptions { AllowTrailingCommas = true };
+            var jsonOptions = new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
 
             Parallel.ForEach(customHeroLocalizations.Concat(fallbackLocalizations), file =>
             {
@@ -67,8 +67,14 @@ namespace WarcraftPlugin.lang
 
         private static Dictionary<string, string> GetChatColors()
         {
-            return typeof(ChatColors).GetProperties()
-                .ToDictionary(prop => prop.Name.ToLower(), prop => prop.GetValue(null)?.ToString() ?? string.Empty, StringComparer.InvariantCultureIgnoreCase);
+            return typeof(ChatColors)
+                .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+                .GroupBy(f => f.Name.ToLower(), StringComparer.InvariantCultureIgnoreCase)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First().GetValue(null)?.ToString() ?? string.Empty,
+                    StringComparer.InvariantCultureIgnoreCase
+                );
         }
 
         private static readonly Regex ChatColorRegex = new Regex(@"{(\D+?)}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
