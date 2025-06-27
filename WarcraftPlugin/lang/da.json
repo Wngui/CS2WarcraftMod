@@ -17,6 +17,7 @@
   "menu.class.locked": "Låst (lvl {0})", // Locked (lvl {0})
   "menu.skills.level": "level", // Level
   "menu.skills.available": "Level-up skills ({0} tilgængelige)", // Level up skills ({0} available)
+  "menu.skills.ultimate.level": "level {0}",
   "class.pending.change": "{Green} Du vil spawne som {Orange}{0}{Green} i næste runde!", // {Green} You will spawn as {Orange}{0}{Green} next round!
   "class.disabled": "{Green}Nuværende klasse er {Red}deaktiveret{Green}! Spiller nu som {Orange}{0}{Default}.", // {Green}Current class is {Red}disabled{Green}! Now playing as {Orange}{0}{Default}.
   "xp.current": "XP", // Experience
@@ -24,6 +25,7 @@
   "xp.bonus.knife": "knivbonus", // knife bonus
   "xp.kill": "{Gold}+{0} XP {Default}for at dræbe {Green}{1} {Default}{2}{3}", // {Gold}+{0} XP {Default}for killing {Green}{1} {Default}{2}{3}
   "xp.add": "Tilføjer {0} xp til spiller {1}", // Adding {0} xp to player {1}
+  "xp.roundwin": "{Gold}+{0} XP {Default}for at vinde runden", // {Gold}+{0} XP {Default}for winning the round
   "ability.ready": "{0} er klar!", // {0} is ready!
   "ultimate.countdown": "Ultimativ skill klar om {0}s", // Ultimate ready in {0}s
   "no.ultimate": "Ingen levels i ultimativ skill", // No levels in ultimate
@@ -35,6 +37,7 @@
   "command.factoryreset": "fabriksnulstil", // factoryreset
   "command.addxp": "givxp", // addxp
   "command.skills": "skills", // skills
+  "command.shopmenu": "shopmenu", // shopmenu
   "command.help": "hjælp", // commands
   "command.help.description": "{Green}Skriv {Gold}!class{Green} for at skifte klasse, {Gold}!skills{Green} for at forbedre færdigheder", // {Green}Type {Gold}!class{Green} to change classes, {Gold}!skills{Green} to level-up
 
@@ -53,6 +56,9 @@
   "rogue": "Røver", // Rogue
   "shapeshifter": "Skabeskifter", // Shapeshifter
   "tinker": "Opfinder", // Tinker
+  "rapscallion": "Rapscallion", // Rapscallion
+  "crypt_lord": "Crypt Lord", // Crypt Lord
+  "necromancer_classic": "Necromancer Classic", // Necromancer Classic
 
   //Stock class abilities
   "barbarian.ability.0": "Blodbad", // Carnage
@@ -127,9 +133,34 @@
   "tinker.ability.3": "Dronesværm", // Drone Swarm
   "tinker.ability.3.description": "Tilkald en sværm af angrebsdroner, der skader alle nærliggende fjender.", // Summon a swarm of attack drones that damage all nearby enemies.
 
+  "rapscallion.ability.0": "Ninja skills", // Ninja skills
+  "rapscallion.ability.0.description": "Heal and gain bonushealth when planting or defusing a bomb.", // Heal and gain bonushealth when planting or defusing a bomb
+  "rapscallion.ability.1": "Agility", // Agility
+  "rapscallion.ability.1.description": "Up to 40% evasion and 160% movement speed.", // Up to 40% evasion and 160% movement speed
+  "rapscallion.ability.2": "Unseen Blade", // Unseen Blade
+  "rapscallion.ability.2.description": "Additional knife damage.", // Additional knife damage
+  "rapscallion.ability.3": "Vanish", // Vanish
+  "rapscallion.ability.3.description": "Full Invisiblity toggle.", // Full Invisiblity toggle
   "shadowblade.ability.0": "Skyggeskridt", // Shadowstep
   "shadowblade.ability.0.description": "Chance for at teleportere bag fjenden, når du tager skade.", // Chance to teleport behind enemy when taking damage.
   "shadowblade.ability.1": "Undvigelse", // Evasion
+  "crypt_lord.ability.0": "Impale", // Impale
+  "crypt_lord.ability.0.description": "Chance for at slynge fjender i vejret ved angreb.", // Chance to launch enemies upward when attacking.
+  "crypt_lord.ability.1": "Spiket Karapace", // Spiked Carapace
+  "crypt_lord.ability.1.description": "Chance for at reflektere en del af indkommende våbenskade.", // Chance to reflect a portion of incoming weapon damage.
+  "crypt_lord.ability.2": "Ådselsbiller", // Carrion Beetles
+  "crypt_lord.ability.2.description": "Chance for at give ekstra skudskade.", // Chance to deal bonus damage on attack.
+  "crypt_lord.ability.3": "Græshoppe-sværm", // Locust Swarm
+  "crypt_lord.ability.3.description": "Stjæl liv fra nærliggende fjender.", // Drain life from nearby foes.
+  "necromancer_classic.ability.0": "Cripple", // Cripple
+  "necromancer_classic.ability.0.description": "Chance to slow an enemy when attacking.", // Chance to slow
+  "necromancer_classic.ability.1": "Unholy Frenzy", // Unholy Frenzy
+  "necromancer_classic.ability.1.description": "Chance to deal double damage.", // Chance double dmg
+  "necromancer_classic.ability.2": "Necromancer Master", // Necromancer Master
+  "necromancer_classic.ability.2.description": "Chance to spawn with an assault rifle.",
+  "necromancer_classic.ability.3": "Raise Skeleton", // Raise Skeleton
+  "necromancer_classic.ability.3.description": "Revive a random ally.",
+
   "shadowblade.ability.1.description": "Chance for helt at undgå indkommende skade.", // Chance to completely dodge incoming damage.
   "shadowblade.ability.2": "Giftangreb", // Venom Strike
   "shadowblade.ability.2.description": "Dine angreb forgifter fjender og giver skade over tid.", // Your attacks poison enemies, dealing damage over time.
@@ -151,6 +182,7 @@
   "paladin.revive": "{Green}Du er blevet genoplivet!", // {Green}You have been revived!
   "paladin.revive.other": "{Green}{0}{Default} er blevet genoplivet af {1}", // {Green}{0}{Default} has been revived by {1}
   "paladin.revive.none": "{Red}Ingen faldne allierede at genoplive!", // {Red}No fallen allies to revive!
+  "necromancer_classic.revive": "{Green}Du er blevet genoprejst!", // revived
   "ranger.dash.cooldown": "{Red}Dash{Default} på cooldown!", // {Red}Dash{Default} on cooldown!
   "ranger.dash.ready": "{Green}Dash{Default} klar!", // {Green}Dash{Default} ready!
   "rogue.backstab": "{Blue}[Bagholdsangreb] {0} bonus skade", // {Blue}[Backstab] {0} bonus damage

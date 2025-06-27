@@ -21,9 +21,9 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Healing Aura", "Emit an aura that gradually heals nearby allies over time."),
+            new WarcraftAbility("Healing Aura", "Heal allies within 100/200/300/400/500 units for 1/2/3/4/5 HP every few seconds."),
             new WarcraftAbility("Holy Shield", "Gain an additional 20/40/60/80/100 armor."),
-            new WarcraftAbility("Smite", "Infuse your attacks with divine energy, potentially stripping enemy armor."),
+            new WarcraftAbility("Smite", "15/30/45/60/75% chance to strip enemy armor for 5/10/15/20/25 points."),
             new WarcraftAbility("Divine Resurrection", "Instantly revive a random fallen ally.")
         ];
 
@@ -51,7 +51,9 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 Player.GiveNamedItem("item_assaultsuit");
-                Player.SetArmor(Player.PlayerPawn.Value.ArmorValue + WarcraftPlayer.GetAbilityLevel(1) * 20);
+                var armorBonus = WarcraftPlayer.GetAbilityLevel(1) * 20;
+                Player.SetArmor(Player.PlayerPawn.Value.ArmorValue + armorBonus);
+                Player.PrintToChat($" {ChatColors.Green}{GetAbility(1).DisplayName}{ChatColors.Default} +{armorBonus} armor");
             }
         }
 
@@ -71,14 +73,14 @@ namespace WarcraftPlugin.Classes
 
         private void DivineResurrection()
         {
-            var deadTeamPlayers = Utilities.GetPlayers().Where(x => x.Team == Player.Team && !x.PawnIsAlive && Player.IsValid);
+            var deadTeamPlayers = Utilities.GetPlayers().Where(x => x.Team == Player.Team && !x.PawnIsAlive && x.IsValid);
 
             // Check if there are any players on the same team
             if (deadTeamPlayers.Any())
             {
                 _hasUsedDivineResurrection = true;
                 // Generate a random index within the range of players
-                int randomIndex = Random.Shared.Next(0, deadTeamPlayers.Count() - 1);
+                int randomIndex = Random.Shared.Next(deadTeamPlayers.Count());
 
                 // Get the random player
                 var playerToRevive = deadTeamPlayers.ElementAt(randomIndex);
@@ -87,7 +89,7 @@ namespace WarcraftPlugin.Classes
                 playerToRevive.Respawn();
                 playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(10, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
 
-                playerToRevive.PrintToChat(" " + Localizer["paladin.revive"]);
+                playerToRevive.PrintToChat($" {ChatColors.Green}Revived by {ChatColors.Default}{Player.PlayerName}!");
                 Utilities.GetPlayers().ForEach(x =>
                     x.PrintToChat(" " + Localizer["paladin.revive.other", playerToRevive.PlayerName, Player.PlayerName]));
             }
@@ -105,7 +107,7 @@ namespace WarcraftPlugin.Classes
             //Smite
             if (victim.PlayerPawn.Value.ArmorValue > 0 && Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
             {
-                @event.AddBonusDamage(0, WarcraftPlayer.GetAbilityLevel(2) * 5);
+                @event.AddBonusDamage(0, WarcraftPlayer.GetAbilityLevel(2) * 5, abilityName: GetAbility(2).DisplayName);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);
                 victim.EmitSound("Weapon_Taser.Hit", volume: 0.1f);
             }
@@ -130,9 +132,16 @@ namespace WarcraftPlugin.Classes
                     {
                         if (player.PlayerPawn.Value.Health < player.PlayerPawn.Value.MaxHealth)
                         {
-                            var healthAfterHeal = player.PlayerPawn.Value.Health + currentAbilityLevel;
+                            var healAmount = Math.Min(currentAbilityLevel, player.PlayerPawn.Value.MaxHealth - player.PlayerPawn.Value.Health);
+                            var healthAfterHeal = player.PlayerPawn.Value.Health + healAmount;
                             player.SetHp(Math.Min(healthAfterHeal, player.PlayerPawn.Value.MaxHealth));
                             Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
+
+                            player.PrintToChat($" {ChatColors.Green}+{healAmount} HP from {ChatColors.Default}{Owner.PlayerName}");
+                            if (player != Owner)
+                            {
+                                Owner.PrintToChat($" {ChatColors.Green}Healed {ChatColors.Default}{player.PlayerName} {ChatColors.Green}+{healAmount} HP");
+                            }
                         }
                     }
                 }

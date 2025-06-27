@@ -17,6 +17,7 @@
   "menu.class.locked": "Закрыто (ур. {0})", // Locked (lvl {0})
   "menu.skills.level": "Уровень", // Level
   "menu.skills.available": "Улучшить навыки ({0} доступно)", // Level up skills ({0} available)
+  "menu.skills.ultimate.level": "уровень {0}",
   "class.pending.change": "{Green} Вы появитесь как {Orange}{0}{Green} в следующем раунде!", // {Green} You will spawn as {Orange}{0}{Green} next round!
   "class.disabled": "{Green}Текущий класс {Red}отключен{Green}! Теперь вы играете за {Orange}{0}{Default}.", // {Green}Current class is {Red}disabled{Green}! Now playing as {Orange}{0}{Default}.
   "xp.current": "Опыт", // Experience
@@ -24,6 +25,7 @@
   "xp.bonus.knife": "Бонус за нож", // knife bonus
   "xp.kill": "{Gold}+{0} XP {Default}за убийство {Green}{1} {Default}{2}{3}", // {Gold}+{0} XP {Default}for killing {Green}{1} {Default}{2}{3}
   "xp.add": "Добавление {0} опыта игроку {1}", // Adding {0} xp to player {1}
+  "xp.roundwin": "{Gold}+{0} XP {Default}за победу в раунде", // {Gold}+{0} XP {Default}for winning the round
   "ability.ready": "{0} готово!", // {0} is ready!
   "ultimate.countdown": "Ультимативная способность будет готова через {0}с", // Ultimate ready in {0}s
   "no.ultimate": "Нет уровней в ультимативной способности", // No levels in ultimate
@@ -35,6 +37,7 @@
   "command.factoryreset": "полныйсброс", // factoryreset
   "command.addxp": "добавитьопыт", // addxp
   "command.skills": "навыки", // skills
+  "command.shopmenu": "shopmenu", // shopmenu
   "command.help": "команды", // commands
   "command.help.description": "{Green}Введите {Gold}!class{Green}, чтобы сменить класс, {Gold}!skills{Green}, чтобы улучшить навыки", // {Green}Type {Gold}!class{Green} to change classes, {Gold}!skills{Green} to level-up
 
@@ -53,6 +56,9 @@
   "rogue": "Разбойник", // Rogue
   "shapeshifter": "Оборотень", // Shapeshifter
   "tinker": "Механик", // Tinker
+  "rapscallion": "Rapscallion", // Rapscallion
+  "crypt_lord": "Crypt Lord", // Crypt Lord
+  "necromancer_classic": "Necromancer Classic", // Necromancer Classic
 
   //Stock class abilities
   "barbarian.ability.0": "Резня", // Carnage
@@ -126,6 +132,31 @@
   "tinker.ability.2.description": "Устанавливает ловушку, которая подбрасывает игроков в воздух.", // Deploy a trap which launches players into the air.
   "tinker.ability.3": "Рой дронов", // Drone Swarm
   "tinker.ability.3.description": "Вызывает рой атакующих дронов, которые наносят урон всем ближайшим врагам.", // Summon a swarm of attack drones that damage all nearby enemies.
+  "rapscallion.ability.0": "Ninja skills", // Ninja skills
+  "rapscallion.ability.0.description": "Heal and gain bonushealth when planting or defusing a bomb.", // Heal and gain bonushealth when planting or defusing a bomb
+  "rapscallion.ability.1": "Agility", // Agility
+  "rapscallion.ability.1.description": "Up to 40% evasion and 160% movement speed.", // Up to 40% evasion and 160% movement speed
+  "rapscallion.ability.2": "Unseen Blade", // Unseen Blade
+  "rapscallion.ability.2.description": "Additional knife damage.", // Additional knife damage
+  "rapscallion.ability.3": "Vanish", // Vanish
+  "rapscallion.ability.3.description": "Full Invisiblity toggle.", // Full Invisiblity toggle
+  "crypt_lord.ability.0": "Impale", // Impale
+  "crypt_lord.ability.0.description": "Шанс подбросить врага в воздух при атаке.", // Chance to launch enemies upward when attacking.
+  "crypt_lord.ability.1": "Колючий Панцирь", // Spiked Carapace
+  "crypt_lord.ability.1.description": "Шанс отразить часть получаемого урона от оружия.", // Chance to reflect a portion of incoming weapon damage.
+  "crypt_lord.ability.2": "Падальщики", // Carrion Beetles
+  "crypt_lord.ability.2.description": "Шанс нанести дополнительный урон при атаке.", // Chance to deal bonus damage on attack.
+  "crypt_lord.ability.3": "Рой Саранчи", // Locust Swarm
+  "crypt_lord.ability.3.description": "Похищает здоровье у ближайших врагов.", // Drain life from nearby foes.
+  "necromancer_classic.ability.0": "Cripple", // Cripple
+  "necromancer_classic.ability.0.description": "Шанс замедлить врага при атаке.",
+  "necromancer_classic.ability.1": "Unholy Frenzy", // Unholy Frenzy
+  "necromancer_classic.ability.1.description": "Шанс нанести двойной урон.",
+  "necromancer_classic.ability.2": "Necromancer Master", // Necromancer Master
+  "necromancer_classic.ability.2.description": "Шанс появиться со штурмовой винтовкой.",
+  "necromancer_classic.ability.3": "Raise Skeleton", // Raise Skeleton
+  "necromancer_classic.ability.3.description": "Возрождает случайного союзника.",
+
 
   "shadowblade.ability.0": "Шаг в тень", // Shadowstep
   "shadowblade.ability.0.description": "Шанс телепортироваться за спину врагу при получении урона.", // Chance to teleport behind enemy when taking damage.
@@ -151,6 +182,7 @@
   "paladin.revive": "{Green}Вы были воскрешены!", // {Green}You have been revived!
   "paladin.revive.other": "{Green}{0}{Default} был воскрешен {1}", // {Green}{0}{Default} has been revived by {1}
   "paladin.revive.none": "{Red}Нет павших союзников для воскрешения!", // {Red}No fallen allies to revive!
+  "necromancer_classic.revive": "{Green}Вы подняты из мертвых!", // revived
   "ranger.dash.cooldown": "{Red}Рывок{Default} на перезарядке!", // {Red}Dash{Default} on cooldown!
   "ranger.dash.ready": "{Green}Рывок{Default} готов!", // {Green}Dash{Default} ready!
   "rogue.backstab": "{Blue}[Удар в спину] {0} дополнительного урона", // {Blue}[Backstab] {0} bonus damage

@@ -617,8 +617,9 @@ namespace WarcraftPlugin.Helpers
         public static string GetRealPlayerName(this CCSPlayerController player)
         {
             if (player == null || !player.IsValid) return string.Empty;
-            var playerNameClean = Regex.Replace(player.PlayerName, @"\d+\s\[.*\]\s", "");
-            return playerNameClean;
+            var pattern = @"^\d+\s\[.*\]\s| - .* lvl\.\d+$";
+            var playerNameClean = Regex.Replace(player.PlayerName, pattern, "");
+            return playerNameClean.Trim();
         }
 
         /// <summary>

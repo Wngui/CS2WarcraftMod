@@ -32,10 +32,10 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Build", "Allows you to build using the builder tool."),
-            new WarcraftAbility("Pickaxe", "Chance to find grenades when stabbing surfaces."),
-            new WarcraftAbility("Stone Skin", "Increase armor."),
-            new WarcraftCooldownAbility("Goldrush!", "Grants 1000 HP for a short time.", 50f)
+            new WarcraftAbility("Build", "Allows you to build using the builder tool with 3/6/9/12/15 charges."),
+            new WarcraftAbility("Pickaxe", "6/12/18/24/30% chance to find grenades when stabbing surfaces."),
+            new WarcraftAbility("Stone Skin", "Increase armor by 20/40/60/80/100."),
+            new WarcraftCooldownAbility("Goldrush!", "Gain 1000 HP and a speed boost for 10s", 50f)
         ];
 
         public override void Register()
@@ -126,7 +126,9 @@ namespace WarcraftPlugin.Classes
                     Server.NextFrame(() =>
                     {
                         Player.GiveNamedItem("item_assaultsuit");
-                        Player.SetArmor(100 + WarcraftPlayer.GetAbilityLevel(2) * _stoneSkinArmorMultiplier);
+                        var armorBonus = WarcraftPlayer.GetAbilityLevel(2) * _stoneSkinArmorMultiplier;
+                        Player.SetArmor(100 + armorBonus);
+                        Player.PrintToChat($" {ChatColors.Green}{GetAbility(2).DisplayName}{ChatColors.Default} +{armorBonus} armor");
                     });
                 }
 

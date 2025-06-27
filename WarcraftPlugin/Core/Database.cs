@@ -27,19 +27,34 @@ namespace WarcraftPlugin.Core
                   `name` VARCHAR(64),
 	                PRIMARY KEY (`steamid`));");
 
-            _connection.Execute(@"
+            var maxAbilities = WarcraftPlugin.Instance.classManager.GetAllClasses().Max(c => c.Abilities.Count);
+
+            var abilityColumns = new List<string>();
+            for (int i = 1; i <= maxAbilities; i++)
+            {
+                abilityColumns.Add($"`ability{i}level` TINYINT NULL DEFAULT 0");
+            }
+
+            _connection.Execute($@"
                 CREATE TABLE IF NOT EXISTS `raceinformation` (
                   `steamid` UNSIGNED BIG INT NOT NULL,
                   `racename` VARCHAR(32) NOT NULL,
                   `currentXP` INT NULL DEFAULT 0,
                   `currentLevel` INT NULL DEFAULT 1,
                   `amountToLevel` INT NULL DEFAULT 100,
-                  `ability1level` TINYINT NULL DEFAULT 0,
-                  `ability2level` TINYINT NULL DEFAULT 0,
-                  `ability3level` TINYINT NULL DEFAULT 0,
-                  `ability4level` TINYINT NULL DEFAULT 0,
+                  {string.Join(",\n                  ", abilityColumns)},
                   PRIMARY KEY (`steamid`, `racename`));
                 ");
+
+            var existingCols = _connection.Query<string>("SELECT name FROM pragma_table_info('raceinformation')").AsList();
+            for (int i = 1; i <= maxAbilities; i++)
+            {
+                var colName = $"ability{i}level";
+                if (!existingCols.Contains(colName))
+                {
+                    _connection.Execute($"ALTER TABLE `raceinformation` ADD COLUMN `{colName}` TINYINT NULL DEFAULT 0;");
+                }
+            }
         }
 
         internal bool PlayerExistsInDatabase(ulong steamid)
@@ -93,9 +108,27 @@ namespace WarcraftPlugin.Core
                     new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
             }
 
-            var raceInformation = _connection.QueryFirst<ClassInformation>(@"
+            var raceRow = _connection.QueryFirst<dynamic>(@"
             SELECT * from `raceinformation` where `steamid` = @steamid AND `racename` = @racename",
                 new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
+
+            var raceDict = (IDictionary<string, object>)raceRow;
+            var raceInformation = new ClassInformation
+            {
+                SteamId = Convert.ToUInt64(raceDict["steamid"]),
+                RaceName = (string)raceDict["racename"],
+                CurrentXp = Convert.ToInt32(raceDict["currentXP"]),
+                CurrentLevel = Convert.ToInt32(raceDict["currentLevel"]),
+                AmountToLevel = Convert.ToInt32(raceDict["amountToLevel"])
+            };
+
+            for (int i = 1; ; i++)
+            {
+                var col = $"ability{i}level";
+                if (!raceDict.ContainsKey(col))
+                    break;
+                raceInformation.AbilityLevels.Add(Convert.ToInt32(raceDict[col]));
+            }
 
             var wcPlayer = new WarcraftPlayer(player);
             wcPlayer.LoadClassInformation(raceInformation, xpSystem);
@@ -106,11 +139,34 @@ namespace WarcraftPlugin.Core
 
         internal List<ClassInformation> LoadClassInformationFromDatabase(CCSPlayerController player)
         {
-            var raceInformation = _connection.Query<ClassInformation>(@"
+            var rows = _connection.Query(@"
             SELECT * from `raceinformation` where `steamid` = @steamid",
                 new { steamid = player.SteamID });
 
-            return raceInformation.AsList();
+            var list = new List<ClassInformation>();
+            foreach (IDictionary<string, object> row in rows)
+            {
+                var info = new ClassInformation
+                {
+                    SteamId = Convert.ToUInt64(row["steamid"]),
+                    RaceName = (string)row["racename"],
+                    CurrentXp = Convert.ToInt32(row["currentXP"]),
+                    CurrentLevel = Convert.ToInt32(row["currentLevel"]),
+                    AmountToLevel = Convert.ToInt32(row["amountToLevel"])
+                };
+
+                for (int i = 1; ; i++)
+                {
+                    var col = $"ability{i}level";
+                    if (!row.ContainsKey(col))
+                        break;
+                    info.AbilityLevels.Add(Convert.ToInt32(row[col]));
+                }
+
+                list.Add(info);
+            }
+
+            return list;
         }
 
         internal void SavePlayerToDatabase(CCSPlayerController player)
@@ -131,26 +187,28 @@ namespace WarcraftPlugin.Core
                     new { steamid = player.SteamID, racename = wcPlayer.className });
             }
 
-            _connection.Execute(@"
-                UPDATE `raceinformation` SET `currentXP` = @currentXp,
+            var abilityCount = wcPlayer.GetClass().Abilities.Count;
+            var abilitySet = new List<string>();
+            var parameters = new DynamicParameters();
+            parameters.Add("currentXp", wcPlayer.currentXp);
+            parameters.Add("currentLevel", wcPlayer.currentLevel);
+            parameters.Add("amountToLevel", wcPlayer.amountToLevel);
+            parameters.Add("steamid", player.SteamID);
+            parameters.Add("racename", wcPlayer.className);
+
+            for (int i = 0; i < abilityCount; i++)
+            {
+                var column = $"ability{i + 1}level";
+                abilitySet.Add($"`{column}` = @a{i}");
+                parameters.Add($"a{i}", wcPlayer.GetAbilityLevel(i));
+            }
+
+            var sql = $@"UPDATE `raceinformation` SET `currentXP` = @currentXp,
                  `currentLevel` = @currentLevel,
-                 `ability1level` = @ability1Level,
-                 `ability2level` = @ability2Level,
-                 `ability3level` = @ability3Level,
-                 `ability4level` = @ability4Level,
-                 `amountToLevel` = @amountToLevel WHERE `steamid` = @steamid AND `racename` = @racename;",
-                new
-                {
-                    wcPlayer.currentXp,
-                    wcPlayer.currentLevel,
-                    ability1Level = wcPlayer.GetAbilityLevel(0),
-                    ability2Level = wcPlayer.GetAbilityLevel(1),
-                    ability3Level = wcPlayer.GetAbilityLevel(2),
-                    ability4Level = wcPlayer.GetAbilityLevel(3),
-                    wcPlayer.amountToLevel,
-                    steamid = player.SteamID,
-                    racename = wcPlayer.className
-                });
+                 {string.Join(",\n                 ", abilitySet)},
+                 `amountToLevel` = @amountToLevel WHERE `steamid` = @steamid AND `racename` = @racename;";
+
+            _connection.Execute(sql, parameters);
         }
 
         internal void SaveClients()
@@ -192,7 +250,10 @@ namespace WarcraftPlugin.Core
 
     internal class DatabasePlayer
     {
-        internal ulong SteamId { get; set; }
+        // Dapper returns integer values from SQLite as long (Int64) which
+        // cannot be automatically cast to ulong. Using a signed integer here
+        // avoids InvalidCastException when mapping query results.
+        internal long SteamId { get; set; }
         internal string CurrentRace { get; set; }
         internal string Name { get; set; }
     }
@@ -204,9 +265,6 @@ namespace WarcraftPlugin.Core
         internal int CurrentXp { get; set; }
         internal int CurrentLevel { get; set; }
         internal int AmountToLevel { get; set; }
-        internal int Ability1Level { get; set; }
-        internal int Ability2Level { get; set; }
-        internal int Ability3Level { get; set; }
-        internal int Ability4Level { get; set; }
+        internal List<int> AbilityLevels { get; set; } = [];
     }
 }

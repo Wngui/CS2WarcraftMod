@@ -28,9 +28,9 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Adaptive Disguise", "Chance to spawn with an enemy disguise, revealed upon attacking."),
-            new WarcraftAbility("Doppelganger", "Create a temporary inanimate clone of yourself, using a decoy grenade."),
-            new WarcraftAbility("Imposter syndrom", "Chance to be notified when revealed by enemies on radar."),
+            new WarcraftAbility("Adaptive Disguise", "8/16/24/32/40% chance to spawn disguised as an enemy."),
+            new WarcraftAbility("Doppelganger", "Create a temporary inanimate clone of yourself, lasting 5/10/15/20/25 seconds."),
+            new WarcraftAbility("Imposter syndrom", "20/40/60/80/100% chance to be notified when revealed by enemies on radar."),
             new WarcraftCooldownAbility("Morphling", "Transform into an unassuming object.", 20f)
         ];
 

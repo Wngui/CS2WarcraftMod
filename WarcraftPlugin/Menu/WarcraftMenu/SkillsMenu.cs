@@ -22,7 +22,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 var abilityLevel = wcPlayer.GetAbilityLevel(i);
                 var maxAbilityLevel = WarcraftPlayer.GetMaxAbilityLevel(i);
 
-                var isUltimate = i == 3;
+                var isUltimate = i == WarcraftPlayer.UltimateAbilityIndex;
                 var isDisabled = false;
 
                 if (abilityLevel == maxAbilityLevel || XpSystem.GetFreeSkillPoints(wcPlayer) == 0)
@@ -53,7 +53,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     {
                         isDisabled = true;
                         color = Color.Gray;
-                        displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} (level 16)</font>";
+                        displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} ({plugin.Localizer["menu.skills.ultimate.level", WarcraftPlugin.MaxLevel]})</font>";
                     }
                 }
 

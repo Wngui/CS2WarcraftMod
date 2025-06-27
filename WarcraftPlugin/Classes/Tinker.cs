@@ -36,9 +36,9 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Attack Drone", "Deploy a gun drone that attacks nearby enemies."),
-            new WarcraftAbility("Spare Parts", "Chance to not lose ammo when firing"),
-            new WarcraftAbility("Spring Trap", "Deploy a trap which launches players into the air."),
+            new WarcraftAbility("Attack Drone", "Deploy a drone that attacks nearby enemies. Damage and rocket chance scale with level."),
+            new WarcraftAbility("Spare Parts", "4/8/12/16/20% chance to not lose ammo when firing."),
+            new WarcraftAbility("Spring Trap", "Deploy a trap which launches players into the air with 500/1000/1500/2000/2500 force."),
             new WarcraftCooldownAbility("Drone Swarm", "Summon a swarm of attack drones that damage all nearby enemies.", 50f)
         ];
 

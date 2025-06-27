@@ -25,9 +25,9 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Fireball", "Infuses molotovs with fire magic, causing a huge explosion on impact."),
-            new WarcraftAbility("Ice Beam", "Chance to freeze enemies in place."),
-            new WarcraftAbility("Mana Shield", "Passive magical shield, which regenerates armor over time."),
+            new WarcraftAbility("Fireball", "Infuses molotovs with fire magic, causing a huge explosion on impact (40/80/120/160/200 damage)."),
+            new WarcraftAbility("Ice Beam", "5/10/15/20/25% chance to freeze enemies in place."),
+            new WarcraftAbility("Mana Shield", "Regenerates 1 armor every 5/2.5/1.7/1.3/1s."),
             new WarcraftCooldownAbility("Teleport", "When you press your ultimate key, you will teleport to the spot you're aiming.", 20f)
         ];
 

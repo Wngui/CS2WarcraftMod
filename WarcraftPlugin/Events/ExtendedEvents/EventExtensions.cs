@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
@@ -14,7 +15,7 @@ namespace WarcraftPlugin.Events.ExtendedEvents
         /// <param name="damageArmor">The amount of armor damage to inflict.</param>
         /// <param name="killFeedIcon">Optional kill feed icon to display if the bonus damage results in a kill.</param>
         /// <param name="forceClientUpdate">Force client UI to update new health values.</param>
-        public static void AddBonusDamage(this EventPlayerHurtOther @event, int damageHealth, int damageArmor = 0, KillFeedIcon? killFeedIcon = null)
+        public static void AddBonusDamage(this EventPlayerHurtOther @event, int damageHealth, int damageArmor = 0, KillFeedIcon? killFeedIcon = null, string abilityName = null)
         {
             var victim = @event.Userid;
             var attacker = @event.Attacker;
@@ -27,6 +28,21 @@ namespace WarcraftPlugin.Events.ExtendedEvents
 
                 var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
                 if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
+
+                if (!string.IsNullOrEmpty(abilityName))
+                {
+                    if (damageHealth > 0)
+                    {
+                        attacker?.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} +{damageHealth} dmg");
+                        victim?.PrintToChat($" {ChatColors.Red}+{damageHealth} dmg from {ChatColors.Green}{abilityName}");
+                    }
+
+                    if (damageArmor > 0)
+                    {
+                        attacker?.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} -{damageArmor} armor");
+                        victim?.PrintToChat($" {ChatColors.Red}-{damageArmor} armor from {ChatColors.Green}{abilityName}");
+                    }
+                }
             }
         }
 

@@ -1,7 +1,9 @@
 ﻿using CounterStrikeSharp.API.Core;
 using System.Collections.Generic;
+using System.Linq;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Items;
 
 namespace WarcraftPlugin.Models
 {
@@ -21,8 +23,12 @@ namespace WarcraftPlugin.Models
         internal int amountToLevel;
         internal string className;
 
-        private readonly List<int> _abilityLevels = new(new int[4]);
-        internal List<float> AbilityCooldowns = new(new float[4]);
+        internal const int UltimateAbilityIndex = 3;
+
+        private readonly List<int> _abilityLevels = [];
+        internal List<float> AbilityCooldowns = [];
+
+        internal readonly List<ShopItem> Items = [];
 
         private WarcraftClass _class;
 
@@ -38,14 +44,16 @@ namespace WarcraftPlugin.Models
             className = dbRace.RaceName;
             amountToLevel = xpSystem.GetXpForLevel(currentLevel);
 
-            _abilityLevels[0] = dbRace.Ability1Level;
-            _abilityLevels[1] = dbRace.Ability2Level;
-            _abilityLevels[2] = dbRace.Ability3Level;
-            _abilityLevels[3] = dbRace.Ability4Level;
-
             _class = WarcraftPlugin.Instance.classManager.InstantiateClassByName(className);
             _class.WarcraftPlayer = this;
             _class.Player = Player;
+
+            EnsureAbilityCapacity(_class.Abilities.Count);
+
+            for (int i = 0; i < _class.Abilities.Count; i++)
+            {
+                _abilityLevels[i] = i < dbRace.AbilityLevels.Count ? dbRace.AbilityLevels[i] : 0;
+            }
         }
 
         public int GetLevel()
@@ -63,16 +71,19 @@ namespace WarcraftPlugin.Models
 
         public int GetAbilityLevel(int abilityIndex)
         {
+            if (abilityIndex >= _abilityLevels.Count)
+                return 0;
             return _abilityLevels[abilityIndex];
         }
 
         public static int GetMaxAbilityLevel(int abilityIndex)
         {
-            return abilityIndex == 3 ? 1 : WarcraftPlugin.MaxSkillLevel;
+            return abilityIndex == UltimateAbilityIndex ? WarcraftPlugin.maxUltimateLevel : WarcraftPlugin.MaxSkillLevel;
         }
 
         public void SetAbilityLevel(int abilityIndex, int value)
         {
+            EnsureAbilityCapacity(abilityIndex + 1);
             _abilityLevels[abilityIndex] = value;
         }
 
@@ -85,6 +96,34 @@ namespace WarcraftPlugin.Models
         {
             Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
+        }
+
+        private void EnsureAbilityCapacity(int count)
+        {
+            while (_abilityLevels.Count < count)
+            {
+                _abilityLevels.Add(0);
+            }
+
+            while (AbilityCooldowns.Count < count)
+            {
+                AbilityCooldowns.Add(0);
+            }
+        }
+
+        internal bool AddItem(ShopItem item)
+        {
+            if (Items.Any(inv => inv.GetType() == item.GetType()))
+                return false;
+
+            Items.Add(item);
+            item.Apply(Player);
+            return true;
+        }
+
+        internal void ClearItems()
+        {
+            Items.Clear();
         }
     }
 }
