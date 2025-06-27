@@ -33,7 +33,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpPerKill")] public float XpPerKill { get; set; } = 10;
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
-        [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 100;
+        [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 30;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
         [JsonPropertyName("TotalLevelRequired")]
         public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
@@ -59,7 +59,7 @@ namespace WarcraftPlugin
 
         public const int MaxLevel = 16;
         public const int MaxSkillLevel = 5;
-        public const int maxUltimateLevel = 1;
+        public const int MaxUltimateLevel = 1;
 
         private readonly Dictionary<IntPtr, WarcraftPlayer> WarcraftPlayers = [];
         private EventSystem _eventSystem;
@@ -102,16 +102,16 @@ namespace WarcraftPlugin
             if (warcraftPlayer == null) return;
 
             var playerNameClean = player.GetRealPlayerName();
-            var playerNameWithPrefix = $"{playerNameClean} - {warcraftPlayer.GetClass().LocalizedDisplayName} lvl.{warcraftPlayer.GetLevel()}";
+            var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().LocalizedDisplayName}] {playerNameClean}";
 
             player.PlayerName = playerNameWithPrefix;
-            Utilities.SetStateChanged(player, "CCSPlayerController", "m_iszPlayerName");
+            Utilities.SetStateChanged(player, "CBasePlayerController", "m_iszPlayerName");
 
             Instance.AddTimer(1, () =>
             {
                 if (player == null || !player.IsValid) return;
                 player.PlayerName = playerNameWithPrefix;
-                Utilities.SetStateChanged(player, "CCSPlayerController", "m_iszPlayerName");
+                Utilities.SetStateChanged(player, "CBasePlayerController", "m_iszPlayerName");
             });
         }
 

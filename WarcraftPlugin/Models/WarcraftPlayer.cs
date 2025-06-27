@@ -78,7 +78,7 @@ namespace WarcraftPlugin.Models
 
         public static int GetMaxAbilityLevel(int abilityIndex)
         {
-            return abilityIndex == UltimateAbilityIndex ? WarcraftPlugin.maxUltimateLevel : WarcraftPlugin.MaxSkillLevel;
+            return abilityIndex == UltimateAbilityIndex ? WarcraftPlugin.MaxUltimateLevel : WarcraftPlugin.MaxSkillLevel;
         }
 
         public void SetAbilityLevel(int abilityIndex, int value)
