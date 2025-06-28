@@ -77,7 +77,7 @@ namespace WarcraftPlugin.Core
             {
                 var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
                 dbPlayer.CurrentRace = defaultClass.InternalName;
-                player.PrintToChat(" "+ WarcraftPlugin.Instance.Localizer["class.disabled", defaultClass.LocalizedDisplayName]);
+                player.PrintToChat(" " + WarcraftPlugin.Instance.Localizer["class.disabled", defaultClass.LocalizedDisplayName]);
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"
@@ -192,14 +192,14 @@ namespace WarcraftPlugin.Core
 
     internal class DatabasePlayer
     {
-        internal ulong SteamId { get; set; }
+        internal long SteamId { get; set; }
         internal string CurrentRace { get; set; }
         internal string Name { get; set; }
     }
 
     internal class ClassInformation
     {
-        internal ulong SteamId { get; set; }
+        internal long SteamId { get; set; }
         internal string RaceName { get; set; }
         internal int CurrentXp { get; set; }
         internal int CurrentLevel { get; set; }

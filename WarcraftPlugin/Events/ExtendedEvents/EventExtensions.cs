@@ -14,7 +14,7 @@ namespace WarcraftPlugin.Events.ExtendedEvents
         /// <param name="damageArmor">The amount of armor damage to inflict.</param>
         /// <param name="killFeedIcon">Optional kill feed icon to display if the bonus damage results in a kill.</param>
         /// <param name="forceClientUpdate">Force client UI to update new health values.</param>
-        public static void AddBonusDamage(this EventPlayerHurtOther @event, int damageHealth, int damageArmor = 0, KillFeedIcon? killFeedIcon = null)
+        public static void AddBonusDamage(this EventPlayerHurtOther @event, int damageHealth, int damageArmor = 0, KillFeedIcon? killFeedIcon = null, string abilityName = null)
         {
             var victim = @event.Userid;
             var attacker = @event.Attacker;
@@ -27,6 +27,21 @@ namespace WarcraftPlugin.Events.ExtendedEvents
 
                 var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
                 if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
+
+                if (!string.IsNullOrEmpty(abilityName))
+                {
+                    if (damageHealth > 0)
+                    {
+                        attacker?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.health.attacker", damageHealth, abilityName]}");
+                        victim?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.health.victim", damageHealth, abilityName]}");
+                    }
+
+                    if (damageArmor > 0)
+                    {
+                        attacker?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.armor.attacker", damageArmor, abilityName]}");
+                        victim?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.armor.victim", damageArmor, abilityName]}");
+                    }
+                }
             }
         }
 

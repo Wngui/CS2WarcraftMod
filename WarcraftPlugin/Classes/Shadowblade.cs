@@ -24,10 +24,10 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Shadowstep", "Chance to teleport behind enemy when taking damage."),
-            new WarcraftAbility("Evasion", "Chance to completely dodge incoming damage."),
-            new WarcraftAbility("Venom Strike", "Your attacks poison enemies, dealing damage over time."),
-            new WarcraftCooldownAbility("Cloak of Shadows", "Become invisible for a short duration.", 40f)
+            new WarcraftAbility("Shadowstep", "4/8/12/16/20% chance to teleport behind the attacker when taking damage."),
+            new WarcraftAbility("Evasion", "6/12/18/24/30% chance to completely dodge incoming damage."),
+            new WarcraftAbility("Venom Strike", "Your attacks poison enemies, dealing 1/2/3/4/5 damage per second for 4s."),
+            new WarcraftCooldownAbility("Cloak of Shadows", "Turn invisible and move faster for 6s", 40f)
         ];
 
         private const float _venomDuration = 4f;
@@ -57,7 +57,7 @@ namespace WarcraftPlugin.Classes
             }
 
             // Shadowstep
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 20))
+            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 20))
             {
                 var posBehindEnemy = attacker.CalculatePositionInFront(-90, attacker.EyeHeight());
 

@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Menu;
 using WarcraftPlugin.Menu.WarcraftMenu;
+using WarcraftPlugin.Items;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
@@ -32,6 +33,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpPerKill")] public float XpPerKill { get; set; } = 10;
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
+        [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 30;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
         [JsonPropertyName("TotalLevelRequired")]
         public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
@@ -57,7 +59,7 @@ namespace WarcraftPlugin
 
         public const int MaxLevel = 16;
         public const int MaxSkillLevel = 5;
-        public const int maxUltimateLevel = 1;
+        public const int MaxUltimateLevel = 1;
 
         private readonly Dictionary<IntPtr, WarcraftPlayer> WarcraftPlayers = [];
         private EventSystem _eventSystem;
@@ -175,6 +177,9 @@ namespace WarcraftPlugin
             AddUniqueCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
             AddUniqueCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
 
+            //AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
+            //AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
+
             AddUniqueCommand("rpg_help", "list all commands", CommandHelp);
             AddUniqueCommand("commands", "list all commands", CommandHelp);
             AddUniqueCommand("wcs", "list all commands", CommandHelp);
@@ -236,6 +241,13 @@ namespace WarcraftPlugin
         {
             var databaseClassInformation = _database.LoadClassInformationFromDatabase(player);
             ClassMenu.Show(player, databaseClassInformation);
+        }
+
+        private void ShowShopMenu(CCSPlayerController player)
+        {
+            var wcPlayer = GetWcPlayer(player);
+            if (wcPlayer != null)
+                ShopMenu.Show(wcPlayer);
         }
 
         [RequiresPermissions("@css/addxp")]
@@ -316,7 +328,8 @@ namespace WarcraftPlugin
         {
             var wcPlayer = GetWcPlayer(client);
 
-            for (int i = 0; i < 4; i++)
+            var abilityCount = wcPlayer.GetClass().Abilities.Count;
+            for (int i = 0; i < abilityCount; i++)
             {
                 wcPlayer.SetAbilityLevel(i, 0);
             }

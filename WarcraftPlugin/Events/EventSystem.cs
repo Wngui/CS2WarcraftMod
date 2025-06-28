@@ -159,6 +159,26 @@ namespace WarcraftPlugin.Events
                 WarcraftPlugin.Instance.EffectManager.DestroyEffects(p, EffectDestroyFlags.OnRoundEnd);
                 p.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event, HookMode.Pre);
             });
+
+            var winnerProp = @event.GetType().GetProperty("Winner");
+            if (winnerProp != null)
+            {
+                var value = winnerProp.GetValue(@event);
+                CsTeam teamWinner;
+                if (value is CsTeam enumTeam)
+                    teamWinner = enumTeam;
+                else
+                    teamWinner = (CsTeam)Convert.ToInt32(value);
+
+                if (teamWinner is CsTeam.Terrorist or CsTeam.CounterTerrorist)
+                {
+                    foreach (var player in Utilities.GetPlayers().Where(p => p.Team == teamWinner && !p.IsBot && !p.ControllingBot))
+                    {
+                        _plugin.XpSystem.AddXp(player, (int)_config.XpPerRoundWin);
+                        player.PrintToChat(_plugin.Localizer["xp.roundwin", _config.XpPerRoundWin]);
+                    }
+                }
+            }
             return HookResult.Continue;
         }
 
@@ -244,6 +264,10 @@ namespace WarcraftPlugin.Events
                 {
                     WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
+                    //foreach (var item in warcraftPlayer.Items)
+                    //{
+                    //    item.Apply(player);
+                    //}
                 });
             }
 
@@ -300,6 +324,7 @@ namespace WarcraftPlugin.Events
                 var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
                 var victimClass = victim.GetWarcraftPlayer()?.GetClass();
                 WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
+                victim.GetWarcraftPlayer()?.ClearItems();
                 victimClass?.InvokeEvent(@event, HookMode.Pre);
                 @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
             }

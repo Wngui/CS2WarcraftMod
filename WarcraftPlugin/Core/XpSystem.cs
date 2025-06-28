@@ -88,7 +88,8 @@ namespace WarcraftPlugin.Core
         {
             int totalPointsUsed = 0;
 
-            for (int i = 0; i < 4; i++)
+            var abilityCount = wcPlayer.GetClass().Abilities.Count;
+            for (int i = 0; i < abilityCount; i++)
             {
                 totalPointsUsed += wcPlayer.GetAbilityLevel(i);
             }

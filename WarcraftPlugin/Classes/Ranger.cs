@@ -30,10 +30,10 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftCooldownAbility("Light footed", "Nimbly perform a dash in midair, by pressing jump", () => 10 / WarcraftPlayer.GetAbilityLevel(0)),
-            new WarcraftAbility("Ensnare trap", "Place a trap by throwing a decoy"),
-            new WarcraftAbility("Marksman", "Additional damage with scoped weapons"),
-            new WarcraftCooldownAbility("Arrowstorm", "Call down a deadly volley of arrows using the ultimate key", 50f)
+            new WarcraftCooldownAbility("Light footed", "Nimbly perform a dash in midair, cooldown decreases from 10s to 2s as you level up.", () => 10 / WarcraftPlayer.GetAbilityLevel(0)),
+            new WarcraftAbility("Ensnare trap", "Place a trap by throwing a decoy that deals 10/20/30/40/50 damage on trigger."),
+            new WarcraftAbility("Marksman", "Deal 2/4/6/8/10 bonus damage with scoped weapons."),
+            new WarcraftCooldownAbility("Arrowstorm", "Ping a point to rain arrows for 10s, hurting and slowing foes", 50f)
         ];
 
         public override void Register()
@@ -65,7 +65,7 @@ namespace WarcraftPlugin.Classes
             if (markmansLevel > 0 && WeaponTypes.Snipers.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                @event.AddBonusDamage(markmansLevel * 2);
+                @event.AddBonusDamage(markmansLevel * 2, abilityName: GetAbility(2).DisplayName);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 60), "particles/maps/de_overpass/chicken_impact_burst2.vpcf");
             }
         }
@@ -121,7 +121,7 @@ namespace WarcraftPlugin.Classes
             public override void OnTick()
             {
                 //Effect is destroyed if player is on the ground
-                if (!Owner.IsAlive() || (Owner.PlayerPawn.Value.Flags & (uint)PlayerFlags.FL_ONGROUND) == 1)
+                if (!Owner.IsAlive() || (Owner.PlayerPawn.Value.Flags & (uint)PlayerFlags.FL_ONGROUND) != 0)
                 {
                     this.Destroy();
                     return;

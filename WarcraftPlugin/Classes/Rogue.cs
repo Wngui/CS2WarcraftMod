@@ -21,7 +21,7 @@ namespace WarcraftPlugin.Classes
         [
             new WarcraftAbility("Stealth", "Become partially invisible for 1/2/3/4/5 seconds, when killing someone."),
             new WarcraftAbility("Sneak Attack", "When you hit an enemy in the back, you do an aditional 5/10/15/20/25 damage."),
-            new WarcraftAbility("Blade Dance", "Increases movement speed and damage with knives."),
+            new WarcraftAbility("Blade Dance", "Knifing grants 12/24/36/48/60 bonus damage and up to 10-50% more speed."),
             new WarcraftCooldownAbility("Smokebomb", "When nearing death, you will automatically drop a smokebomb, letting you cheat death.", 50f)
         ];
 
@@ -109,7 +109,7 @@ namespace WarcraftPlugin.Classes
             if (@event.Weapon == "knife")
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(2) * 12;
-                @event.AddBonusDamage(damageBonus);
+                @event.AddBonusDamage(damageBonus, abilityName: GetAbility(2).DisplayName);
                 Player.EmitSound("Player.GhostKnifeSwish", volume: 0.2f);
             }
         }

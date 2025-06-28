@@ -30,10 +30,10 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Carnage", "Increase damage dealt with shotguns."),
+            new WarcraftAbility("Carnage", "Deal an extra 5/10/15/20/25 damage with shotguns."),
             new WarcraftAbility("Battle-Hardened", "Increase your health by 20/40/60/80/100."),
-            new WarcraftAbility("Throwing Axe", "Chance to throw an exploding barrel when firing."),
-            new WarcraftCooldownAbility("Bloodlust", "Grants infinite ammo, movement speed & health regeneration.", 50f)
+            new WarcraftAbility("Throwing Axe", "Chance to throw an exploding barrel when firing (around 3–13% per shot depending on weapon)."),
+            new WarcraftCooldownAbility("Bloodlust", "For 10s gain infinite ammo, 30% more speed and constant health regen.", 50f)
         ];
 
         private readonly int _battleHardenedHealthMultiplier = 20;
@@ -94,7 +94,7 @@ namespace WarcraftPlugin.Classes
             if (carnageLevel > 0 && WeaponTypes.Shotguns.Contains(@event.Weapon))
             {
                 var victim = @event.Userid;
-                @event.AddBonusDamage(carnageLevel * 5);
+                @event.AddBonusDamage(carnageLevel * 5, abilityName: GetAbility(0).DisplayName);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
                 victim.EmitSound("Flesh.ImpactHard", volume:0.5f);
             }

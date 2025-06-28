@@ -22,9 +22,9 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Life Drain", "Harness dark magic to siphon health from foes and restore your own vitality."),
-            new WarcraftAbility("Poison Cloud", "Infuses smoke grenades with potent toxins, damaging enemies over time."),
-            new WarcraftAbility("Splintered Soul", "Chance to cheat death with a fraction of vitality."),
+            new WarcraftAbility("Life Drain", "Heal for 6/12/18/24/30% of damage dealt."),
+            new WarcraftAbility("Poison Cloud", "Smoke cloud deals 2/4/6/8/10 damage per tick."),
+            new WarcraftAbility("Splintered Soul", "16/32/48/64/80% chance to cheat death."),
             new WarcraftCooldownAbility("Raise Dead", "Summon a horde of undead chicken to fight for you.", 50f)
         ];
 
@@ -63,9 +63,6 @@ namespace WarcraftPlugin.Classes
             var pawn = Player.PlayerPawn.Value;
             if (!_hasCheatedDeath && pawn.Health <= 0)
             {
-                double rolledValue = Random.Shared.NextDouble();
-                float chanceToRespawn = WarcraftPlayer.GetAbilityLevel(2) / 5 * 0.80f;
-
                 if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 80))
                 {
                     _hasCheatedDeath = true;
@@ -114,8 +111,8 @@ namespace WarcraftPlugin.Classes
             {
                 Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf");
                 var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / WarcraftPlugin.MaxSkillLevel * 0.3f);
-                var playerCalculatedHealth = Player.PlayerPawn.Value.Health + healthDrained;
-                Player.SetHp((int)Math.Min(playerCalculatedHealth, Player.PlayerPawn.Value.MaxHealth));
+                var healAmount = Player.Heal((int)healthDrained, GetAbility(0).DisplayName);
+                hurt.Userid.PrintToChat($" {Localizer["necromancer.lifedrain", Player.GetRealPlayerName(), healAmount]}");
             }
         }
 

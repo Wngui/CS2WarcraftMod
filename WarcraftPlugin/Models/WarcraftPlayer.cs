@@ -1,7 +1,9 @@
 ﻿using CounterStrikeSharp.API.Core;
 using System.Collections.Generic;
+using System.Linq;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Items;
 
 namespace WarcraftPlugin.Models
 {
@@ -21,8 +23,12 @@ namespace WarcraftPlugin.Models
         internal int amountToLevel;
         internal string className;
 
-        private readonly List<int> _abilityLevels = new(new int[4]);
-        internal List<float> AbilityCooldowns = new(new float[4]);
+        internal const int UltimateAbilityIndex = 3;
+
+        private readonly List<int> _abilityLevels = [.. new int[4]];
+        internal List<float> AbilityCooldowns = [.. new float[4]];
+
+        internal readonly List<ShopItem> Items = [];
 
         private WarcraftClass _class;
 
@@ -63,12 +69,14 @@ namespace WarcraftPlugin.Models
 
         public int GetAbilityLevel(int abilityIndex)
         {
+            if (abilityIndex >= _abilityLevels.Count)
+                return 0;
             return _abilityLevels[abilityIndex];
         }
 
         public static int GetMaxAbilityLevel(int abilityIndex)
         {
-            return abilityIndex == 3 ? 1 : WarcraftPlugin.MaxSkillLevel;
+            return abilityIndex == UltimateAbilityIndex ? WarcraftPlugin.MaxUltimateLevel : WarcraftPlugin.MaxSkillLevel;
         }
 
         public void SetAbilityLevel(int abilityIndex, int value)
@@ -85,6 +93,21 @@ namespace WarcraftPlugin.Models
         {
             Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
+        }
+
+        internal bool AddItem(ShopItem item)
+        {
+            if (Items.Any(inv => inv.GetType() == item.GetType()))
+                return false;
+
+            Items.Add(item);
+            item.Apply(Player);
+            return true;
+        }
+
+        internal void ClearItems()
+        {
+            Items.Clear();
         }
     }
 }
