@@ -209,11 +209,6 @@ namespace WarcraftPlugin.Events
                     {
                         warcraftClass.ResetCooldowns();
                     });
-
-                    var itemsOwned = warcraftPlayer.Items.Count == 0
-                        ? "None"
-                        : string.Join(", ", warcraftPlayer.Items.Select(i => i.Name));
-                    player.PrintToChat($" Items: {itemsOwned}");
                 }
             });
             return HookResult.Continue;
@@ -269,10 +264,10 @@ namespace WarcraftPlugin.Events
                 {
                     WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
-                    foreach (var item in warcraftPlayer.Items)
-                    {
-                        item.Apply(player);
-                    }
+                    //foreach (var item in warcraftPlayer.Items)
+                    //{
+                    //    item.Apply(player);
+                    //}
                 });
             }
 

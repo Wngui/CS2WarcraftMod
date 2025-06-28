@@ -177,8 +177,8 @@ namespace WarcraftPlugin
             AddUniqueCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
             AddUniqueCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
 
-            AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
-            AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
+            //AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
+            //AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
 
             AddUniqueCommand("rpg_help", "list all commands", CommandHelp);
             AddUniqueCommand("commands", "list all commands", CommandHelp);
