@@ -29,6 +29,12 @@
   "ability.ready": "{0} is ready!",
   "ultimate.countdown": "Ultimate ready in {0}s",
   "no.ultimate": "No levels in ultimate",
+  "bonus.damage.health.attacker": "{Green}+{0} dmg {Gold}[{1}]",
+  "bonus.damage.health.victim": "{Red}+{0} dmg from {Gold}[{1}]",
+  "bonus.damage.armor.attacker": "{Green}+{0} armor dmg {Gold}[{1}]",
+  "bonus.damage.armor.victim": "{Red}-{0} armor from {Gold}[{1}]",
+  "player.healed": "{Green}+{0} HP from {Default}{1}",
+  "player.healed.healer": "{Green}Healed {Default}{0} {Green}+{1} HP",
 
   //Commands, used in-game by typing !<command>
   "command.ultimate": "ultimate",
@@ -56,6 +62,8 @@
   "rogue": "Rogue",
   "shapeshifter": "Shapeshifter",
   "tinker": "Tinker",
+  "shadowblade": "Shadowblade",
+  "dwarf_engineer": "Dwarf Engineer",
 
   //Stock class abilities
   "barbarian.ability.0": "Carnage",
@@ -86,7 +94,7 @@
   "necromancer.ability.3.description": "Summon a horde of undead chicken to fight for you.",
 
   "paladin.ability.0": "Healing Aura",
-  "paladin.ability.0.description": "Heal allies within 100/200/300/400/500 units for 1/2/3/4/5 HP every few seconds.",
+  "paladin.ability.0.description": "Heal allies within 200/300/400/500/600 units for 1/2/3/4/5 HP every few seconds.",
   "paladin.ability.1": "Holy Shield",
   "paladin.ability.1.description": "Gain an additional 20/40/60/80/100 armor.",
   "paladin.ability.2": "Smite",
@@ -151,8 +159,9 @@
   //Stock class extras
   "mage.frozen": "{Blue}[FROZEN]{Default}",
   "necromancer.cheatdeath": "{DarkRed}You have cheated death, for now...",
+  "necromancer.lifedrain": "{0} {Red}drained {1} HP from you!",
   "paladin.revive": "{Green}You have been revived!",
-  "paladin.revive.other": "{Green}{0}{Default} has been revived by {1}",
+  "paladin.revive.other": "{Green}{0}{Default} has been revived by {Gold}{1}",
   "paladin.revive.none": "{Red}No fallen allies to revive!",
   "necromancer_classic.revive": "{Green}You have been raised from the dead!",
   "ranger.dash.cooldown": "{Red}Dash{Default} on cooldown!",

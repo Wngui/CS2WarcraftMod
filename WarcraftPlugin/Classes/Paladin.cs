@@ -52,8 +52,8 @@ namespace WarcraftPlugin.Classes
             {
                 Player.GiveNamedItem("item_assaultsuit");
                 var armorBonus = WarcraftPlayer.GetAbilityLevel(1) * 20;
-                Player.SetArmor(Player.PlayerPawn.Value.ArmorValue + armorBonus);
-                Player.PrintToChat($" {ChatColors.Green}{GetAbility(1).DisplayName}{ChatColors.Default} +{armorBonus} armor");
+                Player.SetArmor(100 + armorBonus);
+                Player.PrintToChat($" {ChatColors.Blue}+{armorBonus} armor {ChatColors.Gold}[{GetAbility(1).DisplayName}]");
             }
         }
 
@@ -89,9 +89,9 @@ namespace WarcraftPlugin.Classes
                 playerToRevive.Respawn();
                 playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(10, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
 
-                playerToRevive.PrintToChat($" {ChatColors.Green}Revived by {ChatColors.Default}{Player.PlayerName}!");
+                playerToRevive.PrintToChat(" " + Localizer["paladin.revive"]);
                 Utilities.GetPlayers().ForEach(x =>
-                    x.PrintToChat(" " + Localizer["paladin.revive.other", playerToRevive.PlayerName, Player.PlayerName]));
+                    x.PrintToChat(" " + Localizer["paladin.revive.other", playerToRevive.GetRealPlayerName(), Player.GetRealPlayerName()]));
             }
             else
             {

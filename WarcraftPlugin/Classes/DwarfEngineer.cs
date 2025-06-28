@@ -128,7 +128,7 @@ namespace WarcraftPlugin.Classes
                         Player.GiveNamedItem("item_assaultsuit");
                         var armorBonus = WarcraftPlayer.GetAbilityLevel(2) * _stoneSkinArmorMultiplier;
                         Player.SetArmor(100 + armorBonus);
-                        Player.PrintToChat($" {ChatColors.Green}{GetAbility(2).DisplayName}{ChatColors.Default} +{armorBonus} armor");
+                        Player.PrintToChat($" {ChatColors.Blue}+{armorBonus} armor {ChatColors.Gold}[{GetAbility(2).DisplayName}]");
                     });
                 }
 

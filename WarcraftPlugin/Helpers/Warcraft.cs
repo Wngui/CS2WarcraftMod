@@ -516,9 +516,9 @@ namespace WarcraftPlugin.Helpers
 
             if (healer != null && healer != player)
             {
-                player.PrintToChat($" {ChatColors.Green}+{healAmount} HP from {ChatColors.Default}{healer.GetRealPlayerName()}" + abilitySuffix);
+                player.PrintToChat($" {WarcraftPlugin.Instance.Localizer["player.healed", healAmount, healer.GetRealPlayerName()]}" + abilitySuffix);
                 if (healer.IsValid)
-                    healer.PrintToChat($" {ChatColors.Green}Healed {ChatColors.Default}{player.GetRealPlayerName()} {ChatColors.Green}+{healAmount} HP" + abilitySuffix);
+                    healer.PrintToChat($" {WarcraftPlugin.Instance.Localizer["player.healed.healer", player.GetRealPlayerName(), healAmount]}" + abilitySuffix);
             }
             else
             {
