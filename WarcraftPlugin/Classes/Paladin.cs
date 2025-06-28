@@ -21,7 +21,7 @@ namespace WarcraftPlugin.Classes
 
         public override List<IWarcraftAbility> Abilities =>
         [
-            new WarcraftAbility("Healing Aura", "Heal allies within 100/200/300/400/500 units for 1/2/3/4/5 HP every few seconds."),
+            new WarcraftAbility("Healing Aura", "Heal allies within 200/300/400/500/600 units for 1/2/3/4/5 HP every few seconds."),
             new WarcraftAbility("Holy Shield", "Gain an additional 20/40/60/80/100 armor."),
             new WarcraftAbility("Smite", "15/30/45/60/75% chance to strip enemy armor for 5/10/15/20/25 points."),
             new WarcraftAbility("Divine Resurrection", "Instantly revive a random fallen ally.")
@@ -119,7 +119,7 @@ namespace WarcraftPlugin.Classes
             public override void OnTick()
             {
                 var currentAbilityLevel = Owner.GetWarcraftPlayer().GetAbilityLevel(0);
-                var auraSize = currentAbilityLevel * 100;
+                var auraSize = currentAbilityLevel * 100 + 100;
                 var healingZone = Warcraft.CreateBoxAroundPoint(Owner.PlayerPawn.Value.AbsOrigin, auraSize, auraSize, auraSize);
                 //healingZone.Show(duration: 2); //Debug
                 //Find players within area
