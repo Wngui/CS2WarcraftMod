@@ -111,11 +111,8 @@ namespace WarcraftPlugin.Classes
             {
                 Warcraft.SpawnParticle(hurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 30), "particles/critters/chicken/chicken_impact_burst_zombie.vpcf");
                 var healthDrained = hurt.DmgHealth * ((float)WarcraftPlayer.GetAbilityLevel(0) / WarcraftPlugin.MaxSkillLevel * 0.3f);
-                var healAmount = Math.Min(healthDrained, Player.PlayerPawn.Value.MaxHealth - Player.PlayerPawn.Value.Health);
-                var playerCalculatedHealth = Player.PlayerPawn.Value.Health + healAmount;
-                Player.SetHp((int)Math.Min(playerCalculatedHealth, Player.PlayerPawn.Value.MaxHealth));
-                Player.PrintToChat($" {ChatColors.Green}+{(int)healAmount} HP from {ChatColors.Default}{GetAbility(0).DisplayName}");
-                hurt.Userid.PrintToChat($" {ChatColors.Red}{Player.PlayerName} drained {(int)healAmount} HP from you!");
+                var healAmount = Player.Heal((int)healthDrained, GetAbility(0).DisplayName);
+                hurt.Userid.PrintToChat($" {ChatColors.Red}{Player.PlayerName} drained {healAmount} HP from you!");
             }
         }
 

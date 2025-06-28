@@ -25,8 +25,8 @@ namespace WarcraftPlugin.Models
 
         internal const int UltimateAbilityIndex = 3;
 
-        private readonly List<int> _abilityLevels = [];
-        internal List<float> AbilityCooldowns = [];
+        private readonly List<int> _abilityLevels = [.. new int[4]];
+        internal List<float> AbilityCooldowns = [.. new float[4]];
 
         internal readonly List<ShopItem> Items = [];
 
@@ -43,6 +43,11 @@ namespace WarcraftPlugin.Models
             currentXp = dbRace.CurrentXp;
             className = dbRace.RaceName;
             amountToLevel = xpSystem.GetXpForLevel(currentLevel);
+
+            _abilityLevels[0] = dbRace.Ability1Level;
+            _abilityLevels[1] = dbRace.Ability2Level;
+            _abilityLevels[2] = dbRace.Ability3Level;
+            _abilityLevels[3] = dbRace.Ability4Level;
 
             _class = WarcraftPlugin.Instance.classManager.InstantiateClassByName(className);
             _class.WarcraftPlayer = this;

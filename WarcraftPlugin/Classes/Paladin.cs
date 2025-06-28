@@ -132,16 +132,8 @@ namespace WarcraftPlugin.Classes
                     {
                         if (player.PlayerPawn.Value.Health < player.PlayerPawn.Value.MaxHealth)
                         {
-                            var healAmount = Math.Min(currentAbilityLevel, player.PlayerPawn.Value.MaxHealth - player.PlayerPawn.Value.Health);
-                            var healthAfterHeal = player.PlayerPawn.Value.Health + healAmount;
-                            player.SetHp(Math.Min(healthAfterHeal, player.PlayerPawn.Value.MaxHealth));
+                            player.Heal(currentAbilityLevel, healer: Owner);
                             Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/ui/ammohealthcenter/ui_hud_kill_burn_fire.vpcf", 1);
-
-                            player.PrintToChat($" {ChatColors.Green}+{healAmount} HP from {ChatColors.Default}{Owner.PlayerName}");
-                            if (player != Owner)
-                            {
-                                Owner.PrintToChat($" {ChatColors.Green}Healed {ChatColors.Default}{player.PlayerName} {ChatColors.Green}+{healAmount} HP");
-                            }
                         }
                     }
                 }
