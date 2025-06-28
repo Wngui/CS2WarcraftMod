@@ -126,6 +126,7 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "XpPerKill": 40, // Experience per kill
   "XpHeadshotModifier": 0.15, // Experience Modifier for headshots
   "XpKnifeModifier": 0.25, // Experience Modifier for knife kills
+  "XpPerRoundWin": 30, // Experience for winning a round
   "MatchReset": true, // Reset all character progress at map start/end
   "TotalLevelRequired": { // Total level required to unlock class
     "Shadowblade": 48, // Unlocks when you have 48 levels in total 
