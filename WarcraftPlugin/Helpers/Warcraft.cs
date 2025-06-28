@@ -1,17 +1,17 @@
-﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API;
-using System.Drawing;
-using CounterStrikeSharp.API.Modules.Utils;
-using System;
-using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
-using System.Runtime.InteropServices;
-using System.Linq;
-using g3;
-using System.Collections.Generic;
-using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.UserMessages;
+using CounterStrikeSharp.API.Modules.Utils;
+using g3;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using WarcraftPlugin.Models;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Helpers
 {
@@ -493,6 +493,39 @@ namespace WarcraftPlugin.Helpers
 
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);
             Marshal.FreeHGlobal(ptr);
+        }
+
+        /// <summary>
+        /// Heals the specified player by a given amount, optionally indicating the healer and ability name.
+        /// Displays chat messages to both the healed player and the healer (if provided).
+        /// </summary>
+        /// <param name="player">The player to heal.</param>
+        /// <param name="amount">The amount of health to restore.</param>
+        /// <param name="abilityName">The name of the ability used to heal (optional).</param>
+        /// <param name="healer">The player who performed the healing (optional).</param>
+        /// <returns>The actual amount of health restored, capped by MaxHealth.</returns>
+        public static int Heal(this CCSPlayerController player, int amount, string abilityName = null, CCSPlayerController healer = null)
+        {
+            if (amount <= 0 || !player.IsAlive()) return 0;
+
+            var healAmount = Math.Min(amount, player.PlayerPawn.Value.MaxHealth - player.PlayerPawn.Value.Health);
+            var playerCalculatedHealth = player.PlayerPawn.Value.Health + healAmount;
+            player.SetHp(Math.Min(playerCalculatedHealth, player.PlayerPawn.Value.MaxHealth));
+
+            var abilitySuffix = string.IsNullOrEmpty(abilityName) ? "" : $"{ChatColors.Gold} [{abilityName}]";
+
+            if (healer != null && healer != player)
+            {
+                player.PrintToChat($" {ChatColors.Green}+{healAmount} HP from {ChatColors.Default}{healer.GetRealPlayerName()}" + abilitySuffix);
+                if (healer.IsValid)
+                    healer.PrintToChat($" {ChatColors.Green}Healed {ChatColors.Default}{player.GetRealPlayerName()} {ChatColors.Green}+{healAmount} HP" + abilitySuffix);
+            }
+            else
+            {
+                player.PrintToChat($" {ChatColors.Green}+{healAmount} HP" + abilitySuffix);
+            }
+
+            return healAmount;
         }
 
         /// <summary>

@@ -47,13 +47,6 @@ namespace WarcraftPlugin.Models
             _class = WarcraftPlugin.Instance.classManager.InstantiateClassByName(className);
             _class.WarcraftPlayer = this;
             _class.Player = Player;
-
-            EnsureAbilityCapacity(_class.Abilities.Count);
-
-            for (int i = 0; i < _class.Abilities.Count; i++)
-            {
-                _abilityLevels[i] = i < dbRace.AbilityLevels.Count ? dbRace.AbilityLevels[i] : 0;
-            }
         }
 
         public int GetLevel()
@@ -83,7 +76,6 @@ namespace WarcraftPlugin.Models
 
         public void SetAbilityLevel(int abilityIndex, int value)
         {
-            EnsureAbilityCapacity(abilityIndex + 1);
             _abilityLevels[abilityIndex] = value;
         }
 
@@ -96,19 +88,6 @@ namespace WarcraftPlugin.Models
         {
             Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
-        }
-
-        private void EnsureAbilityCapacity(int count)
-        {
-            while (_abilityLevels.Count < count)
-            {
-                _abilityLevels.Add(0);
-            }
-
-            while (AbilityCooldowns.Count < count)
-            {
-                AbilityCooldowns.Add(0);
-            }
         }
 
         internal bool AddItem(ShopItem item)
