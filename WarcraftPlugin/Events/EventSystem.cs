@@ -209,6 +209,16 @@ namespace WarcraftPlugin.Events
                     {
                         warcraftClass.ResetCooldowns();
                     });
+
+                    var itemsOwned = warcraftPlayer.Items.Count == 0
+                        ? "None"
+                        : string.Join(", ", warcraftPlayer.Items.Select(i => i.Name));
+                    player.PrintToChat($" Items: {itemsOwned}");
+
+                    if (!warcraftPlayer.IsMaxLevel)
+                    {
+                        player.PrintToChat($" {_plugin.Localizer["xp.roundinfo", warcraftPlayer.currentXp, warcraftPlayer.amountToLevel]}");
+                    }
                 }
             });
             return HookResult.Continue;
@@ -232,7 +242,17 @@ namespace WarcraftPlugin.Events
                 if (attackingClass?.LastHurtOther != Server.CurrentTime)
                 {
                     attackingClass.LastHurtOther = Server.CurrentTime;
-                    attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle), HookMode.Pre);
+                    var hurtOtherEvent = new EventPlayerHurtOther(@event.Handle);
+                    attackingClass.InvokeEvent(hurtOtherEvent, HookMode.Pre);
+
+                    var items = attacker.GetWarcraftPlayer()?.Items;
+                    if (items != null)
+                    {
+                        foreach (var item in items)
+                        {
+                            item.OnPlayerHurtOther(hurtOtherEvent);
+                        }
+                    }
                 }
             }
 
@@ -264,10 +284,10 @@ namespace WarcraftPlugin.Events
                 {
                     WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
-                    //foreach (var item in warcraftPlayer.Items)
-                    //{
-                    //    item.Apply(player);
-                    //}
+                    foreach (var item in warcraftPlayer.Items)
+                    {
+                        item.Apply(player);
+                    }
                 });
             }
 

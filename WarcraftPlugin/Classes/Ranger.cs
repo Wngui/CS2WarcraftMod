@@ -116,6 +116,7 @@ namespace WarcraftPlugin.Classes
             public override void OnStart()
             {
                 _extraJumpDelayTick = Server.CurrentTime + _extraJumpDelay;
+                Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(0).DisplayName}{ChatColors.Default} ready!");
             }
 
             public override void OnTick()
@@ -163,6 +164,7 @@ namespace WarcraftPlugin.Classes
                 Owner.PlayerPawn.Value.AbsVelocity.Z = directionVec.Z;
 
                 Owner.EmitSound("Default.WalkJump", volume: 0.5f);
+                Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(0).DisplayName}{ChatColors.Default} dash!");
             }
 
             public override void OnFinish() { }
@@ -215,6 +217,8 @@ namespace WarcraftPlugin.Classes
                     player.PlayerPawn.Value.VelocityModifier = 0;
                     player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
                     Warcraft.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
+                    player.PrintToChat($" {ChatColors.Red}Trapped by {ChatColors.Green}{Owner.PlayerName}");
+                    Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName}{ChatColors.Default} trapped {player.GetRealPlayerName()}");
                 }
 
                 //Clean-up
@@ -252,6 +256,7 @@ namespace WarcraftPlugin.Classes
                 _hurtBox = Warcraft.CreateBoxAroundPoint(hurtBoxPoint, _stormArea, _stormArea, _stormHeight);
                 //_hurtBox.Show(duration: Duration); //Debug
                 Owner.EmitSound("UI.DeathMatch.Dominating", volume: 0.5f);
+                Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(3).DisplayName}{ChatColors.Default} started!");
             }
 
             public override void OnTick()

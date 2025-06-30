@@ -122,8 +122,7 @@ namespace WarcraftPlugin.Classes
             if (Math.Abs(attackerAngle - victimAngle) <= 50)
             {
                 var damageBonus = WarcraftPlayer.GetAbilityLevel(1) * 5;
-                eventPlayerHurt.AddBonusDamage(damageBonus);
-                Player.PrintToChat(" " + Localizer["rogue.backstab", damageBonus]);
+                eventPlayerHurt.AddBonusDamage(damageBonus, abilityName: GetAbility(1).DisplayName);
                 Warcraft.SpawnParticle(eventPlayerHurt.Userid.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 85), "particles/overhead_icon_fx/radio_voice_flash.vpcf", 1);
             }
         }

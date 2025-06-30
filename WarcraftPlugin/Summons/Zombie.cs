@@ -52,7 +52,7 @@ namespace WarcraftPlugin.Summons
                 FollowLeader();
             }
 
-            if (Target.IsAlive())
+            if (Target != null && Target.IsAlive())
             {
                 if (LastLeapTick == 0 || LastLeapTick + _leapCooldown + Random.Shared.NextDouble() < Server.TickedTime)
                 {
@@ -101,6 +101,7 @@ namespace WarcraftPlugin.Summons
 
         private void AttackLeap()
         {
+            if (Target == null) return;
             LastLeapTick = Server.TickedTime;
             Attack();
 
@@ -114,6 +115,7 @@ namespace WarcraftPlugin.Summons
 
         private void Attack()
         {
+            if (Target == null) return;
             var playerCollison = Target.PlayerPawn.Value.Collision.ToBox(Target.PlayerPawn.Value.AbsOrigin.Clone().Add(z: -60));
 
             //Check if zombie is inside targets collision box
@@ -139,12 +141,12 @@ namespace WarcraftPlugin.Summons
         {
             if (!enemy.IsAlive()) return;
 
-            if (Target.IsAlive())
+            if (Target != null && Target.IsAlive())
             {
                 return;
             }
 
-            if (Target == enemy) { return; }
+            if (Target != null && Target == enemy) { return; }
             IsFollowingLeader = false;
             InterestScore = _interestMax;
             Target = enemy;

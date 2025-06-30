@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
@@ -32,14 +33,14 @@ namespace WarcraftPlugin.Events.ExtendedEvents
                 {
                     if (damageHealth > 0)
                     {
-                        attacker?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.health.attacker", damageHealth, abilityName]}");
-                        victim?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.health.victim", damageHealth, abilityName]}");
+                        attacker?.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} +{damageHealth} dmg");
+                        victim?.PrintToChat($" {ChatColors.Red}+{damageHealth} dmg from {ChatColors.Green}{abilityName}");
                     }
 
                     if (damageArmor > 0)
                     {
-                        attacker?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.armor.attacker", damageArmor, abilityName]}");
-                        victim?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.armor.victim", damageArmor, abilityName]}");
+                        attacker?.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} -{damageArmor} armor");
+                        victim?.PrintToChat($" {ChatColors.Red}-{damageArmor} armor from {ChatColors.Green}{abilityName}");
                     }
                 }
             }

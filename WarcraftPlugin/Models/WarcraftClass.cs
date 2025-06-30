@@ -91,7 +91,11 @@ namespace WarcraftPlugin.Models
             {
                 Player.PlayerPawn.Value.SetModel(model);
             }
+
+            AfterSetDefaultAppearance();
         }
+
+        protected virtual void AfterSetDefaultAppearance() { }
 
         private static Color GenerateShade(Color baseColor, int shadeIndex)
         {
