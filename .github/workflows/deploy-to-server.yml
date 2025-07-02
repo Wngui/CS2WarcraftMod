@@ -1,10 +1,11 @@
 name: Deploy to Dev Server
 on: 
-  push:
-    branches:
-      - dev
-  schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC (Refresh server in-case of crashes)
+    workflow_dispatch:
+    push:
+     branches:
+     - main
+    schedule:
+     - cron: '0 0 * * *'  # Runs daily at midnight UTC (Refresh server in-case of crashes)
 
 jobs:
   build:
