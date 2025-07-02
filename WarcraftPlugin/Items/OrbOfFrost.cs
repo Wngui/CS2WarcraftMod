@@ -37,7 +37,7 @@ internal class OrbOfFrost : ShopItem
             if (!_victim.IsAlive()) return;
             var pawn = _victim.PlayerPawn.Value;
             _originalSpeed = pawn.MovementServices.Maxspeed;
-            _originalModifier = pawn.VelocityModifier;
+            _originalModifier = pawn.VelocityModifier; 
             pawn.MovementServices.Maxspeed = _originalSpeed * 0.67f;
             pawn.VelocityModifier = _originalModifier * 0.67f;
             _victim.PrintToChat($" {ChatColors.Red}Slowed by {ChatColors.Green}{Owner.PlayerName}");
