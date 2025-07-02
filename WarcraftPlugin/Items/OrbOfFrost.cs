@@ -3,6 +3,7 @@ using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
 using System;
+using CounterStrikeSharp.API.Modules.Utils;
 namespace WarcraftPlugin.Items;
 
 internal class OrbOfFrost : ShopItem
