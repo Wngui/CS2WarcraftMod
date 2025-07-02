@@ -1,23 +1,13 @@
 name: Release Warcraft plugin
 on:
-  workflow_dispatch:
-    inputs:
-      release_type:
-        description: "Type of release"
-        required: true
-        default: patch
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-#      body:
-#        description: 'Release notes'
-#        required: false
-#        default: ''
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: production
     name: Build and Release
     runs-on: ubuntu-latest
     steps:
@@ -35,23 +25,26 @@ jobs:
       id: calculate_version
       run: |
         current_version=${{ env.current_version }}
-        release_type=${{ github.event.inputs.release_type }}
         
         # Parse current version into major, minor, and patch
         major=$(echo $current_version | cut -d. -f1)
         minor=$(echo $current_version | cut -d. -f2)
         patch=$(echo $current_version | cut -d. -f3)
 
-        # Increment based on release type
-        if [ "$release_type" = "major" ]; then
-          major=$((major + 1))
+        # Increment minor by 1
+        minor=$((minor + 1))
+
+        # Check if minor exceeds 9
+        if [ "$minor" -gt 9 ]; then
           minor=0
-          patch=0
-        elif [ "$release_type" = "minor" ]; then
-          minor=$((minor + 1))
-          patch=0
-        else
           patch=$((patch + 1))
+        fi
+
+        # Check if patch exceeds 9
+        if [ "$patch" -gt 9 ]; then
+          patch=0
+          minor=0
+          major=$((major + 1))
         fi
 
         # Create new version string
