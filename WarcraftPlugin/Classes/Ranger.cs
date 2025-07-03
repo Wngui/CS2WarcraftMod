@@ -215,6 +215,8 @@ namespace WarcraftPlugin.Classes
                     player.PlayerPawn.Value.VelocityModifier = 0;
                     player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
                     Warcraft.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
+                    player.PrintToChat($" {ChatColors.Red}Trapped by {ChatColors.Green}{Owner.PlayerName}");
+                    Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName}{ChatColors.Default} trapped {player.GetRealPlayerName()}");
                 }
 
                 //Clean-up

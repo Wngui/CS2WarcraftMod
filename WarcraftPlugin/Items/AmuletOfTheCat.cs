@@ -1,0 +1,83 @@
+using CounterStrikeSharp.API.Core;
+using WarcraftPlugin.Core.Effects;
+using CounterStrikeSharp.API.Modules.UserMessages;
+using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Events;
+using CounterStrikeSharp.API.Modules.Utils;
+using System.Linq;
+using System;
+using System.Collections.Generic;
+using WarcraftPlugin.Helpers;
+
+namespace WarcraftPlugin.Items;
+
+internal class AmuletOfTheCat : ShopItem
+{
+    internal override string Name => "Amulet of the Cat";
+    internal override string Description => "Silent Footsteps";
+    internal override int Price => 4000;
+
+    internal override void Apply(CCSPlayerController player)
+    {
+        new SilentFootstepsEffect(player).Start();
+    }
+
+    private class SilentFootstepsEffect(CCSPlayerController owner) : WarcraftEffect(owner)
+    {
+        // Tracks all players currently under the silent footstep effect
+        private static readonly HashSet<IntPtr> _silentPlayers = [];
+
+        public override void OnStart()
+        {
+            if (_silentPlayers.Count == 0)
+            {
+                WarcraftPlugin.Instance.HookUserMessage(208, PreFootstepMessage, HookMode.Pre);
+                WarcraftPlugin.Instance.RegisterEventHandler<EventPlayerFootstep>(OnPlayerFootstep, HookMode.Pre);
+            }
+
+            _silentPlayers.Add(owner.PlayerPawn.Value.Handle);
+            owner.PrintToChat(" Silent footsteps activated.");
+        }
+
+        private static HookResult PreFootstepMessage(UserMessage um)
+        {
+            var entityIndex = um.ReadInt("source_entity_index");
+            var player = Utilities.GetPlayers().FirstOrDefault(p =>
+                p.PlayerPawn.Value?.Index == entityIndex);
+
+            if (player == null)
+                return HookResult.Continue;
+
+            if (!_silentPlayers.Contains(player.PlayerPawn.Value.Handle))
+                return HookResult.Continue;
+
+            um.Recipients.Clear();
+            return HookResult.Stop;
+        }
+
+        private static HookResult OnPlayerFootstep(EventPlayerFootstep @event, GameEventInfo info)
+        {
+            var player = @event.Userid;
+            if (player == null)
+                return HookResult.Continue;
+
+            if (!_silentPlayers.Contains(player.PlayerPawn.Value.Handle))
+                return HookResult.Continue;
+
+            info.DontBroadcast = true;
+            return HookResult.Stop;
+        }
+
+        public override void OnTick() { }
+
+        public override void OnFinish()
+        {
+            _silentPlayers.Remove(owner.PlayerPawn.Value.Handle);
+
+            if (_silentPlayers.Count == 0)
+            {
+                WarcraftPlugin.Instance.UnhookUserMessage(208, PreFootstepMessage, HookMode.Pre);
+            }
+        }
+    }
+}

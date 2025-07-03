@@ -34,6 +34,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
         [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 30;
+        [JsonPropertyName("EnableLevelDifferenceXp")] public bool EnableLevelDifferenceXp { get; set; } = false;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
         [JsonPropertyName("TotalLevelRequired")]
         public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
@@ -75,12 +76,19 @@ namespace WarcraftPlugin
 
         internal WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
-            if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
+            if (!player.IsValid) return null;
 
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
+                if (player.IsBot || player.ControllingBot)
+                {
+                    wcPlayer = CreateBotPlayer(player);
+                }
+                else
+                {
+                    wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
+                }
                 WarcraftPlayers[player.Handle] = wcPlayer;
             }
 
@@ -90,6 +98,26 @@ namespace WarcraftPlugin
         internal void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
         {
             WarcraftPlayers[player.Handle] = wcPlayer;
+        }
+
+        private WarcraftPlayer CreateBotPlayer(CCSPlayerController player)
+        {
+            var classes = classManager.GetAllClasses();
+            var randomClass = classes[Random.Shared.Next(classes.Length)];
+
+            var info = new ClassInformation
+            {
+                SteamId = 0,
+                RaceName = randomClass.InternalName,
+                CurrentXp = 0,
+                CurrentLevel = 1,
+                AmountToLevel = XpSystem.GetXpForLevel(1)
+            };
+
+            var wcPlayer = new WarcraftPlayer(player);
+            wcPlayer.LoadClassInformation(info, XpSystem);
+            XpSystem.AutoSpendSkillPoints(wcPlayer);
+            return wcPlayer;
         }
 
         internal static void RefreshPlayerName(CCSPlayerController player)
@@ -149,42 +177,73 @@ namespace WarcraftPlugin
                 AdvertManager = new AdvertManager();
                 AdvertManager.Initialize();
             }
+            var ultimateAliases = new[]
+            {
+                "ultimate", "ult",
+                Localizer["command.ultimate"], Localizer["command.ult"]
+            };
+            foreach (var alias in ultimateAliases)
+                AddUniqueCommand(alias, "ultimate", UltimatePressed);
 
-            AddUniqueCommand("ultimate", "ultimate", UltimatePressed);
-            AddUniqueCommand(Localizer["command.ultimate"], "ultimate", UltimatePressed);
+            var classAliases = new[]
+            {
+                "changerace", "changeclass", "race", "class", "rpg", "cr",
+                Localizer["command.changerace"], Localizer["command.changeclass"],
+                Localizer["command.race"], Localizer["command.class"],
+                Localizer["command.rpg"], Localizer["command.cr"]
+            };
+            foreach (var alias in classAliases)
+                AddUniqueCommand(alias, "change class", (player, _) => ShowClassMenu(player));
 
-            AddUniqueCommand("changerace", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("changeclass", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("race", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("class", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("rpg", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("cr", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand(Localizer["command.changeclass"], "change class", (player, _) => ShowClassMenu(player));
+            var resetAliases = new[]
+            {
+                "reset", "resetskills", "resetskillpoints",
+                Localizer["command.reset"], Localizer["command.resetskills"], Localizer["command.resetskillpoints"]
+            };
+            foreach (var alias in resetAliases)
+                AddUniqueCommand(alias, "reset skills", CommandResetSkills);
 
-            AddUniqueCommand("reset", "reset skills", CommandResetSkills);
-            AddUniqueCommand(Localizer["command.reset"], "reset skills", CommandResetSkills);
+            var factoryResetAliases = new[]
+            {
+                "factoryreset", "fullreset", "resetlevels",
+                Localizer["command.factoryreset"], Localizer["command.fullreset"], Localizer["command.resetlevels"]
+            };
+            foreach (var alias in factoryResetAliases)
+                AddUniqueCommand(alias, "reset levels", CommandFactoryReset);
 
-            AddUniqueCommand("factoryreset", "reset levels", CommandFactoryReset);
-            AddUniqueCommand(Localizer["command.factoryreset"], "reset levels", CommandFactoryReset);
+            var addXpAliases = new[]
+            {
+                "addxp", "givexp", "xpadd",
+                Localizer["command.addxp"], Localizer["command.givexp"], Localizer["command.xpadd"]
+            };
+            foreach (var alias in addXpAliases)
+                AddUniqueCommand(alias, "addxp", CommandAddXp);
 
-            AddUniqueCommand("addxp", "addxp", CommandAddXp);
-            AddUniqueCommand(Localizer["command.addxp"], "addxp", CommandAddXp);
+            var skillsAliases = new[]
+            {
+                "skills", "level",
+                Localizer["command.skills"], Localizer["command.level"]
+            };
+            foreach (var alias in skillsAliases)
+                AddUniqueCommand(alias, "skills", (player, _) => ShowSkillsMenu(player));
 
-            //AddUniqueCommand("setlevel", "set level", CommandSetLevel);
-            //AddUniqueCommand(Localizer["command.setlevel"], "set level", CommandSetLevel);
+            var shopAliases = new[]
+            {
+                "shopmenu", "shop", "buymenu",
+                Localizer["command.shopmenu"], Localizer["command.shop"], Localizer["command.buymenu"]
+            };
+            foreach (var alias in shopAliases)
+                AddUniqueCommand(alias, "open item shop", (player, _) => ShowShopMenu(player));
 
-            AddUniqueCommand("skills", "skills", (player, _) => ShowSkillsMenu(player));
-            AddUniqueCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
-            AddUniqueCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
-
-            //AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
-            //AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
-
-            AddUniqueCommand("rpg_help", "list all commands", CommandHelp);
-            AddUniqueCommand("commands", "list all commands", CommandHelp);
-            AddUniqueCommand("wcs", "list all commands", CommandHelp);
-            AddUniqueCommand("war3menu", "list all commands", CommandHelp);
-            AddUniqueCommand(Localizer["command.help"], "list all commands", CommandHelp);
+            var helpAliases = new[]
+            {
+                "rpg_help", "commands", "wcs", "war3menu",
+                Localizer["command.rpg_help"], Localizer["command.commands"],
+                Localizer["command.wcs"], Localizer["command.war3menu"],
+                Localizer["command.help"]
+            };
+            foreach (var alias in helpAliases)
+                AddUniqueCommand(alias, "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
             RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
@@ -369,6 +428,7 @@ namespace WarcraftPlugin
         private void OnMapEndHandler()
         {
             EffectManager.DestroyAllEffects();
+            AdvertManager?.Cancel();
             if (Config.MatchReset)
             {
                 _database.ResetClients();
@@ -392,15 +452,21 @@ namespace WarcraftPlugin
         {
             var player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
             Console.WriteLine($"Put in server {player.Handle}");
-            // No bots, invalid clients or non-existent clients.
-            if (!player.IsValid || player.IsBot) return;
+            if (!player.IsValid) return;
 
-            if (!_database.PlayerExistsInDatabase(player.SteamID))
+            if (player.IsBot)
             {
-                _database.AddNewPlayerToDatabase(player);
+                WarcraftPlayers[player.Handle] = CreateBotPlayer(player);
             }
+            else
+            {
+                if (!_database.PlayerExistsInDatabase(player.SteamID))
+                {
+                    _database.AddNewPlayerToDatabase(player);
+                }
 
-            WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
+                WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
+            }
 
             Console.WriteLine("Player just connected: " + WarcraftPlayers[player.Handle]);
         }
@@ -452,7 +518,10 @@ namespace WarcraftPlugin
                 //Avoid getting stuck in old menu
                 player.EnableMovement();
             }
+            AdvertManager?.Cancel();
+            _saveClientsTimer?.Kill();
             _database.SaveClients();
+            _database.Dispose();
             VolumeFix.Unload();
             base.Unload(hotReload);
         }

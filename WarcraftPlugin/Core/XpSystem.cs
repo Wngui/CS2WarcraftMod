@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 
@@ -59,6 +60,10 @@ namespace WarcraftPlugin.Core
 
             RecalculateXpForLevel(wcPlayer);
             PerformLevelupEvents(wcPlayer);
+            if (wcPlayer.GetPlayer().IsBot)
+            {
+                AutoSpendSkillPoints(wcPlayer);
+            }
         }
 
         private static void PerformLevelupEvents(WarcraftPlayer wcPlayer)
@@ -99,6 +104,24 @@ namespace WarcraftPlugin.Core
                 level = WarcraftPlugin.MaxSkillLevel;
 
             return level - totalPointsUsed;
+        }
+
+        private static readonly Random _random = new();
+
+        internal static void AutoSpendSkillPoints(WarcraftPlayer wcPlayer)
+        {
+            var wcClass = wcPlayer.GetClass();
+            while (GetFreeSkillPoints(wcPlayer) > 0)
+            {
+                var available = Enumerable.Range(0, wcClass.Abilities.Count)
+                    .Where(i => wcPlayer.GetAbilityLevel(i) < WarcraftPlayer.GetMaxAbilityLevel(i)
+                                && (i != WarcraftPlayer.UltimateAbilityIndex || wcPlayer.IsMaxLevel))
+                    .ToList();
+                if (available.Count == 0)
+                    break;
+                var index = available[_random.Next(available.Count)];
+                wcPlayer.GrantAbilityLevel(index);
+            }
         }
     }
 }

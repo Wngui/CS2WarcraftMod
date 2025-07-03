@@ -3,6 +3,7 @@ using System.Drawing;
 using CounterStrikeSharp.API.Core;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using System.Linq;
