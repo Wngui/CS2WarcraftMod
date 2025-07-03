@@ -2,12 +2,9 @@ using CounterStrikeSharp.API.Core;
 using WarcraftPlugin.Core.Effects;
 using CounterStrikeSharp.API.Modules.UserMessages;
 using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Modules.Events;
-using CounterStrikeSharp.API.Modules.Utils;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Items;
 

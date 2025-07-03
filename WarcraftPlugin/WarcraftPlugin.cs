@@ -12,7 +12,6 @@ using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Menu;
 using WarcraftPlugin.Menu.WarcraftMenu;
-using WarcraftPlugin.Items;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;

@@ -1,5 +1,4 @@
 using CounterStrikeSharp.API.Core;
-using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
 

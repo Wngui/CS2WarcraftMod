@@ -1,8 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using System;
-using WarcraftPlugin.Core;
-using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Items;
 

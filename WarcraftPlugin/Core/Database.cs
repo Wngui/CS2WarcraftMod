@@ -6,7 +6,6 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using Dapper;
 using Microsoft.Data.Sqlite;
-using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
