@@ -23,7 +23,7 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 5;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 6;
 
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
@@ -33,7 +33,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
         [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 30;
-        [JsonPropertyName("EnableLevelDifferenceXp")] public bool EnableLevelDifferenceXp { get; set; } = false;
+        [JsonPropertyName("EnableLevelDifferenceXp")] public bool EnableLevelDifferenceXp { get; set; } = true;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
         [JsonPropertyName("TotalLevelRequired")]
         public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
