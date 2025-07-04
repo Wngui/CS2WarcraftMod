@@ -8,8 +8,8 @@ namespace WarcraftPlugin.Items;
 
 internal class OrbOfFrost : ShopItem
 {
-    internal override string Name => "Orb of Frost";
-    internal override string Description => "33% chance to slow enemy on hit";
+    protected override string Name => "Orb of Frost";
+    protected override string Description => "33% chance to slow enemy on hit";
     internal override int Price => 3500;
 
     internal override void Apply(CCSPlayerController player) { }

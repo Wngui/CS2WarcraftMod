@@ -6,9 +6,9 @@ namespace WarcraftPlugin.Items;
 
 internal class BootsOfSpeed : ShopItem
 {
-    internal override string Name => "Boots of Speed";
-    internal override string Description => "Increase Speed by 20%";
-    internal override int Price => 3000;
+    protected override string Name => "Boots of Speed";
+    protected override string Description => "Increase Speed by 20%";
+    internal override int Price => 2500;
 
     internal override void Apply(CCSPlayerController player)
     {

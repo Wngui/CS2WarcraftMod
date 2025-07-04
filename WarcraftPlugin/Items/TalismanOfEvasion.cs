@@ -5,8 +5,8 @@ namespace WarcraftPlugin.Items;
 
 internal class TalismanOfEvasion : ShopItem
 {
-    internal override string Name => "Talisman of Evasion";
-    internal override string Description => "20% chance to evade";
+    protected override string Name => "Talisman of Evasion";
+    protected override string Description => "20% chance to evade";
     internal override int Price => 4000;
 
     internal override void Apply(CCSPlayerController player) { }

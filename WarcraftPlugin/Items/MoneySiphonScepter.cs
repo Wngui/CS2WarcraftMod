@@ -2,13 +2,14 @@ using CounterStrikeSharp.API.Core;
 using WarcraftPlugin.Events.ExtendedEvents;
 using System;
 using WarcraftPlugin.Helpers;
+using CounterStrikeSharp.API;
 
 namespace WarcraftPlugin.Items;
 
 internal class MoneySiphonScepter : ShopItem
 {
-    internal override string Name => "Money Siphon Scepter";
-    internal override string Description => "Steal 2% of enemy money on hit";
+    protected override string Name => "Money Siphon Scepter";
+    protected override string Description => "Steal 2% of enemy money on hit";
     internal override int Price => 3000;
 
     internal override void Apply(CCSPlayerController player) { }

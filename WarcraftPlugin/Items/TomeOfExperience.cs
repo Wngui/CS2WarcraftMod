@@ -5,8 +5,8 @@ namespace WarcraftPlugin.Items;
 
 internal class TomeOfExperience : ShopItem
 {
-    internal override string Name => "Tome of Experience";
-    internal override string Description => "Gain 150XP";
+    protected override string Name => "Tome of Experience";
+    protected override string Description => "Gain 150XP";
     internal override int Price => 4000;
     internal override bool IsInstant => true;
 

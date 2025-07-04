@@ -8,8 +8,8 @@ namespace WarcraftPlugin.Items;
 
 internal class DaggerOfVenom : ShopItem
 {
-    internal override string Name => "Dagger of Venom";
-    internal override string Description => "Poison enemies on hit";
+    protected override string Name => "Dagger of Venom";
+    protected override string Description => "Poison enemies on hit";
     internal override int Price => 2500;
 
     internal override void Apply(CCSPlayerController player) { }

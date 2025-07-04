@@ -8,8 +8,8 @@ namespace WarcraftPlugin.Items;
 
 internal class GlovesOfDazzle : ShopItem
 {
-    internal override string Name => "Gloves of Dazzle";
-    internal override string Description => "Receive a Flashbang every 12s";
+    protected override string Name => "Gloves of Dazzle";
+    protected override string Description => "Receive a Flashbang every 12s";
     internal override int Price => 3000;
 
     internal override void Apply(CCSPlayerController player)

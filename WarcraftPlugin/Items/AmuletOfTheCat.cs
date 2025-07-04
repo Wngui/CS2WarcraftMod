@@ -10,8 +10,8 @@ namespace WarcraftPlugin.Items;
 
 internal class AmuletOfTheCat : ShopItem
 {
-    internal override string Name => "Amulet of the Cat";
-    internal override string Description => "Silent Footsteps";
+    protected override string Name => "Amulet of the Cat";
+    protected override string Description => "Silent Footsteps";
     internal override int Price => 4000;
 
     internal override void Apply(CCSPlayerController player)

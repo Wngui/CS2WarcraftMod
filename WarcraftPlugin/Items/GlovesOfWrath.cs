@@ -8,8 +8,8 @@ namespace WarcraftPlugin.Items;
 
 internal class GlovesOfWrath : ShopItem
 {
-    internal override string Name => "Gloves of Wrath";
-    internal override string Description => "Receive an HE grenade every 12s";
+    protected override string Name => "Gloves of Wrath";
+    protected override string Description => "Receive an HE grenade every 12s";
     internal override int Price => 3000;
 
     internal override void Apply(CCSPlayerController player)

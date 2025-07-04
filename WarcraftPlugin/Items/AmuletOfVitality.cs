@@ -6,8 +6,8 @@ namespace WarcraftPlugin.Items;
 
 internal class AmuletOfVitality : ShopItem
 {
-    internal override string Name => "Amulet of Vitality";
-    internal override string Description => "Increase max HP by 50";
+    protected override string Name => "Amulet of Vitality";
+    protected override string Description => "Increase max HP by 50";
     internal override int Price => 3500;
 
     internal override void Apply(CCSPlayerController player)

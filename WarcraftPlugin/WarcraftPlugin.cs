@@ -427,7 +427,6 @@ namespace WarcraftPlugin
         private void OnMapEndHandler()
         {
             EffectManager.DestroyAllEffects();
-            AdvertManager?.Cancel();
             if (Config.MatchReset)
             {
                 _database.ResetClients();
@@ -459,11 +458,6 @@ namespace WarcraftPlugin
             }
             else
             {
-                if (!_database.PlayerExistsInDatabase(player.SteamID))
-                {
-                    _database.AddNewPlayerToDatabase(player);
-                }
-
                 WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
             }
 

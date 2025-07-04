@@ -6,8 +6,8 @@ namespace WarcraftPlugin.Items;
 
 internal class RingOfRegeneration : ShopItem
 {
-    internal override string Name => "Ring of Regeneration";
-    internal override string Description => "Regen 1 HP each sec.";
+    protected override string Name => "Ring of Regeneration";
+    protected override string Description => "Regen 1 HP each sec.";
     internal override int Price => 3000;
 
     internal override void Apply(CCSPlayerController player)

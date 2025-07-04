@@ -7,8 +7,8 @@ namespace WarcraftPlugin.Items;
 
 internal class MaskOfDeath : ShopItem
 {
-    internal override string Name => "Mask of Death";
-    internal override string Description => "50% Chance to Heal 15% of Weapon Damage dealt";
+    protected override string Name => "Mask of Death";
+    protected override string Description => "50% Chance to Heal 15% of Weapon Damage dealt";
     internal override int Price => 4000;
 
     internal override void Apply(CCSPlayerController player) { }

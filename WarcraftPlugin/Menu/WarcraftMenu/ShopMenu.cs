@@ -35,8 +35,8 @@ internal static class ShopMenu
 
         foreach (var item in items)
         {
-            menu.Add($"<font color='white' class='{FontSizes.FontSizeSm}'>{item.Name} - ${item.Price}</font>",
-                $"<font color='grey' class='{FontSizes.FontSizeS}'>{item.Description}</font>", (player, option) =>
+            menu.Add($"<font color='white' class='{FontSizes.FontSizeSm}'>{item.LocalizedName} - ${item.Price}</font>",
+                $"<font color='grey' class='{FontSizes.FontSizeS}'>{item.LocalizedDescription}</font>", (player, option) =>
             {
                 if (!item.IsInstant)
                 {
@@ -92,12 +92,12 @@ internal static class ShopMenu
                 {
                     item.Apply(player);
                     player.PlayLocalSound("sounds/buttons/button9.vsnd");
-                    player.PrintToChat($" Bought {item.Name}");
+                    player.PrintToChat($" Bought {item.LocalizedName}");
                 }
                 else if (wcPlayer.AddItem(item))
                 {
                     player.PlayLocalSound("sounds/buttons/button9.vsnd");
-                    player.PrintToChat($" Bought {item.Name}");
+                    player.PrintToChat($" Bought {item.LocalizedName}");
                 }
             });
         }

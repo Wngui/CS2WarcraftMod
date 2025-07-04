@@ -212,7 +212,7 @@ namespace WarcraftPlugin.Events
 
                     var itemsOwned = warcraftPlayer.Items.Count == 0
                         ? "None"
-                        : string.Join(", ", warcraftPlayer.Items.Select(i => i.Name));
+                        : string.Join(", ", warcraftPlayer.Items.Select(i => i.LocalizedName));
                     player.PrintToChat($" Items: {itemsOwned}");
 
                     if (!warcraftPlayer.IsMaxLevel)
