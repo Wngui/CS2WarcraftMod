@@ -197,14 +197,6 @@ namespace WarcraftPlugin.Helpers
             var pawn = controller.PlayerPawn.Value;
             if (!controller.PawnIsAlive || pawn == null) return;
 
-            if (health > pawn.Health)
-            {
-                var isPoisoned = WarcraftPlugin.Instance.EffectManager
-                    .GetEffectsByType<VenomStrikeEffect>()
-                    .Any(x => x.Victim.Handle == controller.Handle);
-                if (isPoisoned) return;
-            }
-
             pawn.Health = health;
 
             Utilities.SetStateChanged(pawn, "CBaseEntity", "m_iHealth");
