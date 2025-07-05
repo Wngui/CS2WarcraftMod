@@ -294,59 +294,12 @@ namespace WarcraftPlugin.Events
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventPlayerKilledOther(@event.Handle), HookMode.Pre);
                 var weaponName = @event.Weapon;
 
-                var xpHeadshot = 0f;
-                var xpKnife = 0f;
-
-                if (headshot)
-                    xpHeadshot = Convert.ToInt32(_config.XpPerKill * _config.XpHeadshotModifier);
-
-                if (weaponName.StartsWith("knife"))
-                {
-                    xpKnife = Convert.ToInt32(_config.XpPerKill * _config.XpKnifeModifier);
-                }
-
-                var xpToAdd = Convert.ToInt32(_config.XpPerKill + xpHeadshot + xpKnife);
-                var levelBonus = 0;
-                if (_config.EnableLevelDifferenceXp)
-                {
-                    var attackerWc = attacker.GetWarcraftPlayer();
-                    var victimWc = victim.GetWarcraftPlayer();
-                    if (attackerWc != null && victimWc != null)
-                    {
-                        var diff = victimWc.GetLevel() - attackerWc.GetLevel();
-                        if (diff > 0)
-                        {
-                            var multiplier = 1 + (diff * 2f / (WarcraftPlugin.MaxLevel - 1));
-                            var newXp = Convert.ToInt32(xpToAdd * multiplier);
-                            levelBonus = newXp - xpToAdd;
-                            xpToAdd = newXp;
-                        }
-                    }
-                }
-
-                _plugin.XpSystem.AddXp(attacker, xpToAdd);
-
-                string hsBonus = "";
-                if (xpHeadshot != 0)
-                {
-                    hsBonus = $"(+{xpHeadshot} {_plugin.Localizer["xp.bonus.headshot"]})";
-                }
-
-                string knifeBonus = "";
-                if (xpKnife != 0)
-                {
-                    knifeBonus = $"(+{xpKnife} {_plugin.Localizer["xp.bonus.knife"]})";
-                }
-
-                string levelDiffBonus = "";
-                if (levelBonus > 0)
-                {
-                    levelDiffBonus = $"(+{levelBonus} {_plugin.Localizer["xp.bonus.level"]})";
-                }
-
-                string xpString = $" {_plugin.Localizer["xp.kill", xpToAdd, victim.PlayerName, hsBonus, knifeBonus, levelDiffBonus]}";
-
-                attacker.PrintToChat(xpString);
+                _plugin.XpSystem.CalculateAndAddKillXp(
+                    attacker,
+                    victim,
+                    weaponName,
+                    headshot
+                );
             }
 
             if (victim.IsValid && attacker.IsValid)

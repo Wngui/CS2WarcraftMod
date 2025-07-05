@@ -158,7 +158,7 @@ namespace WarcraftPlugin
 
             _instance ??= this;
 
-            XpSystem = new XpSystem(this);
+            XpSystem = new XpSystem(this, Config, Localizer);
             XpSystem.GenerateXpCurve(110, 1.07f, MaxLevel);
 
             _database = new Database();
