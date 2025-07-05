@@ -177,8 +177,8 @@ namespace WarcraftPlugin
             AddUniqueCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
             AddUniqueCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
 
-            //AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
-            //AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
+            AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
+            AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
 
             AddUniqueCommand("rpg_help", "list all commands", CommandHelp);
             AddUniqueCommand("commands", "list all commands", CommandHelp);
@@ -369,6 +369,7 @@ namespace WarcraftPlugin
         private void OnMapEndHandler()
         {
             EffectManager.DestroyAllEffects();
+            AdvertManager?.Cancel();
             if (Config.MatchReset)
             {
                 _database.ResetClients();
@@ -452,7 +453,10 @@ namespace WarcraftPlugin
                 //Avoid getting stuck in old menu
                 player.EnableMovement();
             }
+            AdvertManager?.Cancel();
+            _saveClientsTimer?.Kill();
             _database.SaveClients();
+            _database.Dispose();
             VolumeFix.Unload();
             base.Unload(hotReload);
         }

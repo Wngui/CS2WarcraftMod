@@ -1,5 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Timers;
+using System.Linq;
+using System.Collections.Generic;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 
@@ -8,28 +10,54 @@ namespace WarcraftPlugin.Core
     internal class CooldownManager
     {
         private readonly float _tickRate = 0.25f;
+        private readonly HashSet<WarcraftPlayer> _playersOnCooldown = [];
 
         internal void Initialize()
         {
             WarcraftPlugin.Instance.AddTimer(_tickRate, CooldownTick, TimerFlags.REPEAT);
         }
 
+        private void RegisterPlayer(WarcraftPlayer player)
+        {
+            if (player != null)
+            {
+                _playersOnCooldown.Add(player);
+            }
+        }
+
+        private void UnregisterPlayer(WarcraftPlayer player)
+        {
+            if (player != null)
+            {
+                _playersOnCooldown.Remove(player);
+            }
+        }
+
         private void CooldownTick()
         {
-            foreach (var player in Utilities.GetPlayers())
+            foreach (var wcPlayer in _playersOnCooldown.ToArray())
             {
-                var warcraftPlayer = player?.GetWarcraftPlayer();
-                if (warcraftPlayer == null) continue;
-                for (int i = 0; i < warcraftPlayer.AbilityCooldowns.Count; i++)
+                bool hasCooldown = false;
+
+                for (int i = 0; i < wcPlayer.AbilityCooldowns.Count; i++)
                 {
-                    if (warcraftPlayer.AbilityCooldowns[i] <= 0) continue;
+                    if (wcPlayer.AbilityCooldowns[i] <= 0) continue;
 
-                    warcraftPlayer.AbilityCooldowns[i] -= 0.25f;
+                    wcPlayer.AbilityCooldowns[i] -= _tickRate;
 
-                    if (warcraftPlayer.AbilityCooldowns[i] <= 0)
+                    if (wcPlayer.AbilityCooldowns[i] <= 0)
                     {
-                        PlayEffects(warcraftPlayer, i);
+                        PlayEffects(wcPlayer, i);
                     }
+                    else
+                    {
+                        hasCooldown = true;
+                    }
+                }
+
+                if (!hasCooldown)
+                {
+                    _playersOnCooldown.Remove(wcPlayer);
                 }
             }
         }
@@ -47,6 +75,7 @@ namespace WarcraftPlugin.Core
         internal static void StartCooldown(WarcraftPlayer player, int abilityIndex, float abilityCooldown)
         {
             player.AbilityCooldowns[abilityIndex] = abilityCooldown;
+            WarcraftPlugin.Instance.CooldownManager.RegisterPlayer(player);
         }
 
         internal static void ResetCooldowns(WarcraftPlayer player)
@@ -55,6 +84,8 @@ namespace WarcraftPlugin.Core
             {
                 player.AbilityCooldowns[abilityIndex] = 0;
             }
+
+            WarcraftPlugin.Instance.CooldownManager.UnregisterPlayer(player);
         }
 
         private static void PlayEffects(WarcraftPlayer wcplayer, int abilityIndex)

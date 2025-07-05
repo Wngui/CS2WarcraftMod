@@ -10,9 +10,10 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    internal class Database
+    internal class Database : IDisposable
     {
         private SqliteConnection _connection;
+        private bool _disposed;
 
         internal void Initialize(string directory)
         {
@@ -77,7 +78,7 @@ namespace WarcraftPlugin.Core
             {
                 var defaultClass = WarcraftPlugin.Instance.classManager.GetDefaultClass();
                 dbPlayer.CurrentRace = defaultClass.InternalName;
-                player.PrintToChat(" " + WarcraftPlugin.Instance.Localizer["class.disabled", defaultClass.LocalizedDisplayName]);
+                player.PrintToChat(" "+ WarcraftPlugin.Instance.Localizer["class.disabled", defaultClass.LocalizedDisplayName]);
             }
 
             var raceInformationExists = _connection.ExecuteScalar<int>(@"
@@ -187,6 +188,15 @@ namespace WarcraftPlugin.Core
 
             _connection.Execute(@"
                 DELETE FROM `raceinformation`;");
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            _connection?.Dispose();
+            _disposed = true;
         }
     }
 

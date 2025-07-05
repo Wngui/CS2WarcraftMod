@@ -10,10 +10,17 @@ namespace WarcraftPlugin.Adverts
         private readonly float _interval = 180f;
         private readonly int _advertCount = WarcraftPlugin.Instance.Localizer.GetAllStrings().Count(x => x.Name.Contains("advert."));
         private int _advertIndex = 0;
+        private Timer? _advertTimer;
 
         internal void Initialize()
         {
-            WarcraftPlugin.Instance.AddTimer(_interval, AdvertTick, TimerFlags.REPEAT);
+            _advertTimer = WarcraftPlugin.Instance.AddTimer(_interval, AdvertTick, TimerFlags.REPEAT);
+        }
+
+        internal void Cancel()
+        {
+            _advertTimer?.Kill();
+            _advertTimer = null;
         }
 
         private void AdvertTick()
