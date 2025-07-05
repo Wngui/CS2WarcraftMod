@@ -176,71 +176,73 @@ namespace WarcraftPlugin
                 AdvertManager = new AdvertManager();
                 AdvertManager.Initialize();
             }
-            var ultimateAliases = new[]
-            {
+
+            List<string> ultimateAliases =
+            [
                 "ultimate", "ult",
-                Localizer["command.ultimate"], Localizer["command.ult"]
-            };
+                ..Localizer["command.ultimate"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in ultimateAliases)
                 AddUniqueCommand(alias, "ultimate", UltimatePressed);
 
-            var classAliases = new[]
-            {
-                "changerace", "changeclass", "race", "class", "rpg", "cr",
-                Localizer["command.changerace"], Localizer["command.changeclass"],
-                Localizer["command.race"], Localizer["command.class"],
-                Localizer["command.rpg"], Localizer["command.cr"]
-            };
+            List<string> classAliases =
+            [
+                "changerace",
+                "changeclass",
+                "race",
+                "class",
+                "rpg",
+                "cr",
+                ..Localizer["command.changeclass"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in classAliases)
                 AddUniqueCommand(alias, "change class", (player, _) => ShowClassMenu(player));
 
-            var resetAliases = new[]
-            {
+            List<string> resetAliases =
+            [
                 "reset", "resetskills", "resetskillpoints",
-                Localizer["command.reset"], Localizer["command.resetskills"], Localizer["command.resetskillpoints"]
-            };
+                ..Localizer["command.reset"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in resetAliases)
                 AddUniqueCommand(alias, "reset skills", CommandResetSkills);
 
-            var factoryResetAliases = new[]
-            {
+            List<string> factoryResetAliases =
+            [
                 "factoryreset", "fullreset", "resetlevels",
-                Localizer["command.factoryreset"], Localizer["command.fullreset"], Localizer["command.resetlevels"]
-            };
+                ..Localizer["command.factoryreset"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in factoryResetAliases)
                 AddUniqueCommand(alias, "reset levels", CommandFactoryReset);
 
-            var addXpAliases = new[]
-            {
+            List<string> addXpAliases = 
+                [
                 "addxp", "givexp", "xpadd",
-                Localizer["command.addxp"], Localizer["command.givexp"], Localizer["command.xpadd"]
-            };
+                ..Localizer["command.addxp"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in addXpAliases)
                 AddUniqueCommand(alias, "addxp", CommandAddXp);
 
-            var skillsAliases = new[]
-            {
+            List<string> skillsAliases =
+            [
                 "skills", "level",
-                Localizer["command.skills"], Localizer["command.level"]
-            };
+                ..Localizer["command.skills"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in skillsAliases)
                 AddUniqueCommand(alias, "skills", (player, _) => ShowSkillsMenu(player));
 
-            var shopAliases = new[]
-            {
+            List<string> shopAliases =
+            [
                 "shopmenu", "shop", "buymenu",
-                Localizer["command.shopmenu"], Localizer["command.shop"], Localizer["command.buymenu"]
-            };
+                ..Localizer["command.shopmenu"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in shopAliases)
                 AddUniqueCommand(alias, "open item shop", (player, _) => ShowShopMenu(player));
 
-            var helpAliases = new[]
-            {
+            List<string> helpAliases =
+            [
                 "rpg_help", "commands", "wcs", "war3menu",
-                Localizer["command.rpg_help"], Localizer["command.commands"],
-                Localizer["command.wcs"], Localizer["command.war3menu"],
-                Localizer["command.help"]
-            };
+                ..Localizer["command.help"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
             foreach (var alias in helpAliases)
                 AddUniqueCommand(alias, "list all commands", CommandHelp);
 
