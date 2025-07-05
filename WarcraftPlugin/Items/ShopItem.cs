@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using Microsoft.Extensions.Localization;
+using System.Drawing;
 using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.lang;
 
@@ -27,6 +28,11 @@ internal abstract class ShopItem
     /// Instant items are not stored in the player's inventory.
     /// </summary>
     internal virtual bool IsInstant => false;
+
+    /// <summary>
+    /// The display color of the item.
+    /// </summary>
+    internal virtual Color Color => Color.White; // Default: white
 
     internal abstract void Apply(CCSPlayerController player);
 

@@ -3,6 +3,7 @@ using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Classes;
 using WarcraftPlugin.Helpers;
 using System.Linq;
+using System.Drawing;
 
 namespace WarcraftPlugin.Items;
 
@@ -11,6 +12,7 @@ internal class DaggerOfVenom : ShopItem
     protected override string Name => "Dagger of Venom";
     protected override string Description => "Poison enemies on hit";
     internal override int Price => 2500;
+    internal override Color Color => Color.FromArgb(255, 34, 139, 34); // ForestGreen for poison/venom
 
     internal override void Apply(CCSPlayerController player) { }
 

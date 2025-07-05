@@ -4,6 +4,8 @@ using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
 using System;
+using System.Drawing;
+
 namespace WarcraftPlugin.Items;
 
 internal class OrbOfFrost : ShopItem
@@ -11,6 +13,7 @@ internal class OrbOfFrost : ShopItem
     protected override string Name => "Orb of Frost";
     protected override string Description => "33% chance to slow enemy on hit";
     internal override int Price => 3500;
+    internal override Color Color => Color.FromArgb(255, 0, 191, 255); // DeepSkyBlue for frost/slow
 
     internal override void Apply(CCSPlayerController player) { }
 

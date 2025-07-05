@@ -3,6 +3,7 @@ using WarcraftPlugin.Events.ExtendedEvents;
 using System;
 using WarcraftPlugin.Helpers;
 using CounterStrikeSharp.API;
+using System.Drawing;
 
 namespace WarcraftPlugin.Items;
 
@@ -11,6 +12,7 @@ internal class MoneySiphonScepter : ShopItem
     protected override string Name => "Money Siphon Scepter";
     protected override string Description => "Steal 2% of enemy money on hit";
     internal override int Price => 3000;
+    internal override Color Color => Color.FromArgb(255, 255, 215, 0); // Gold for money/unique
 
     internal override void Apply(CCSPlayerController player) { }
 

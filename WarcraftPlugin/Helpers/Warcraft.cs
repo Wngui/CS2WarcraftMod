@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using WarcraftPlugin.Models;
 using CounterStrikeSharp.API.Modules.UserMessages;
 using System.Text.RegularExpressions;
-using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Classes;
 
 namespace WarcraftPlugin.Helpers
 {

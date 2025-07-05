@@ -1,4 +1,5 @@
 using CounterStrikeSharp.API.Core;
+using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
 
@@ -9,6 +10,7 @@ internal class BootsOfSpeed : ShopItem
     protected override string Name => "Boots of Speed";
     protected override string Description => "Increase Speed by 20%";
     internal override int Price => 2500;
+    internal override Color Color => Color.FromArgb(255, 30, 144, 255); // DodgerBlue for speed/movement
 
     internal override void Apply(CCSPlayerController player)
     {

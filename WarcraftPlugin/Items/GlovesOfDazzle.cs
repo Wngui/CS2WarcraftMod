@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using System.Drawing;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
@@ -11,6 +12,7 @@ internal class GlovesOfDazzle : ShopItem
     protected override string Name => "Gloves of Dazzle";
     protected override string Description => "Receive a Flashbang every 12s";
     internal override int Price => 3000;
+    internal override Color Color => Color.FromArgb(255, 255, 255, 0); // Yellow for utility/flashbang
 
     internal override void Apply(CCSPlayerController player)
     {

@@ -210,10 +210,7 @@ namespace WarcraftPlugin.Events
                         warcraftClass.ResetCooldowns();
                     });
 
-                    var itemsOwned = warcraftPlayer.Items.Count == 0
-                        ? "None"
-                        : string.Join(", ", warcraftPlayer.Items.Select(i => i.LocalizedName));
-                    player.PrintToChat($" Items: {itemsOwned}");
+                    warcraftPlayer.PrintItemsOwned();
 
                     if (!warcraftPlayer.IsMaxLevel)
                     {

@@ -1,6 +1,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using System;
+using System.Drawing;
 
 namespace WarcraftPlugin.Items;
 
@@ -10,6 +11,7 @@ internal class TomeOfGambling : ShopItem
     protected override string Description => "Chance to gain 150-450 XP";
     internal override int Price => 8000;
     internal override bool IsInstant => true;
+    internal override Color Color => Color.FromArgb(255, 255, 215, 0); // Gold for legendary/XP/instant
 
     internal override void Apply(CCSPlayerController player)
     {
