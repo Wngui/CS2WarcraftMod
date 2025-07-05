@@ -10,9 +10,10 @@ using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Core
 {
-    internal class Database
+    internal class Database : IDisposable
     {
         private SqliteConnection _connection;
+        private bool _disposed;
 
         internal void Initialize(string directory)
         {
@@ -188,10 +189,22 @@ namespace WarcraftPlugin.Core
             _connection.Execute(@"
                 DELETE FROM `raceinformation`;");
         }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            _connection?.Dispose();
+            _disposed = true;
+        }
     }
 
     internal class DatabasePlayer
     {
+        // Dapper returns integer values from SQLite as long (Int64) which
+        // cannot be automatically cast to ulong. Using a signed integer here
+        // avoids InvalidCastException when mapping query results.
         internal long SteamId { get; set; }
         internal string CurrentRace { get; set; }
         internal string Name { get; set; }

@@ -51,7 +51,7 @@ namespace WarcraftPlugin.Classes
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
                 var decoy = new CDecoyGrenade(Player.GiveNamedItem("weapon_smokegrenade"));
-                decoy.AttributeManager.Item.CustomName = "Posion cloud";
+                decoy.AttributeManager.Item.CustomName = "Poison cloud";
             }
         }
 

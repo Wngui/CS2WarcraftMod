@@ -14,8 +14,11 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
         {
             var plugin = WarcraftPlugin.Instance;
 
-            // Create a dictionary for fast lookups by InternalName
-            var classInfoDict = classInformations?.ToDictionary(x => x.RaceName, x => x);
+            // Create a dictionary for fast lookups by InternalName with case-insensitive comparison
+            var classInfoDict = classInformations?.ToDictionary(
+                x => x.RaceName,
+                x => x,
+                StringComparer.OrdinalIgnoreCase);
 
             var warcraftClassInformations = new List<WarcraftClassInformation>();
             foreach (var warcraftClass in plugin.classManager.GetAllClasses())

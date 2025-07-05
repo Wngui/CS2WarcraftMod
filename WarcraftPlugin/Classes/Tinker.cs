@@ -24,6 +24,7 @@ namespace WarcraftPlugin.Classes
         private static readonly int _droneUltimateAmount = 3;
         private Timer _ultimateTimer;
         private const int _ultimateTime = 20;
+        private OnTick? _updateDronesListener;
 
         public override string DisplayName => "Tinker";
         public override Color DefaultColor => Color.Teal;
@@ -100,7 +101,8 @@ namespace WarcraftPlugin.Classes
                 _drones.Add(new Drone(Player, _droneDefaultPosition.Clone()));
             }
 
-            WarcraftPlugin.Instance.RegisterListener<OnTick>(UpdateDrones);
+            _updateDronesListener = new OnTick(UpdateDrones);
+            WarcraftPlugin.Instance.RegisterListener(_updateDronesListener);
         }
 
         private void UpdateDrones()
@@ -135,8 +137,11 @@ namespace WarcraftPlugin.Classes
 
         private void DeactivateDrones()
         {
-            var onTick = new OnTick(UpdateDrones);
-            WarcraftPlugin.Instance.RemoveListener(onTick);
+            if (_updateDronesListener != null)
+            {
+                WarcraftPlugin.Instance.RemoveListener(_updateDronesListener);
+                _updateDronesListener = null;
+            }
 
             foreach (var drone in _drones)
             {
