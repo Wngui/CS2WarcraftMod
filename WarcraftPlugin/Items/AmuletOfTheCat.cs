@@ -29,7 +29,6 @@ internal class AmuletOfTheCat : ShopItem
             if (_silentPlayers.Count == 0)
             {
                 WarcraftPlugin.Instance.HookUserMessage(208, PreFootstepMessage, HookMode.Pre);
-                WarcraftPlugin.Instance.RegisterEventHandler<EventPlayerFootstep>(OnPlayerFootstep, HookMode.Pre);
             }
 
             _silentPlayers.Add(owner.PlayerPawn.Value.Handle);
@@ -49,19 +48,6 @@ internal class AmuletOfTheCat : ShopItem
                 return HookResult.Continue;
 
             um.Recipients.Clear();
-            return HookResult.Stop;
-        }
-
-        private static HookResult OnPlayerFootstep(EventPlayerFootstep @event, GameEventInfo info)
-        {
-            var player = @event.Userid;
-            if (player == null)
-                return HookResult.Continue;
-
-            if (!_silentPlayers.Contains(player.PlayerPawn.Value.Handle))
-                return HookResult.Continue;
-
-            info.DontBroadcast = true;
             return HookResult.Stop;
         }
 
