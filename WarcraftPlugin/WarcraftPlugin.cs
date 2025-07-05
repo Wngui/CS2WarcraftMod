@@ -187,12 +187,7 @@ namespace WarcraftPlugin
 
             List<string> classAliases =
             [
-                "changerace",
-                "changeclass",
-                "race",
-                "class",
-                "rpg",
-                "cr",
+                "changerace", "changeclass", "race", "class", "rpg", "cr",
                 ..Localizer["command.changeclass"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             ];
             foreach (var alias in classAliases)

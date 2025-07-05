@@ -38,14 +38,14 @@
   "player.healed.healer": "{Green}Healed {Default}{0} {Green}+{1} HP",
 
   //Commands, used in-game by typing !<command>
-  "command.ultimate": "ultimate",
-  "command.changeclass": "changeclass",
-  "command.reset": "reset",
-  "command.factoryreset": "factoryreset",
-  "command.addxp": "addxp",
-  "command.skills": "skills",
-  "command.shopmenu": "shopmenu",
-  "command.help": "commands", //"help" is a reserved keyword
+  "command.ultimate": "ultimate, ult",
+  "command.changeclass": "changerace, changeclass, race, class, rpg, cr",
+  "command.reset": "reset, resetskills, resetskillpoints",
+  "command.factoryreset": "factoryreset, fullreset, resetlevels",
+  "command.addxp": "addxp, givexp, xpadd",
+  "command.skills": "skills, level",
+  "command.shopmenu": "shopmenu, shop, buymenu",
+  "command.help": "rpg_help, commands, wcs, war3menu", //"help" is a reserved keyword
   "command.help.description": "{Green}Type {Gold}!class{Green} to change classes, {Gold}!skills{Green} to level-up",
 
   //Adverts
