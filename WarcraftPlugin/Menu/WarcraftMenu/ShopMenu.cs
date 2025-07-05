@@ -1,9 +1,10 @@
-using WarcraftPlugin.Items;
 using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Utils;
 using System.Linq;
-using WarcraftPlugin.Models;
-using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Core;
+using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Items;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu;
 
@@ -84,15 +85,14 @@ internal static class ShopMenu
                 if (item.IsInstant)
                 {
                     item.Apply(player);
-                    player.PlayLocalSound("sounds/buttons/button9.vsnd");
-                    player.PrintToChat($" Bought {item.LocalizedName}");
                 }
                 else if (wcPlayer.AddItem(item))
                 {
                     item.Apply(player);
-                    player.PlayLocalSound("sounds/buttons/button9.vsnd");
-                    player.PrintToChat($" Bought {item.LocalizedName}");
                 }
+
+                player.PlayLocalSound("sounds/buttons/button9.vsnd");
+                player.PrintToChat($" Bought {ChatColors.Green}[{ChatColors.Gold}{item.LocalizedName}{ChatColors.Green}]");
             });
         }
 

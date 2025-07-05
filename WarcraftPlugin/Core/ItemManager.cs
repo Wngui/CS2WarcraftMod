@@ -1,3 +1,4 @@
+using CounterStrikeSharp.API.Modules.Utils;
 using System.Linq;
 using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Items;
@@ -49,11 +50,11 @@ namespace WarcraftPlugin.Core
         public static void PrintItemsOwned(this WarcraftPlayer warcraftPlayer)
         {
             var player = warcraftPlayer?.Player;
-            string itemsOwned = "None";
+            string itemsOwned = $" {ChatColors.Grey}None";
             if (warcraftPlayer != null && warcraftPlayer.Items != null && warcraftPlayer.Items.Count > 0)
             {
                 itemsOwned = string.Join(", ", warcraftPlayer.Items.Select(i =>
-                    $"[{{ChatColor.Gold}}{i.LocalizedName} {{ChatColor.Default}}]"));
+                    $"{ChatColors.Green}[{ChatColors.Gold}{i.LocalizedName}{ChatColors.Green}]"));
             }
             player?.PrintToChat($" Items: {itemsOwned}");
         }
