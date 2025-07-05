@@ -95,20 +95,5 @@ namespace WarcraftPlugin.Models
             Player.PlayLocalSound("sounds/buttons/button9.vsnd");
             _abilityLevels[abilityIndex] += 1;
         }
-
-        internal bool AddItem(ShopItem item)
-        {
-            if (Items.Any(inv => inv.GetType() == item.GetType()))
-                return false;
-
-            Items.Add(item);
-            item.Apply(Player);
-            return true;
-        }
-
-        internal void ClearItems()
-        {
-            Items.Clear();
-        }
     }
 }

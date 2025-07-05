@@ -3,6 +3,7 @@ using CounterStrikeSharp.API;
 using System.Linq;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Core;
 
 namespace WarcraftPlugin.Menu.WarcraftMenu;
 
@@ -96,6 +97,7 @@ internal static class ShopMenu
                 }
                 else if (wcPlayer.AddItem(item))
                 {
+                    item.Apply(player);
                     player.PlayLocalSound("sounds/buttons/button9.vsnd");
                     player.PrintToChat($" Bought {item.LocalizedName}");
                 }

@@ -245,14 +245,7 @@ namespace WarcraftPlugin.Events
                     var hurtOtherEvent = new EventPlayerHurtOther(@event.Handle);
                     attackingClass.InvokeEvent(hurtOtherEvent, HookMode.Pre);
 
-                    var items = attacker.GetWarcraftPlayer()?.Items;
-                    if (items != null)
-                    {
-                        foreach (var item in items)
-                        {
-                            item.OnPlayerHurtOther(hurtOtherEvent);
-                        }
-                    }
+                    ItemManager.OnPlayerHurtOther(hurtOtherEvent);
                 }
             }
 
@@ -284,10 +277,7 @@ namespace WarcraftPlugin.Events
                 {
                     WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
-                    foreach (var item in warcraftPlayer.Items)
-                    {
-                        item.Apply(player);
-                    }
+                    warcraftPlayer?.ApplyItems();
                 });
             }
 
@@ -362,14 +352,17 @@ namespace WarcraftPlugin.Events
                 attacker.PrintToChat(xpString);
             }
 
-            if (victim.IsValid && attacker.IsValid && attacker != victim)
+            if (victim.IsValid && attacker.IsValid)
             {
-                var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
-                var victimClass = victim.GetWarcraftPlayer()?.GetClass();
-                WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
+                if (attacker != victim)
+                {
+                    var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
+                    var victimClass = victim.GetWarcraftPlayer()?.GetClass();
+                    WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
+                    victimClass?.InvokeEvent(@event, HookMode.Pre);
+                    @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
+                }
                 victim.GetWarcraftPlayer()?.ClearItems();
-                victimClass?.InvokeEvent(@event, HookMode.Pre);
-                @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
             }
             return HookResult.Continue;
         }
