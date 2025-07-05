@@ -11,7 +11,7 @@ internal class TomeOfGambling : ShopItem
     protected override string Description => "Chance to gain 150-450 XP";
     internal override int Price => 8000;
     internal override bool IsInstant => true;
-    internal override Color Color => Color.FromArgb(255, 255, 215, 0); // Gold for legendary/XP/instant
+    internal override Color Color => Color.RosyBrown; 
 
     internal override void Apply(CCSPlayerController player)
     {

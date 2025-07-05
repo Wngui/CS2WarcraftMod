@@ -11,7 +11,7 @@ internal static class ShopMenu
 {
     internal static void Show(WarcraftPlayer wcPlayer)
     {
-        var menu = MenuManager.CreateMenu("<font color='lightgrey' class='fontSize-m'>Item Shop</font>");
+        var menu = MenuManager.CreateMenu($"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Item Shop</font>", 4);
         var plugin = WarcraftPlugin.Instance;
 
         var items = new ShopItem[]
@@ -34,10 +34,10 @@ internal static class ShopMenu
             new TomeOfGambling()
         };
 
-        foreach (var item in items)
+        foreach (var item in items.OrderBy(x => x.Price))
         {
-            menu.Add($"<font color='white' class='{FontSizes.FontSizeSm}'>{item.LocalizedName} - ${item.Price}</font>",
-                $"<font color='grey' class='{FontSizes.FontSizeS}'>{item.LocalizedDescription}</font>", (player, option) =>
+            menu.Add($"<font color='{item.Color.ToHex()}' class='{FontSizes.FontSizeSm}'>{item.LocalizedName}</font><font class='{FontSizes.FontSizeSm}'> - </font><font color='lightgreen' class='{FontSizes.FontSizeSm}'>${item.Price}</font>",
+                $"<font color='#D3D3D3' class='{FontSizes.FontSizeS}'>{item.LocalizedDescription}</font>", (player, option) =>
             {
                 if (!item.IsInstant)
                 {
@@ -65,16 +65,8 @@ internal static class ShopMenu
                         return;
                     }
 
-                    // Print debug info of player's money before purchase
-                    var moneyBefore = player.InGameMoneyServices.Account;
-                    Server.PrintToConsole($"[Shop] {player.GetRealPlayerName()} money before purchase: {moneyBefore}");
-
                     // Directly modify the account balance so the deduction always applies
                     player.InGameMoneyServices.Account -= item.Price;
-
-                    // Print debug info of player's money after purchase
-                    var moneyAfter = player.InGameMoneyServices.Account;
-                    Server.PrintToConsole($"[Shop] {player.GetRealPlayerName()} money after purchase: {moneyAfter}");
 
                     // Notify the client that the player's money service has
                     // changed so the HUD reflects the new balance. The
