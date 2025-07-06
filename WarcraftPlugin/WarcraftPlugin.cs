@@ -12,7 +12,6 @@ using System.Text.Json.Serialization;
 using WarcraftPlugin.Events;
 using WarcraftPlugin.Menu;
 using WarcraftPlugin.Menu.WarcraftMenu;
-using WarcraftPlugin.Items;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
@@ -24,7 +23,7 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 5;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 6;
 
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
@@ -34,6 +33,7 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
         [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 30;
+        [JsonPropertyName("EnableLevelDifferenceXp")] public bool EnableLevelDifferenceXp { get; set; } = true;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
         [JsonPropertyName("TotalLevelRequired")]
         public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
@@ -75,12 +75,19 @@ namespace WarcraftPlugin
 
         internal WarcraftPlayer GetWcPlayer(CCSPlayerController player)
         {
-            if (!player.IsValid || player.IsBot || player.ControllingBot) return null;
+            if (!player.IsValid) return null;
 
             WarcraftPlayers.TryGetValue(player.Handle, out var wcPlayer);
             if (wcPlayer == null)
             {
-                wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
+                if (player.IsBot || player.ControllingBot)
+                {
+                    wcPlayer = CreateBotPlayer(player);
+                }
+                else
+                {
+                    wcPlayer = _database.LoadPlayerFromDatabase(player, XpSystem);
+                }
                 WarcraftPlayers[player.Handle] = wcPlayer;
             }
 
@@ -90,6 +97,26 @@ namespace WarcraftPlugin
         internal void SetWcPlayer(CCSPlayerController player, WarcraftPlayer wcPlayer)
         {
             WarcraftPlayers[player.Handle] = wcPlayer;
+        }
+
+        private WarcraftPlayer CreateBotPlayer(CCSPlayerController player)
+        {
+            var classes = classManager.GetAllClasses();
+            var randomClass = classes[Random.Shared.Next(classes.Length)];
+
+            var info = new ClassInformation
+            {
+                SteamId = 0,
+                RaceName = randomClass.InternalName,
+                CurrentXp = 0,
+                CurrentLevel = 1,
+                AmountToLevel = XpSystem.GetXpForLevel(1)
+            };
+
+            var wcPlayer = new WarcraftPlayer(player);
+            wcPlayer.LoadClassInformation(info, XpSystem);
+            XpSystem.AutoSpendSkillPoints(wcPlayer);
+            return wcPlayer;
         }
 
         internal static void RefreshPlayerName(CCSPlayerController player)
@@ -131,7 +158,7 @@ namespace WarcraftPlugin
 
             _instance ??= this;
 
-            XpSystem = new XpSystem(this);
+            XpSystem = new XpSystem(this, Config, Localizer);
             XpSystem.GenerateXpCurve(110, 1.07f, MaxLevel);
 
             _database = new Database();
@@ -150,41 +177,69 @@ namespace WarcraftPlugin
                 AdvertManager.Initialize();
             }
 
-            AddUniqueCommand("ultimate", "ultimate", UltimatePressed);
-            AddUniqueCommand(Localizer["command.ultimate"], "ultimate", UltimatePressed);
+            List<string> ultimateAliases =
+            [
+                "ultimate", "ult",
+                ..Localizer["command.ultimate"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in ultimateAliases)
+                AddUniqueCommand(alias, "ultimate", UltimatePressed);
 
-            AddUniqueCommand("changerace", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("changeclass", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("race", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("class", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("rpg", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand("cr", "change class", (player, _) => ShowClassMenu(player));
-            AddUniqueCommand(Localizer["command.changeclass"], "change class", (player, _) => ShowClassMenu(player));
+            List<string> classAliases =
+            [
+                "changerace", "changeclass", "race", "class", "rpg", "cr",
+                ..Localizer["command.changeclass"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in classAliases)
+                AddUniqueCommand(alias, "change class", (player, _) => ShowClassMenu(player));
 
-            AddUniqueCommand("reset", "reset skills", CommandResetSkills);
-            AddUniqueCommand(Localizer["command.reset"], "reset skills", CommandResetSkills);
+            List<string> resetAliases =
+            [
+                "reset", "resetskills", "resetskillpoints",
+                ..Localizer["command.reset"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in resetAliases)
+                AddUniqueCommand(alias, "reset skills", CommandResetSkills);
 
-            AddUniqueCommand("factoryreset", "reset levels", CommandFactoryReset);
-            AddUniqueCommand(Localizer["command.factoryreset"], "reset levels", CommandFactoryReset);
+            List<string> factoryResetAliases =
+            [
+                "factoryreset", "fullreset", "resetlevels",
+                ..Localizer["command.factoryreset"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in factoryResetAliases)
+                AddUniqueCommand(alias, "reset levels", CommandFactoryReset);
 
-            AddUniqueCommand("addxp", "addxp", CommandAddXp);
-            AddUniqueCommand(Localizer["command.addxp"], "addxp", CommandAddXp);
+            List<string> addXpAliases = 
+                [
+                "addxp", "givexp", "xpadd",
+                ..Localizer["command.addxp"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in addXpAliases)
+                AddUniqueCommand(alias, "addxp", CommandAddXp);
 
-            //AddUniqueCommand("setlevel", "set level", CommandSetLevel);
-            //AddUniqueCommand(Localizer["command.setlevel"], "set level", CommandSetLevel);
+            List<string> skillsAliases =
+            [
+                "skills", "level",
+                ..Localizer["command.skills"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in skillsAliases)
+                AddUniqueCommand(alias, "skills", (player, _) => ShowSkillsMenu(player));
 
-            AddUniqueCommand("skills", "skills", (player, _) => ShowSkillsMenu(player));
-            AddUniqueCommand("level", "skills", (player, _) => ShowSkillsMenu(player));
-            AddUniqueCommand(Localizer["command.skills"], "skills", (player, _) => ShowSkillsMenu(player));
+            List<string> shopAliases =
+            [
+                "shopmenu", "shop", "buymenu",
+                ..Localizer["command.shopmenu"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in shopAliases)
+                AddUniqueCommand(alias, "open item shop", (player, _) => ShowShopMenu(player));
 
-            //AddUniqueCommand("shopmenu", "open item shop", (player, _) => ShowShopMenu(player));
-            //AddUniqueCommand(Localizer["command.shopmenu"], "open item shop", (player, _) => ShowShopMenu(player));
-
-            AddUniqueCommand("rpg_help", "list all commands", CommandHelp);
-            AddUniqueCommand("commands", "list all commands", CommandHelp);
-            AddUniqueCommand("wcs", "list all commands", CommandHelp);
-            AddUniqueCommand("war3menu", "list all commands", CommandHelp);
-            AddUniqueCommand(Localizer["command.help"], "list all commands", CommandHelp);
+            List<string> helpAliases =
+            [
+                "rpg_help", "commands", "wcs", "war3menu",
+                ..Localizer["command.help"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in helpAliases)
+                AddUniqueCommand(alias, "list all commands", CommandHelp);
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
             RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
@@ -392,15 +447,16 @@ namespace WarcraftPlugin
         {
             var player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
             Console.WriteLine($"Put in server {player.Handle}");
-            // No bots, invalid clients or non-existent clients.
-            if (!player.IsValid || player.IsBot) return;
+            if (!player.IsValid) return;
 
-            if (!_database.PlayerExistsInDatabase(player.SteamID))
+            if (player.IsBot)
             {
-                _database.AddNewPlayerToDatabase(player);
+                WarcraftPlayers[player.Handle] = CreateBotPlayer(player);
             }
-
-            WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
+            else
+            {
+                WarcraftPlayers[player.Handle] = _database.LoadPlayerFromDatabase(player, XpSystem);
+            }
 
             Console.WriteLine("Player just connected: " + WarcraftPlayers[player.Handle]);
         }
@@ -452,7 +508,10 @@ namespace WarcraftPlugin
                 //Avoid getting stuck in old menu
                 player.EnableMovement();
             }
+            AdvertManager?.Cancel();
+            _saveClientsTimer?.Kill();
             _database.SaveClients();
+            _database.Dispose();
             VolumeFix.Unload();
             base.Unload(hotReload);
         }
