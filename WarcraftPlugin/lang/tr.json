@@ -59,6 +59,7 @@
   "advert.1": "{Green}Harcanmamış yetenek puanların mı var? {Gold}!skills{Green} yaz", // Unspent skill points? Type !skills
   "advert.2": "{Green}Yeni yetenekler denemek mi istiyorsun? {Gold}!reset{Green} yaz", // Want to try new skills? Type !reset
   "advert.3": "{Green}Ultini kullanmak mı istiyorsun? Konsola 'bind <tuş> ultimate' yaz. Örnek: {Grey}bind x ultimate", // Want to use your ultimate? Type 'bind <key> ultimate' in console. Example: bind x ultimate
+  "advert.4": "{Green}Eşya satın almak mı istiyorsun? {Gold}!shop{Green} yaz", // Want to buy items? Type !shop to open the shop menu
 
   //Stock class names // Sınıf isimleri
   "barbarian": "Barbar", // Barbarian

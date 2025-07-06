@@ -59,6 +59,7 @@
   "advert.1": "{Green}Unspent skill points? Type {Gold}!skills{Green} to level up abilities",
   "advert.2": "{Green}Want to try new abilities? Type {Gold}!reset{Green} to reassign",
   "advert.3": "{Green}Want to use your ultimate? Type 'bind <key> ultimate' in console. Example: {Grey}bind x ultimate",
+  "advert.4": "{Green}Want to buy items? Type {Gold}!shop{Green} to open the shop menu",
 
   //Stock class names
   "barbarian": "Barbarian",

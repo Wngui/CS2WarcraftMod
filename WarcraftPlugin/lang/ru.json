@@ -59,6 +59,7 @@
   "advert.1": "{Green}Есть нераспределенные очки? Введите {Gold}!skills{Green} для улучшения", // Unspent points? Type !skills to upgrade
   "advert.2": "{Green}Хотите новые способности? Введите {Gold}!reset{Green} для сброса", // Want new abilities? Type !reset to reset
   "advert.3": "{Green}Для использования ультимейта введите 'bind <клавиша> ultimate' в консоли. Пример: {Grey}bind x ultimate", // To use ultimate, type 'bind <key> ultimate' in console. Example: bind x ultimate
+  "advert.4": "{Green}Хотите купить предметы? Введите {Gold}!shop{Green} для открытия магазина", // Want to buy items? Type !shop to open the shop menu
 
   //Stock class names //Названия классов
   "barbarian": "Варвар", // Barbarian

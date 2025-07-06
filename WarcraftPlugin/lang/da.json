@@ -60,6 +60,7 @@
   "advert.1": "{Green}Uforbrugte færdighedspoint? Skriv {Gold}!skills{Green} for at opgradere", // Unused skill points? Type !skills to upgrade
   "advert.2": "{Green}Vil du prøve nye færdigheder? Skriv {Gold}!reset{Green} for at omfordele", // Want to try new skills? Type !reset to redistribute
   "advert.3": "{Green}Vil du bruge din ultimative færdighed? Skriv 'bind <tast> ultimate' i konsollen. Eksempel: {Grey}bind x ultimate", // Want to use your ultimate? Type 'bind <key> ultimate' in console. Example: bind x ultimate
+  "advert.4": "{Green}Vil du købe genstande? Skriv {Gold}!shop{Green} for at åbne shopmenuen", // Want to buy items? Type !shop to open the shop menu
 
   //Stock class names //Stock class names
   "barbarian": "Barbar", // Barbarian
