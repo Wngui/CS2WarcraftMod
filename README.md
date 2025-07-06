@@ -109,6 +109,23 @@ Ultimate can be activated by binding it in the console, example
 - **Spring Trap**: Deploy a trap which launches players into the air.
 - **Drone Swarm**: Summon a swarm of attack drones that damage all nearby enemies.
 
+## Items
+- Amulet Of The Cat – Silent Footsteps
+- Amulet Of Vitality – Increase max HP by 50
+- Boots Of Speed – Increase Speed by 20%
+- Dagger Of Venom – Poison enemies on hit
+- Gloves Of Cloud – Receive a Smoke grenade every 12s
+- Gloves Of Dazzle – Receive a Flashbang every 12s
+- Gloves Of Wrath – Receive an HE grenade every 12s
+- Mask Of Death – 50% Chance to Heal 15% of Weapon Damage dealt
+- Money Siphon Scepter – Steal 2% of enemy money on hit
+- Orb Of Frost – 33% chance to slow enemy on hit
+- Ring Of Regeneration – Regen 1 HP each sec.
+- Sock Of Feathers – Decrease Gravity by 50%
+- Talisman Of Evasion – 20% chance to evade
+- Tome Of Experience – Gain 150XP
+- Tome Of Gambling – Chance to gain 150-450 XP
+
 ## Setup
 
 **Install the Plugin**
