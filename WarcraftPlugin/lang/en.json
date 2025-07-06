@@ -22,7 +22,7 @@
   "menu.shop.carry_limit": "You cannot carry more items.",
   "menu.shop.already_owned": "You already own this item.",
   "menu.shop.not_enough_money": "Not enough money!",
-  "menu.shop.bought": "Bought {0}[{1}{2}{0}]",
+  "menu.shop.bought": "Bought {Green}[{Gold}{0}{Green}]",
   "class.pending.change": "{Green} You will spawn as {Orange}{0}{Green} next round!",
   "class.disabled": "{Green}Current class is {Red}disabled{Green}! Now playing as {Orange}{0}{Default}.",
   "xp.current": "Experience",

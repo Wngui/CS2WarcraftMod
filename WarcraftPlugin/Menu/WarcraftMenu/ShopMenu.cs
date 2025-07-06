@@ -92,7 +92,7 @@ internal static class ShopMenu
                 }
 
                 player.PlayLocalSound("sounds/buttons/button9.vsnd");
-                player.PrintToChat($" {ShopItem.Localizer["menu.shop.bought", ChatColors.Green, ChatColors.Gold, item.LocalizedName, ChatColors.Green]}");
+                player.PrintToChat($" {ShopItem.Localizer["menu.shop.bought", item.LocalizedName]}");
             });
         }
 

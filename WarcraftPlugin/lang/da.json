@@ -18,14 +18,21 @@
   "menu.skills.level": "Niveau", // Level
   "menu.skills.available": "Opgrader færdigheder ({0} tilgængelige)", // Upgrade skills ({0} available)
   "menu.skills.ultimate.level": "niveau {0}", // level {0}
+  "menu.shop": "Genstandsbiks", // Item Shop
+  "menu.shop.carry_limit": "Du kan ikke bære flere genstande.", // Du kan ikke bære flere genstande.
+  "menu.shop.already_owned": "Du ejer allerede denne genstand.", // Du ejer allerede denne genstand.
+  "menu.shop.not_enough_money": "Ikke nok penge!", // Ikke nok penge!
+  "menu.shop.bought": "Købt {Green}[{Gold}{0}{Green}]",
   "class.pending.change": "{Green} Du vil spawne som {Orange}{0}{Green} i næste runde!", // You will spawn as {0} next round!
   "class.disabled": "{Green}Nuværende klasse er {Red}deaktiveret{Green}! Spiller nu som {Orange}{0}{Default}.", // Current class is disabled! Now playing as {0}.
   "xp.current": "Erfaring", // Experience
   "xp.bonus.headshot": "Hovedskudsbonus", // Headshot bonus
   "xp.bonus.knife": "Knivbonus", // Knife bonus
+  "xp.bonus.level": "Niveaubonus", // Niveaubonus
   "xp.kill": "{Gold}+{0} XP {Default}for at dræbe {Green}{1} {Default}{2}{3}", // +{0} XP for killing {1} {2}{3}
   "xp.add": "Tilføjer {0} xp til spiller {1}", // Adding {0} xp to player {1}
   "xp.roundwin": "{Gold}+{0} XP {Default}for at vinde runden", // +{0} XP for winning the round
+  "xp.roundinfo": "{0}/{1}xp", // {0}/{1}xp
   "ability.ready": "{0} er klar!", // {0} is ready!
   "ultimate.countdown": "Ultimativ færdighed klar om {0}s", // Ultimate ability ready in {0}s
   "no.ultimate": "Ingen niveauer i ultimativ færdighed", // No levels in ultimate ability
