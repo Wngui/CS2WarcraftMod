@@ -29,7 +29,7 @@
   "xp.bonus.headshot": "Hovedskudsbonus", // Headshot bonus
   "xp.bonus.knife": "Knivbonus", // Knife bonus
   "xp.bonus.level": "Niveaubonus", // Niveaubonus
-  "xp.kill": "{Gold}+{0} XP {Default}for at dræbe {Green}{1} {Default}{2}{3}", // +{0} XP for killing {1} {2}{3}
+  "xp.kill": "{Gold}+{0} XP {Default}for at dræbe {Green}{1} {Default}{2}{3}{4}", // +{0} XP for killing {1} {2}{3}{4}
   "xp.add": "Tilføjer {0} xp til spiller {1}", // Adding {0} xp to player {1}
   "xp.roundwin": "{Gold}+{0} XP {Default}for at vinde runden", // +{0} XP for winning the round
   "xp.roundinfo": "{0}/{1}xp", // {0}/{1}xp
