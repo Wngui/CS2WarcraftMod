@@ -36,6 +36,9 @@ internal class MoneySiphonScepter : ShopItem
 
             Utilities.SetStateChanged(@event.Userid, "CCSPlayerController", "m_pInGameMoneyServices");
             Utilities.SetStateChanged(@event.Attacker, "CCSPlayerController", "m_pInGameMoneyServices");
+
+            @event.Attacker.PrintToChat($" {ShopItem.Localizer["item.money_siphon_scepter.steal", stealAmount, @event.Userid.PlayerName]}");
+            @event.Userid.PrintToChat($" {ShopItem.Localizer["item.money_siphon_scepter.stolen", stealAmount, @event.Attacker.PlayerName]}");
         }
         catch
         {

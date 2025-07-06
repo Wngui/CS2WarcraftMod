@@ -16,7 +16,7 @@ internal class GlovesOfWrath : ShopItem
 
     internal override void Apply(CCSPlayerController player)
     {
-        new GrenadeSupplyEffect(player, "weapon_hegrenade", "HE grenade").Start();
+        new GrenadeSupplyEffect(player, "weapon_hegrenade", ShopItem.Localizer["item.gloves_of_wrath.grenade_name"]).Start();
     }
 
     private class GrenadeSupplyEffect(CCSPlayerController owner, string grenadeName, string displayName)

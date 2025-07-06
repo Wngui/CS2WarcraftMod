@@ -43,7 +43,7 @@ internal class OrbOfFrost : ShopItem
             _originalModifier = pawn.VelocityModifier;
             pawn.MovementServices.Maxspeed = _originalSpeed * 0.67f;
             pawn.VelocityModifier = _originalModifier * 0.67f;
-            _victim.PrintToChat($" {ChatColors.Red}Slowed by {ChatColors.Green}{Owner.PlayerName}");
+            _victim.PrintToChat($" {ShopItem.Localizer["item.orb_of_frost.slowed", Owner.PlayerName]}");
         }
 
         public override void OnTick() { }

@@ -56,7 +56,7 @@ namespace WarcraftPlugin.Core
                 itemsOwned = string.Join(", ", warcraftPlayer.Items.Select(i =>
                     $"{ChatColors.Green}[{ChatColors.Gold}{i.LocalizedName}{ChatColors.Green}]"));
             }
-            player?.PrintToChat($" Items: {itemsOwned}");
+            player?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["item.owned", itemsOwned]}");
         }
     }
 }

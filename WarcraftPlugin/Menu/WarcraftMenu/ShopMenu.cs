@@ -12,7 +12,7 @@ internal static class ShopMenu
 {
     internal static void Show(WarcraftPlayer wcPlayer)
     {
-        var menu = MenuManager.CreateMenu($"<font color='lightgrey' class='{FontSizes.FontSizeM}'>Item Shop</font>", 4);
+        var menu = MenuManager.CreateMenu($"<font color='lightgrey' class='{FontSizes.FontSizeM}'>" + ShopItem.Localizer["menu.shop"] + "</font>", 4);
         var plugin = WarcraftPlugin.Instance;
 
         var items = new ShopItem[]
@@ -45,14 +45,14 @@ internal static class ShopMenu
                     if (wcPlayer.Items.Count >= 2)
                     {
                         player.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
-                        player.PrintToChat(" You cannot carry more items.");
+                        player.PrintToChat($" {ShopItem.Localizer["menu.shop.carry_limit"]}");
                         return;
                     }
 
                     if (wcPlayer.Items.Any(inv => inv.GetType() == item.GetType()))
                     {
                         player.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
-                        player.PrintToChat(" You already own this item.");
+                        player.PrintToChat($" {ShopItem.Localizer["menu.shop.already_owned"]}");
                         return;
                     }
                 }
@@ -62,7 +62,7 @@ internal static class ShopMenu
                     if (player.InGameMoneyServices.Account < item.Price)
                     {
                         player.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
-                        player.PrintToChat(" Not enough money!");
+                        player.PrintToChat($" {ShopItem.Localizer["menu.shop.not_enough_money"]}");
                         return;
                     }
 
@@ -92,7 +92,7 @@ internal static class ShopMenu
                 }
 
                 player.PlayLocalSound("sounds/buttons/button9.vsnd");
-                player.PrintToChat($" Bought {ChatColors.Green}[{ChatColors.Gold}{item.LocalizedName}{ChatColors.Green}]");
+                player.PrintToChat($" {ShopItem.Localizer["menu.shop.bought", ChatColors.Green, ChatColors.Gold, item.LocalizedName, ChatColors.Green]}");
             });
         }
 

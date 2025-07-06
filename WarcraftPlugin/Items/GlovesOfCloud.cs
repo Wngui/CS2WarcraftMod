@@ -16,7 +16,7 @@ internal class GlovesOfCloud : ShopItem
 
     internal override void Apply(CCSPlayerController player)
     {
-        new GrenadeSupplyEffect(player, "weapon_smokegrenade", "Smoke grenade").Start();
+        new GrenadeSupplyEffect(player, "weapon_smokegrenade", ShopItem.Localizer["item.gloves_of_cloud.grenade_name"]).Start();
     }
 
     private class GrenadeSupplyEffect(CCSPlayerController owner, string grenadeName, string displayName)

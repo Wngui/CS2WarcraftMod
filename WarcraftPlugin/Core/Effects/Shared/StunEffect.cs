@@ -44,8 +44,8 @@ namespace WarcraftPlugin.Core.Effects.Shared
 
             if (!string.IsNullOrEmpty(_abilityName))
             {
-                Owner.PrintToChat($" {ChatColors.Red}Stunned by {ChatColors.Green}{_abilityName}");
-                _attacker?.PrintToChat($" {ChatColors.Green}{_abilityName}{ChatColors.Default} stunned {Owner.GetRealPlayerName()}");
+                Owner.PrintToChat($" {Localizer["effect.stun.stunnedby", _abilityName]}");
+                _attacker?.PrintToChat($" {Localizer["effect.stun.stunowner", _abilityName, Owner.GetRealPlayerName()]}");
             }
         }
 

@@ -16,7 +16,7 @@ internal class GlovesOfDazzle : ShopItem
 
     internal override void Apply(CCSPlayerController player)
     {
-        new GrenadeSupplyEffect(player, "weapon_flashbang", "Flashbang").Start();
+        new GrenadeSupplyEffect(player, "weapon_flashbang", ShopItem.Localizer["item.gloves_of_dazzle.grenade_name"]).Start();
     }
 
     private class GrenadeSupplyEffect(CCSPlayerController owner, string grenadeName, string displayName)

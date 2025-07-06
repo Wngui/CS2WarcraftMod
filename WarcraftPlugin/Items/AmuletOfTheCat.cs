@@ -34,7 +34,7 @@ internal class AmuletOfTheCat : ShopItem
             }
 
             _silentPlayers.Add(owner.PlayerPawn.Value.Handle);
-            owner.PrintToChat(" Silent footsteps activated.");
+            owner.PrintToChat($" {Localizer["item.amulet_of_the_cat.activated"]}");
         }
 
         private static HookResult PreFootstepMessage(UserMessage um)
