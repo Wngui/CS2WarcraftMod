@@ -1,9 +1,6 @@
 name: Deploy to Dev Server
 on: 
     workflow_dispatch:
-    push:
-     branches:
-     - main
     schedule:
      - cron: '0 0 * * *'  # Runs daily at midnight UTC (Refresh server in-case of crashes)
 
