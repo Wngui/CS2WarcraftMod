@@ -172,7 +172,7 @@ namespace WarcraftPlugin.Events
 
                 if (teamWinner is CsTeam.Terrorist or CsTeam.CounterTerrorist)
                 {
-                    foreach (var player in Utilities.GetPlayers().Where(p => p.Team == teamWinner && !p.IsBot && !p.ControllingBot))
+                    foreach (var player in Utilities.GetPlayers().Where(p => p.Team == teamWinner && !p.ControllingBot))
                     {
                         _plugin.XpSystem.AddXp(player, (int)_config.XpPerRoundWin);
                         player.PrintToChat(_plugin.Localizer["xp.roundwin", _config.XpPerRoundWin]);
@@ -209,6 +209,13 @@ namespace WarcraftPlugin.Events
                     {
                         warcraftClass.ResetCooldowns();
                     });
+
+                    warcraftPlayer.PrintItemsOwned();
+
+                    if (!warcraftPlayer.IsMaxLevel)
+                    {
+                        player.PrintToChat($" {_plugin.Localizer["xp.roundinfo", warcraftPlayer.currentXp, warcraftPlayer.amountToLevel]}");
+                    }
                 }
             });
             return HookResult.Continue;
@@ -232,7 +239,10 @@ namespace WarcraftPlugin.Events
                 if (attackingClass?.LastHurtOther != Server.CurrentTime)
                 {
                     attackingClass.LastHurtOther = Server.CurrentTime;
-                    attackingClass.InvokeEvent(new EventPlayerHurtOther(@event.Handle), HookMode.Pre);
+                    var hurtOtherEvent = new EventPlayerHurtOther(@event.Handle);
+                    attackingClass.InvokeEvent(hurtOtherEvent, HookMode.Pre);
+
+                    ItemManager.OnPlayerHurtOther(hurtOtherEvent);
                 }
             }
 
@@ -264,10 +274,7 @@ namespace WarcraftPlugin.Events
                 {
                     WarcraftPlugin.RefreshPlayerName(player);
                     warcraftClass?.SetDefaultAppearance();
-                    //foreach (var item in warcraftPlayer.Items)
-                    //{
-                    //    item.Apply(player);
-                    //}
+                    warcraftPlayer?.ApplyItems();
                 });
             }
 
@@ -282,51 +289,30 @@ namespace WarcraftPlugin.Events
 
             if (attacker == null || victim == null) return HookResult.Continue;
 
-            if (attacker.IsValid && victim.IsValid && attacker != victim && !attacker.IsBot && attacker.PlayerPawn.IsValid && attacker.PawnIsAlive && !attacker.ControllingBot)
+            if (attacker.IsValid && victim.IsValid && attacker != victim && attacker.PlayerPawn.IsValid && attacker.PawnIsAlive && !attacker.ControllingBot)
             {
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventPlayerKilledOther(@event.Handle), HookMode.Pre);
                 var weaponName = @event.Weapon;
 
-                var xpHeadshot = 0f;
-                var xpKnife = 0f;
-
-                if (headshot)
-                    xpHeadshot = Convert.ToInt32(_config.XpPerKill * _config.XpHeadshotModifier);
-
-                if (weaponName.StartsWith("knife"))
-                {
-                    xpKnife = Convert.ToInt32(_config.XpPerKill * _config.XpKnifeModifier);
-                }
-
-                var xpToAdd = Convert.ToInt32(_config.XpPerKill + xpHeadshot + xpKnife);
-
-                _plugin.XpSystem.AddXp(attacker, xpToAdd);
-
-                string hsBonus = "";
-                if (xpHeadshot != 0)
-                {
-                    hsBonus = $"(+{xpHeadshot} {_plugin.Localizer["xp.bonus.headshot"]})";
-                }
-
-                string knifeBonus = "";
-                if (xpKnife != 0)
-                {
-                    knifeBonus = $"(+{xpKnife} {_plugin.Localizer["xp.bonus.knife"]})";
-                }
-
-                string xpString = $" {_plugin.Localizer["xp.kill", xpToAdd, victim.PlayerName, hsBonus, knifeBonus]}";
-
-                attacker.PrintToChat(xpString);
+                _plugin.XpSystem.CalculateAndAddKillXp(
+                    attacker,
+                    victim,
+                    weaponName,
+                    headshot
+                );
             }
 
-            if (victim.IsValid && attacker.IsValid && attacker != victim)
+            if (victim.IsValid && attacker.IsValid)
             {
-                var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
-                var victimClass = victim.GetWarcraftPlayer()?.GetClass();
-                WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
+                if (attacker != victim)
+                {
+                    var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
+                    var victimClass = victim.GetWarcraftPlayer()?.GetClass();
+                    WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
+                    victimClass?.InvokeEvent(@event, HookMode.Pre);
+                    @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
+                }
                 victim.GetWarcraftPlayer()?.ClearItems();
-                victimClass?.InvokeEvent(@event, HookMode.Pre);
-                @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
             }
             return HookResult.Continue;
         }

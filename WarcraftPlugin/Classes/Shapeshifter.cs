@@ -24,6 +24,7 @@ namespace WarcraftPlugin.Classes
         private bool _isDisguised = false;
         private CDynamicProp _playerShapeshiftProp;
         private CDynamicProp _cameraProp;
+        private OnTick? _updateCameraListener;
         private readonly List<string> _weaponList = [];
 
         public override List<IWarcraftAbility> Abilities =>
@@ -168,8 +169,11 @@ namespace WarcraftPlugin.Classes
 
         private void UnhookCamera()
         {
-            var onTick = new OnTick(UpdateCamera);
-            WarcraftPlugin.Instance.RemoveListener(onTick);
+            if (_updateCameraListener != null)
+            {
+                WarcraftPlugin.Instance.RemoveListener(_updateCameraListener);
+                _updateCameraListener = null;
+            }
 
             Player.PlayerPawn.Value.CameraServices.ViewEntity.Raw = uint.MaxValue;
             Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBasePlayerPawn", "m_pCameraServices");
@@ -220,7 +224,8 @@ namespace WarcraftPlugin.Classes
             Utilities.SetStateChanged(Player.PlayerPawn.Value, "CBasePlayerPawn", "m_pCameraServices");
             Player.EmitSound("Player.SnowballEquip", volume: 0.5f);
 
-            WarcraftPlugin.Instance.RegisterListener<OnTick>(UpdateCamera);
+            _updateCameraListener = new OnTick(UpdateCamera);
+            WarcraftPlugin.Instance.RegisterListener(_updateCameraListener);
 
             _isShapeshifted = true;
         }
