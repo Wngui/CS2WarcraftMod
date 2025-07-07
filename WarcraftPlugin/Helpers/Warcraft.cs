@@ -469,6 +469,7 @@ namespace WarcraftPlugin.Helpers
         /// <param name="penetrationKill">Indicates if the damage was caused by a penetration.</param>
         public static void TakeDamage(this CCSPlayerController victim, float damage, CCSPlayerController attacker, KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false)
         {
+            if (!attacker.IsAlive()) return;
             var size = Schema.GetClassSize("CTakeDamageInfo");
             var ptr = Marshal.AllocHGlobal(size);
 

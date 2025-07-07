@@ -1,18 +1,18 @@
-﻿using System;
+﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities.Constants;
+using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API;
-using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
-using WarcraftPlugin.Helpers;
+using g3;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using CounterStrikeSharp.API.Modules.Memory;
-using g3;
-using WarcraftPlugin.Models;
-using CounterStrikeSharp.API.Modules.Entities.Constants;
 using WarcraftPlugin.Core.Effects;
-using System.Collections.Generic;
 using WarcraftPlugin.Events.ExtendedEvents;
+using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
@@ -215,8 +215,8 @@ namespace WarcraftPlugin.Classes
                     player.PlayerPawn.Value.VelocityModifier = 0;
                     player.PlayerPawn.Value.MovementServices.Maxspeed = 20;
                     Warcraft.SpawnParticle(player.CalculatePositionInFront(10, 60), "particles/blood_impact/blood_impact_basic.vpcf");
-                    player.PrintToChat($" {Localizer["ranger.trappedby", Owner.PlayerName]}");
-                    Owner.PrintToChat($" {Localizer["ranger.trapowner", Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName, player.GetRealPlayerName()]}");
+                    player.PrintToChat($" {Localizer["ranger.trappedby", Owner.GetRealPlayerName()]}");
+                    Owner.PrintToChat($" {Localizer["ranger.trapowner", player.GetRealPlayerName()]}");
                 }
 
                 //Clean-up

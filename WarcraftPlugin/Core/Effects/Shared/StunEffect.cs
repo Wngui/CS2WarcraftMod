@@ -1,5 +1,4 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 
 namespace WarcraftPlugin.Core.Effects.Shared
