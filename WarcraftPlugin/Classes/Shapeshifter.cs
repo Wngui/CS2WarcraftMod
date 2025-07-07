@@ -51,7 +51,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(1) > 0)
             {
-                Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
+                Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.RemoveIfValid();
                 new CloneDecoyEffect(Player, 5 * WarcraftPlayer.GetAbilityLevel(1), new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
             }
         }

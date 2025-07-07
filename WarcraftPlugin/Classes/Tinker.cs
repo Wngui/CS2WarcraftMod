@@ -156,7 +156,7 @@ namespace WarcraftPlugin.Classes
         {
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
-                Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.Remove();
+                Utilities.GetEntityFromIndex<CDecoyProjectile>(decoy.Entityid)?.RemoveIfValid();
                 new SpringTrapEffect(Player, 120, new Vector(decoy.X, decoy.Y, decoy.Z)).Start();
             }
         }

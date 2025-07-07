@@ -57,7 +57,7 @@ namespace WarcraftPlugin.Classes
             }
 
             // Shadowstep
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 20))
+            if (attacker.IsAlive() && Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 20))
             {
                 var posBehindEnemy = attacker.CalculatePositionInFront(-90, attacker.EyeHeight());
 

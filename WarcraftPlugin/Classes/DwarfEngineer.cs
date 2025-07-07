@@ -340,6 +340,7 @@ namespace WarcraftPlugin.Classes
         {
             Server.NextFrame(() =>
             {
+                if (_blueprintProp == null || !_blueprintProp.IsValid) return;
                 var currentDef = Props[_currentPropIndex];
 
                 var prop = Utilities.CreateEntityByName<CPhysicsPropOverride>("prop_physics_override");
