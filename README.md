@@ -42,6 +42,8 @@ Ultimate can be activated by binding it in the console, example
 
 ```!skills``` - Opens skill selection menu
 
+```!shop``` - Opens shop menu
+
 ```!reset``` - Unassign skill points for current class
 
 ```!factoryreset``` - Completely resets progress for current class
@@ -107,6 +109,23 @@ Ultimate can be activated by binding it in the console, example
 - **Spring Trap**: Deploy a trap which launches players into the air.
 - **Drone Swarm**: Summon a swarm of attack drones that damage all nearby enemies.
 
+## Items
+- **Amulet Of The Cat** – Silent Footsteps
+- **Amulet Of Vitality** – Increase max HP by 50
+- **Boots Of Speed** – Increase Speed by 20%
+- **Dagger Of Venom** – Poison enemies on hit
+- **Gloves Of Cloud** – Receive a Smoke grenade every 12s
+- **Gloves Of Dazzle** – Receive a Flashbang every 12s
+- **Gloves Of Wrath** – Receive an HE grenade every 12s
+- **Mask Of Death** – 50% Chance to Heal 15% of Weapon Damage dealt
+- **Money Siphon Scepter** – Steal 2% of enemy money on hit
+- **Orb Of Frost** – 33% chance to slow enemy on hit
+- **Ring Of Regeneration** – Regen 1 HP each sec.
+- **Sock Of Feathers** – Decrease Gravity by 50%
+- **Talisman Of Evasion** – 20% chance to evade
+- **Tome Of Experience** – Gain 150XP
+- **Tome Of Gambling** – Chance to gain 150-450 XP
+
 ## Setup
 
 **Install the Plugin**
@@ -114,11 +133,11 @@ Ultimate can be activated by binding it in the console, example
    - Download the latest [Warcraft release](https://github.com/Wngui/CS2WarcraftMod/releases/latest)
    - Copy the `WarcraftPlugin` folder to `counterstrikesharp -> plugins`
 
-## Configuration example
+## Configuration explanation
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
 ```jsonc
 {
-  "ConfigVersion": 3,
+  "ConfigVersion": 6,
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
   "DefaultClass": "ranger", //Sets the default class for new players
@@ -128,6 +147,7 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "XpKnifeModifier": 0.25, // Experience Modifier for knife kills
   "XpPerRoundWin": 30, // Experience for winning a round
   "MatchReset": true, // Reset all character progress at map start/end
+  "EnableLevelDifferenceXp": false, // Turn off bonus xp from killing higher level players
   "TotalLevelRequired": { // Total level required to unlock class
     "Shadowblade": 48, // Unlocks when you have 48 levels in total 
     "Tinker": 60 // Unlocks when you have 60 levels in total 
