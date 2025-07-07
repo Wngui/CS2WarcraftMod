@@ -47,7 +47,8 @@ namespace WarcraftPlugin.Classes
             if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 30))
             {
                 Player.PrintToChat(" " + Localizer["shadowblade.evaded", @event.DmgHealth]);
-                attacker.PrintToChat(" " + Localizer["shadowblade.evaded", Player.GetRealPlayerName()]);
+                attacker?.PrintToChat(" " + Localizer["shadowblade.evaded", Player.GetRealPlayerName()]);
+
                 @event.IgnoreDamage();
                 Player.PlayerPawn.Value.EmitSound("BulletBy.Subsonic", volume: 0.2f);
                 var particle = Warcraft.SpawnParticle(Player.EyePosition(-50), "particles/explosions_fx/explosion_hegrenade_dirt_ground.vpcf");
