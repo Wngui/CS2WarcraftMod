@@ -1,6 +1,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
@@ -19,9 +20,9 @@ namespace WarcraftPlugin.Classes
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Inner Vitality", "Passively recover 1/2/3/4/5 HP. When below 40% you heal twice as fast"),
-            new WarcraftAbility("Burning Spear", "Passively lose 5% max HP, but set enemies ablaze. Deals 1/2/3/4/5 DPS for next 3 seconds. Stacks 3 times"),
+            new WarcraftAbility("Burning Spear", "Passively lose 5% maxHP, but set enemies ablaze. Deals 1/2/3/4/5 DPS for next 3 seconds. Stacks 3 times"),
             new WarcraftAbility("Berserkers Blood", "Gain 1/2/3/4 percent attack speed for each 7 percent of your health missing"),
-            new WarcraftCooldownAbility("Life Break", "Damage yourself (20% of max HP) to deal a great amount of damage (40% of victim's max HP)", 40f)
+            new WarcraftCooldownAbility("Life Break", "Damage yourself (20% of maxHP) to deal a great amount of damage (40% of victim's maxHP)", 40f)
         ];
 
         public override void Register()
@@ -54,21 +55,28 @@ namespace WarcraftPlugin.Classes
             var level = WarcraftPlayer.GetAbilityLevel(1);
             if (level > 0)
             {
-                // Apply burning effect to the victim. Limit to 3 stacks per attacker
-                var effects = WarcraftPlugin.Instance.EffectManager.GetEffectsByType<BurningSpearEffect>()
-                    .Where(x => x.Victim.Handle == @event.Userid.Handle && x.Owner.Handle == Player.Handle)
+                var origin = @event.Userid.PlayerPawn.Value.AbsOrigin;
+                var radius = 150f;
+                var enemies = Utilities.GetPlayers()
+                    .Where(p => p.PawnIsAlive && !p.AllyOf(Player))
+                    .Where(p => (p.PlayerPawn.Value.AbsOrigin - origin).Length() <= radius)
                     .ToList();
 
-                if (effects.Count >= 3)
+                foreach (var enemy in enemies)
                 {
-                    // Refresh the oldest stack
-                    var oldest = effects.OrderBy(e => e.RemainingDuration).First();
-                    oldest.Destroy();
+                    var effects = WarcraftPlugin.Instance.EffectManager.GetEffectsByType<BurningSpearEffect>()
+                        .Where(x => x.Victim.Handle == enemy.Handle && x.Owner.Handle == Player.Handle)
+                        .ToList();
+
+                    if (effects.Count >= 3)
+                    {
+                        var oldest = effects.OrderBy(e => e.RemainingDuration).First();
+                        oldest.Destroy();
+                    }
+
+                    new BurningSpearEffect(Player, enemy, 3f, level).Start();
                 }
 
-                new BurningSpearEffect(Player, @event.Userid, 3f, level).Start();
-
-                // Each successful hit costs the warrior 5% of their maximum health
                 var burnCost = (int)(Player.PlayerPawn.Value.MaxHealth * 0.05f);
                 Player.TakeDamage(burnCost, Player, KillFeedIcon.inferno);
             }
@@ -81,7 +89,11 @@ namespace WarcraftPlugin.Classes
             var trace = Player.RayTrace();
             if (trace == null) return;
 
-            var target = Utilities.GetPlayers().FirstOrDefault(p => p.PawnIsAlive && !p.AllyOf(Player) && p.PlayerPawn.Value.CollisionBox().Contains(trace));
+            var target = Utilities.GetPlayers()
+                .Where(p => p.PawnIsAlive && !p.AllyOf(Player))
+                .OrderBy(p => (p.PlayerPawn.Value.AbsOrigin - trace).Length())
+                .FirstOrDefault(p => p.PlayerPawn.Value.CollisionBox().Contains(trace) ||
+                                     (p.PlayerPawn.Value.AbsOrigin - trace).Length() <= 50);
             if (target == null) return;
 
             var selfDamage = (int)(Player.PlayerPawn.Value.MaxHealth * 0.2f);
@@ -112,7 +124,8 @@ namespace WarcraftPlugin.Classes
         public override void OnFinish() { }
     }
 
-    internal class BurningSpearEffect(CCSPlayerController owner, CCSPlayerController victim, float duration, int damage) : WarcraftEffect(owner, duration, onTickInterval:1f)
+    internal class BurningSpearEffect(CCSPlayerController owner, CCSPlayerController victim, float duration, int damage)
+        : WarcraftEffect(owner, duration, destroyOnDeath: false, onTickInterval:1f)
     {
         public CCSPlayerController Victim = victim;
         public override void OnStart()
@@ -127,8 +140,6 @@ namespace WarcraftPlugin.Classes
         public override void OnTick()
         {
             if (!Victim.IsAlive()) { Destroy(); return; }
-            // Add burn damage as weapon damage so it stacks with other effects
-            // Only show the burning kill icon if the victim dies from this tick
             var remaining = Victim.PlayerPawn.Value.Health - damage;
             KillFeedIcon? icon = remaining <= 0 ? KillFeedIcon.inferno : null;
             Victim.TakeDamage(damage, Owner, icon);
