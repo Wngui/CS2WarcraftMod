@@ -1,0 +1,243 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
+using CounterStrikeSharp.API;
+using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Models;
+using WarcraftPlugin.Events.ExtendedEvents;
+using WarcraftPlugin.Core.Effects;
+
+namespace WarcraftPlugin.Classes
+{
+    internal class SilentAssassin : WarcraftClass
+    {
+        public override string DisplayName => "Silent Assassin";
+        public override Color DefaultColor => Color.Gray;
+
+        public override List<IWarcraftAbility> Abilities =>
+        [
+            new WarcraftAbility("Shrink", "Reduce model size by 15/20/25/30/35%"),
+            new WarcraftAbility("Lightweight", "Increase speed and reduce gravity"),
+            new WarcraftAbility("Assassin's Blade", "40% chance to add bonus knife damage"),
+            // Ultimate lasts 3 seconds with a 15 second cooldown
+            new WarcraftCooldownAbility("Ghost Walk", "Completely invisible for 3 seconds", 15f)
+        ];
+
+        private readonly float[] _scaleLevels = {1f, 0.85f, 0.80f, 0.75f, 0.70f, 0.65f};
+        private readonly float[] _speedLevels = {1f, 1.15f, 1.20f, 1.25f, 1.30f, 1.35f};
+        private readonly float[] _gravityLevels = {1f, 0.94f, 0.90f, 0.86f, 0.82f, 0.79f};
+        private readonly int[] _knifeBonusMax = {0, 10, 20, 30, 40, 50};
+
+        public override void Register()
+        {
+            HookEvent<EventPlayerSpawn>(PlayerSpawn);
+            HookEvent<EventPlayerHurtOther>(PlayerHurtOther);
+            HookAbility(3, Ultimate);
+        }
+
+        public override void PlayerChangingToAnotherRace()
+        {
+            ResetModifiers();
+            base.PlayerChangingToAnotherRace();
+        }
+
+        private void ResetModifiers()
+        {
+            if (Player?.IsValid != true || Player.PlayerPawn?.Value == null) return;
+            Player.PlayerPawn.Value.SetScale(1f);
+            Player.PlayerPawn.Value.VelocityModifier = 1f;
+            Player.PlayerPawn.Value.GravityScale = 1f;
+        }
+
+        private void PlayerSpawn(EventPlayerSpawn spawn)
+        {
+            Server.NextFrame(() =>
+            {
+                if (Player == null || !Player.IsAlive()) return;
+
+                // apply scale
+                int shrinkLevel = WarcraftPlayer.GetAbilityLevel(0);
+                Player.PlayerPawn.Value.SetScale(_scaleLevels[shrinkLevel]);
+
+                // apply speed and gravity
+                int agilityLevel = WarcraftPlayer.GetAbilityLevel(1);
+                Player.PlayerPawn.Value.VelocityModifier = _speedLevels[agilityLevel];
+                Player.PlayerPawn.Value.GravityScale = _gravityLevels[agilityLevel];
+
+                // restrict weapons
+                var allowed = new List<string> { "weapon_knife" };
+                bool includeBomb = false;
+                if (Player.TeamNum == (int)CsTeam.Terrorist)
+                {
+                    allowed.Add("weapon_c4");
+                    includeBomb = true;
+                }
+                else
+                {
+                    var itemServices = new CCSPlayer_ItemServices(Player.PlayerPawn.Value.ItemServices.Handle);
+                    itemServices.HasDefuser = true;
+                }
+                new RestrictWeaponsEffect(Player, 999f, allowed, includeBomb).Start();
+                Player.GiveNamedItem("weapon_knife");
+            });
+        }
+
+        private void PlayerHurtOther(EventPlayerHurtOther @event)
+        {
+            if (@event.Userid.AllyOf(Player)) return;
+            if (@event.Weapon != "knife") return;
+
+            int level = WarcraftPlayer.GetAbilityLevel(2);
+            if (level <= 0) return;
+            if (Random.Shared.NextDouble() <= 0.4)
+            {
+                int bonus = Random.Shared.Next(1, _knifeBonusMax[level] + 1);
+                @event.AddBonusDamage(bonus, abilityName: GetAbility(2).DisplayName);
+            }
+        }
+
+        private void Ultimate()
+        {
+            if (WarcraftPlayer.GetAbilityLevel(3) < 1 || !IsAbilityReady(3)) return;
+            new InvisibleEffect(Player, 3f).Start();
+            StartCooldown(3);
+        }
+
+        private class InvisibleEffect(CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
+        {
+            public override void OnStart()
+            {
+                if (!Owner.IsAlive()) return;
+                Owner.PrintToCenter(Localizer["rogue.invsible"]);
+                Owner.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
+            }
+            public override void OnTick() { }
+            public override void OnFinish()
+            {
+                if (!Owner.IsAlive()) return;
+                Owner.GetWarcraftPlayer().GetClass().SetDefaultAppearance();
+                Owner.PrintToCenter(Localizer["rogue.visible"]);
+            }
+        }
+
+        private class RestrictWeaponsEffect : WarcraftEffect
+        {
+            private readonly List<string> _allowedWeapons;
+            private readonly bool _includeBomb;
+
+            public RestrictWeaponsEffect(CCSPlayerController owner, float duration, List<string> allowedWeapons, bool includeBomb = false)
+                : base(owner, duration)
+            {
+                _allowedWeapons = allowedWeapons;
+                _includeBomb = includeBomb;
+            }
+
+            public override void OnStart()
+            {
+                if (!Owner.IsValid || Owner.PlayerPawn?.Value == null)
+                    return;
+
+                Owner.PlayerPawn.Value.WeaponServices!.PreventWeaponPickup = true;
+
+                WarcraftPlugin.Instance.AddTimer(0.3f, () =>
+                {
+                    DropAllWeaponsExceptAllowed();
+
+                    WarcraftPlugin.Instance.AddTimer(0.2f, () =>
+                    {
+                        GiveAllowedWeapons();
+                    });
+                });
+            }
+
+            public override void OnTick()
+            {
+                if (!Owner.IsValid || Owner.PlayerPawn?.Value == null)
+                    return;
+
+                var activeWeapon = Owner.PlayerPawn.Value.WeaponServices?.ActiveWeapon?.Value;
+                var weaponName = activeWeapon?.DesignerName;
+
+                if (string.IsNullOrEmpty(weaponName) || _allowedWeapons.Contains(weaponName))
+                    return;
+
+                DropAllWeaponsExceptAllowed();
+
+                WarcraftPlugin.Instance.AddTimer(0.2f, () =>
+                {
+                    GiveAllowedWeapons();
+                });
+            }
+
+            public override void OnFinish()
+            {
+                if (!Owner.IsValid || Owner.PlayerPawn?.Value == null)
+                    return;
+
+                Owner.PlayerPawn.Value.WeaponServices!.PreventWeaponPickup = false;
+            }
+
+            private void DropAllWeaponsExceptAllowed()
+            {
+                var pawn = Owner.PlayerPawn.Value;
+                var weapons = pawn.WeaponServices.MyWeapons;
+                if (weapons == null) return;
+
+                for (int i = weapons.Count - 1; i >= 0; i--)
+                {
+                    var weapon = weapons[i].Value;
+                    if (weapon == null || !_allowedWeapons.Contains(weapon.DesignerName))
+                    {
+                        DropWeaponByDesignerName(Owner, weapon?.DesignerName ?? "");
+                    }
+                }
+            }
+
+            private void DropWeaponByDesignerName(CCSPlayerController player, string weaponName)
+            {
+                if (player == null || !player.IsValid || string.IsNullOrEmpty(weaponName)) return;
+
+                var pawn = player.PlayerPawn.Value;
+                if (pawn == null || !pawn.IsValid || !player.PawnIsAlive || pawn.WeaponServices == null) return;
+
+                var matchedWeapon = pawn.WeaponServices.MyWeapons
+                    .FirstOrDefault(x => x.Value?.DesignerName == weaponName);
+
+                if (matchedWeapon != null && matchedWeapon.IsValid)
+                {
+                    pawn.WeaponServices.ActiveWeapon.Raw = matchedWeapon.Raw;
+                    player.DropActiveWeapon();
+                }
+            }
+
+            private void GiveAllowedWeapons()
+            {
+                var pawn = Owner.PlayerPawn.Value;
+                var inventory = pawn.WeaponServices.MyWeapons;
+
+                foreach (var weaponName in _allowedWeapons)
+                {
+                    if (weaponName == "weapon_c4")
+                    {
+                        if (!_includeBomb || Owner.TeamNum != (int)CsTeam.Terrorist)
+                            continue;
+
+                        bool hasBomb = inventory != null && inventory.Any(w => w.Value?.DesignerName == weaponName);
+                        if (!hasBomb)
+                            continue;
+                    }
+
+                    bool alreadyHasWeapon = inventory != null && inventory.Any(w => w.Value?.DesignerName == weaponName);
+
+                    if (!alreadyHasWeapon)
+                    {
+                        Owner.GiveNamedItem(weaponName);
+                    }
+                }
+            }
+        }
+    }
+}
