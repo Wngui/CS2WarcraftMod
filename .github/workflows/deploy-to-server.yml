@@ -1,13 +1,13 @@
 name: Deploy to Dev Server
-on: 
-    workflow_dispatch:
-    schedule:
-     - cron: '0 0 * * *'  # Runs daily at midnight UTC (Refresh server in-case of crashes)
+
+on:
+  workflow_dispatch:
 
 jobs:
   build:
     name: Deploy
     runs-on: ubuntu-latest
+    environment: game-server
     steps:
       - name: Checkout
         uses: actions/checkout@v4
