@@ -21,7 +21,7 @@ namespace WarcraftPlugin.Classes
             new WarcraftAbility("Inner Vitality", "Passively recover 1/2/3/4/5 HP. When below 40% you heal twice as fast"),
             new WarcraftAbility("Burning Spear", "Passively lose 5% max HP, but set enemies ablaze. Deals 1/2/3/4/5 DPS for next 3 seconds. Stacks 3 times"),
             new WarcraftAbility("Berserkers Blood", "Gain 1/2/3/4 percent attack speed for each 7 percent of your health missing"),
-            new WarcraftCooldownAbility("Life Break", "Damage yourself (20% of maxHP) to deal a great amount of damage (40% of victim's maxHP)", 40f)
+            new WarcraftCooldownAbility("Life Break", "Damage yourself (20% of max HP) to deal a great amount of damage (40% of victim's max HP)", 40f)
         ];
 
         public override void Register()
