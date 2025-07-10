@@ -43,6 +43,9 @@ namespace WarcraftPlugin.Events
             RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
             VirtualFunctions.CCSPlayer_ItemServices_CanAcquireFunc.Hook(OnWeaponCanAcquire, HookMode.Pre);
 
+            //Virtual functions
+            VirtualFunctions.CCSPlayer_ItemServices_CanAcquireFunc.Hook(OnWeaponCanAcquire, HookMode.Pre);
+
             //Custom events
             _plugin.AddTimer(1, PlayerSpottedOnRadar, TimerFlags.REPEAT);
 
