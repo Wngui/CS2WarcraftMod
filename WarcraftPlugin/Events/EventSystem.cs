@@ -1,13 +1,15 @@
-﻿using System;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Events;
+using CounterStrikeSharp.API.Modules.Memory;
+using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
+using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Events;
-using CounterStrikeSharp.API.Modules.Timers;
-using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Core;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events.ExtendedEvents;
@@ -39,6 +41,9 @@ namespace WarcraftPlugin.Events
             RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre);
             RegisterEventHandler<EventRoundStart>(RoundStart, HookMode.Pre);
             RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
+
+            //Virtual functions
+            VirtualFunctions.CCSPlayer_ItemServices_CanAcquireFunc.Hook(OnWeaponCanAcquire, HookMode.Pre);
 
             //Custom events
             _plugin.AddTimer(1, PlayerSpottedOnRadar, TimerFlags.REPEAT);
@@ -109,6 +114,29 @@ namespace WarcraftPlugin.Events
                 // Else Invoke global events on all players
                 Utilities.GetPlayers().ForEach(p => { p.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(@event, hookMode); });
             }
+            return HookResult.Continue;
+        }
+
+        private HookResult OnWeaponCanAcquire(DynamicHook hook)
+        {
+            CCSPlayerController client = hook.GetParam<CCSPlayer_ItemServices>(0).Pawn.Value!.Controller.Value!.As<CCSPlayerController>();
+
+            if (client == null || !client.IsValid || !client.PawnIsAlive)
+                return HookResult.Continue;
+
+            var warcraftClass = client?.GetWarcraftPlayer()?.GetClass();
+            if (warcraftClass == null)
+                return HookResult.Continue;
+
+            CCSWeaponBaseVData vdata = VirtualFunctions.GetCSWeaponDataFromKeyFunc.Invoke(-1, hook.GetParam<CEconItemView>(1).ItemDefinitionIndex.ToString());
+
+            // Weapon is restricted
+            if (warcraftClass.WeaponWhitelist.Count > 0 && !warcraftClass.WeaponWhitelist.Any(whitelistName => vdata.Name.Contains(whitelistName, StringComparison.OrdinalIgnoreCase)))
+            {
+                hook.SetReturn(AcquireResult.InvalidItem);
+                return HookResult.Stop;
+            }
+
             return HookResult.Continue;
         }
 

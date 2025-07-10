@@ -79,6 +79,7 @@ namespace WarcraftPlugin.Models
         public virtual void PlayerChangingToAnotherRace() { SetDefaultAppearance(); }
 
         public virtual List<string> PreloadResources { get; } = [];
+        public virtual List<string> WeaponWhitelist { get; } = [];
         public readonly IStringLocalizer Localizer = WarcraftPlugin.Instance.Localizer;
 
         public void SetDefaultAppearance()
