@@ -322,12 +322,13 @@ namespace WarcraftPlugin.Events
                 attacker?.GetWarcraftPlayer()?.GetClass()?.InvokeEvent(new EventPlayerKilledOther(@event.Handle), HookMode.Pre);
                 var weaponName = @event.Weapon;
 
-                _plugin.XpSystem.CalculateAndAddKillXp(
-                    attacker,
-                    victim,
-                    weaponName,
-                    headshot
-                );
+                if (!attacker.AllyOf(victim))
+                    _plugin.XpSystem.CalculateAndAddKillXp(
+                        attacker,
+                        victim,
+                        weaponName,
+                        headshot
+                    );
             }
 
             if (victim.IsValid && attacker.IsValid)
