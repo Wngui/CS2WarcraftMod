@@ -40,20 +40,6 @@ namespace WarcraftPlugin.Classes
             HookAbility(3, Ultimate);
         }
 
-        public override void PlayerChangingToAnotherRace()
-        {
-            ResetModifiers();
-            base.PlayerChangingToAnotherRace();
-        }
-
-        private void ResetModifiers()
-        {
-            if (Player?.IsValid != true || Player.PlayerPawn?.Value == null) return;
-            Player.PlayerPawn.Value.SetScale(1f);
-            Player.PlayerPawn.Value.VelocityModifier = 1f;
-            Player.PlayerPawn.Value.GravityScale = 1f;
-        }
-
         private void PlayerSpawn(EventPlayerSpawn spawn)
         {
             Server.NextFrame(() =>
