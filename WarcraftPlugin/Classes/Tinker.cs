@@ -69,7 +69,7 @@ namespace WarcraftPlugin.Classes
 
         private void PlayerShoot(EventWeaponFire fire)
         {
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 20))
+            if (Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(1), 20))
             {
                 var activeWeapon = Player.PlayerPawn.Value.WeaponServices?.ActiveWeapon.Value;
                 if (activeWeapon != null && activeWeapon.IsValid)

@@ -70,7 +70,7 @@ namespace WarcraftPlugin.Classes
             //Disguise
             if (WarcraftPlayer.GetAbilityLevel(0) > 0)
             {
-                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 40))
+                if (Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(0), 40))
                 {
                     Disguise();
                 }
@@ -323,7 +323,7 @@ namespace WarcraftPlugin.Classes
             if (Owner.PlayerPawn.Value.EntitySpottedState.Spotted)
             {
                 //chance to notify
-                if (Warcraft.RollDice(Owner.GetWarcraftPlayer().GetAbilityLevel(2)))
+                if (Warcraft.RollAbilityCheck(Owner.GetWarcraftPlayer().GetAbilityLevel(2)))
                 {
                     Owner.PrintToCenter(Localizer["shapeshifter.spotted"]);
                     Owner.EmitSound("UI.PlayerPingUrgent", volume: 0.2f);

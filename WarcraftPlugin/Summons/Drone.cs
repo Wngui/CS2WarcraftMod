@@ -114,7 +114,7 @@ namespace WarcraftPlugin.Summons
                 {
                     int rocketMaxChance = 20;
 
-                    WarcraftPlugin.Instance.AddTimer((float)(0.2 * i), () => TryShootTarget(enemy, Warcraft.RollDice(droneLevel, rocketMaxChance)));
+                    WarcraftPlugin.Instance.AddTimer((float)(0.2 * i), () => TryShootTarget(enemy, Warcraft.RollAbilityCheck(droneLevel, rocketMaxChance)));
                 }
             }
         }
