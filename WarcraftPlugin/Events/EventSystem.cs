@@ -41,7 +41,6 @@ namespace WarcraftPlugin.Events
             RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre);
             RegisterEventHandler<EventRoundStart>(RoundStart, HookMode.Pre);
             RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
-            VirtualFunctions.CCSPlayer_ItemServices_CanAcquireFunc.Hook(OnWeaponCanAcquire, HookMode.Pre);
 
             //Virtual functions
             VirtualFunctions.CCSPlayer_ItemServices_CanAcquireFunc.Hook(OnWeaponCanAcquire, HookMode.Pre);

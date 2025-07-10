@@ -17,6 +17,8 @@ namespace WarcraftPlugin.Classes
         public override string DisplayName => "Silent Assassin";
         public override Color DefaultColor => Color.Gray;
 
+        public override List<string> WeaponWhitelist => ["knife", "c4", "defuse"];
+
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Shrink", "Reduce model size by 15/20/25/30/35%"),
@@ -66,22 +68,6 @@ namespace WarcraftPlugin.Classes
                 int agilityLevel = WarcraftPlayer.GetAbilityLevel(1);
                 Player.PlayerPawn.Value.VelocityModifier = _speedLevels[agilityLevel];
                 Player.PlayerPawn.Value.GravityScale = _gravityLevels[agilityLevel];
-
-                // restrict weapons
-                var allowed = new List<string> { "weapon_knife" };
-                bool includeBomb = false;
-                if (Player.TeamNum == (int)CsTeam.Terrorist)
-                {
-                    allowed.Add("weapon_c4");
-                    includeBomb = true;
-                }
-                else
-                {
-                    var itemServices = new CCSPlayer_ItemServices(Player.PlayerPawn.Value.ItemServices.Handle);
-                    itemServices.HasDefuser = true;
-                }
-                new RestrictWeaponsEffect(Player, 999f, allowed, includeBomb).Start();
-                Player.GiveNamedItem("weapon_knife");
             });
         }
 
@@ -120,123 +106,6 @@ namespace WarcraftPlugin.Classes
                 if (!Owner.IsAlive()) return;
                 Owner.GetWarcraftPlayer().GetClass().SetDefaultAppearance();
                 Owner.PrintToCenter(Localizer["rogue.visible"]);
-            }
-        }
-
-        private class RestrictWeaponsEffect : WarcraftEffect
-        {
-            private readonly List<string> _allowedWeapons;
-            private readonly bool _includeBomb;
-
-            public RestrictWeaponsEffect(CCSPlayerController owner, float duration, List<string> allowedWeapons, bool includeBomb = false)
-                : base(owner, duration)
-            {
-                _allowedWeapons = allowedWeapons;
-                _includeBomb = includeBomb;
-            }
-
-            public override void OnStart()
-            {
-                if (!Owner.IsValid || Owner.PlayerPawn?.Value == null)
-                    return;
-
-                Owner.PlayerPawn.Value.WeaponServices!.PreventWeaponPickup = true;
-
-                WarcraftPlugin.Instance.AddTimer(0.3f, () =>
-                {
-                    DropAllWeaponsExceptAllowed();
-
-                    WarcraftPlugin.Instance.AddTimer(0.2f, () =>
-                    {
-                        GiveAllowedWeapons();
-                    });
-                });
-            }
-
-            public override void OnTick()
-            {
-                if (!Owner.IsValid || Owner.PlayerPawn?.Value == null)
-                    return;
-
-                var activeWeapon = Owner.PlayerPawn.Value.WeaponServices?.ActiveWeapon?.Value;
-                var weaponName = activeWeapon?.DesignerName;
-
-                if (string.IsNullOrEmpty(weaponName) || _allowedWeapons.Contains(weaponName))
-                    return;
-
-                DropAllWeaponsExceptAllowed();
-
-                WarcraftPlugin.Instance.AddTimer(0.2f, () =>
-                {
-                    GiveAllowedWeapons();
-                });
-            }
-
-            public override void OnFinish()
-            {
-                if (!Owner.IsValid || Owner.PlayerPawn?.Value == null)
-                    return;
-
-                Owner.PlayerPawn.Value.WeaponServices!.PreventWeaponPickup = false;
-            }
-
-            private void DropAllWeaponsExceptAllowed()
-            {
-                var pawn = Owner.PlayerPawn.Value;
-                var weapons = pawn.WeaponServices.MyWeapons;
-                if (weapons == null) return;
-
-                for (int i = weapons.Count - 1; i >= 0; i--)
-                {
-                    var weapon = weapons[i].Value;
-                    if (weapon == null || !_allowedWeapons.Contains(weapon.DesignerName))
-                    {
-                        DropWeaponByDesignerName(Owner, weapon?.DesignerName ?? "");
-                    }
-                }
-            }
-
-            private void DropWeaponByDesignerName(CCSPlayerController player, string weaponName)
-            {
-                if (player == null || !player.IsValid || string.IsNullOrEmpty(weaponName)) return;
-
-                var pawn = player.PlayerPawn.Value;
-                if (pawn == null || !pawn.IsValid || !player.PawnIsAlive || pawn.WeaponServices == null) return;
-
-                var matchedWeapon = pawn.WeaponServices.MyWeapons
-                    .FirstOrDefault(x => x.Value?.DesignerName == weaponName);
-
-                if (matchedWeapon != null && matchedWeapon.IsValid)
-                {
-                    pawn.WeaponServices.ActiveWeapon.Raw = matchedWeapon.Raw;
-                    player.DropActiveWeapon();
-                }
-            }
-
-            private void GiveAllowedWeapons()
-            {
-                var pawn = Owner.PlayerPawn.Value;
-                var inventory = pawn.WeaponServices.MyWeapons;
-
-                foreach (var weaponName in _allowedWeapons)
-                {
-                    if (weaponName == "weapon_c4")
-                    {
-                        if (!_includeBomb || Owner.TeamNum != (int)CsTeam.Terrorist)
-                            continue;
-
-                        bool hasBomb = inventory != null && inventory.Any(w => w.Value?.DesignerName == weaponName);
-                        if (!hasBomb)
-                            continue;
-                    }
-
-                    bool alreadyHasWeapon = inventory != null && inventory.Any(w => w.Value?.DesignerName == weaponName);
-
-                    if (!alreadyHasWeapon)
-                    {
-                        Owner.GiveNamedItem(weaponName);
-                    }
-                }
             }
         }
     }
