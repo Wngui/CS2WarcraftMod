@@ -99,7 +99,7 @@ namespace WarcraftPlugin.Classes
         {
             if (!@event.Userid.IsAlive() || @event.Userid.UserId == Player.UserId) return;
 
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 25))
+            if (Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(1), 25))
             {
                 var victim = @event.Userid;
                 new FreezeEffect(Player, 1.0f, victim).Start();

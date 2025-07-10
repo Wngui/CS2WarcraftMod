@@ -695,7 +695,7 @@ namespace WarcraftPlugin.Helpers
         /// </summary>
         /// <param name="chanceOfSuccess">The chance of success (0-100).</param>
         /// <returns>True if the roll is successful, otherwise false.</returns>
-        private static bool RollDice(int chanceOfSuccess)
+        public static bool RollDice(int chanceOfSuccess)
         {
             var roll = Random.Shared.NextInt64(100);
             return roll >= 100 - chanceOfSuccess;
@@ -705,8 +705,21 @@ namespace WarcraftPlugin.Helpers
         /// Rolls a dice to determine success based on ability level. The higher the level, the higher the chance of success.
         /// </summary>
         /// <param name="abilityLevel">The level of the ability.</param>
+        /// <param name="successChanceAtMaxLevel">Chance of success at maximum level (default is 100).</param>
+        /// <returns>True if the roll is successful, otherwise false.</returns>
+        public static bool RollAbilityCheck(int abilityLevel, int successChanceAtMaxLevel = 100)
+        {
+            var chanceInterval = successChanceAtMaxLevel / WarcraftPlugin.MaxSkillLevel;
+            return RollDice(chanceInterval * abilityLevel);
+        }
+
+        /// <summary>
+        /// Rolls a dice to determine success based on ability level. The higher the level, the higher the chance of success.
+        /// </summary>
+        /// <param name="abilityLevel">The level of the ability.</param>
         /// <param name="maxLevelChance">Chance of success at maximum level (default is 100).</param>
         /// <returns>True if the roll is successful, otherwise false.</returns>
+        [Obsolete(message: "Use RollAbilityCheck")]
         public static bool RollDice(int abilityLevel, int maxLevelChance = 100)
         {
             var chanceInterval = maxLevelChance / WarcraftPlugin.MaxSkillLevel;

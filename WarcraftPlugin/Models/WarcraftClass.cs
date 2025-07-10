@@ -76,7 +76,13 @@ namespace WarcraftPlugin.Models
 
         public abstract void Register();
 
-        public virtual void PlayerChangingToAnotherRace() { SetDefaultAppearance(); }
+        public virtual void PlayerChangingToAnotherRace()
+        {
+            if (Player?.IsValid != true || Player.PlayerPawn?.Value == null) return;
+
+            Player.PlayerPawn.Value.SetScale(1);
+            SetDefaultAppearance();
+        }
 
         public virtual List<string> PreloadResources { get; } = [];
         public virtual List<string> WeaponWhitelist { get; } = [];

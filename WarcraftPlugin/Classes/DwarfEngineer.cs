@@ -87,7 +87,7 @@ namespace WarcraftPlugin.Classes
 
             if (isCloseToMineableWall)
             {
-                var success = Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 30);
+                var success = Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(1), 30);
                 new PickAxeEffect(Player, 10, success, trace).Start();
             }
         }
@@ -96,7 +96,7 @@ namespace WarcraftPlugin.Classes
         {
             Server.NextFrame(() =>
             {
-                //Steve is small
+                //Dwarf is small
                 Player.PlayerPawn.Value.SetScale(0.8f);
 
                 //Build tool

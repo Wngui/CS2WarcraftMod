@@ -105,7 +105,7 @@ namespace WarcraftPlugin.Classes
             if (!victim.IsAlive() || victim.UserId == Player.UserId) return;
 
             //Smite
-            if (victim.PlayerPawn.Value.ArmorValue > 0 && Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 75))
+            if (victim.PlayerPawn.Value.ArmorValue > 0 && Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(2), 75))
             {
                 @event.AddBonusDamage(0, WarcraftPlayer.GetAbilityLevel(2) * 5, abilityName: GetAbility(2).DisplayName);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.Clone().Add(z: 40), "particles/survival_fx/gas_cannister_impact_child_flash.vpcf", 1);

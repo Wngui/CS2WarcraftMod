@@ -58,7 +58,7 @@ namespace WarcraftPlugin.Classes
 
                 var maxChance = 400 / maxClip; // The bigger the mag, the lower the chance, to avoid negev spam
 
-                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), maxChance))
+                if (Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(2), maxChance))
                 {
                     new ThrowingAxeEffect(Player, 2).Start();
                 }
@@ -96,7 +96,7 @@ namespace WarcraftPlugin.Classes
                 var victim = @event.Userid;
                 @event.AddBonusDamage(carnageLevel * 5, abilityName: GetAbility(0).DisplayName);
                 Warcraft.SpawnParticle(victim.PlayerPawn.Value.AbsOrigin.With(z: victim.PlayerPawn.Value.AbsOrigin.Z + 60), "particles/blood_impact/blood_impact_basic.vpcf");
-                victim.EmitSound("Flesh.ImpactHard", volume:0.5f);
+                victim.EmitSound("Flesh.ImpactHard", volume: 0.5f);
             }
         }
     }

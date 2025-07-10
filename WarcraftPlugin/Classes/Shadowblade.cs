@@ -44,7 +44,7 @@ namespace WarcraftPlugin.Classes
         {
             var attacker = @event.Attacker;
             // Evasion: Chance to dodge damage
-            if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(1), 30))
+            if (Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(1), 30))
             {
                 Player.PrintToChat(" " + Localizer["shadowblade.evaded", @event.DmgHealth]);
                 attacker?.PrintToChat(" " + Localizer["shadowblade.evaded", Player.GetRealPlayerName()]);
@@ -58,7 +58,7 @@ namespace WarcraftPlugin.Classes
             }
 
             // Shadowstep
-            if (attacker.IsAlive() && Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(0), 20))
+            if (attacker.IsAlive() && Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(0), 20))
             {
                 var posBehindEnemy = attacker.CalculatePositionInFront(-90, attacker.EyeHeight());
 

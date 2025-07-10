@@ -63,7 +63,7 @@ namespace WarcraftPlugin.Classes
             var pawn = Player.PlayerPawn.Value;
             if (!_hasCheatedDeath && pawn.Health <= 0)
             {
-                if (Warcraft.RollDice(WarcraftPlayer.GetAbilityLevel(2), 80))
+                if (Warcraft.RollAbilityCheck(WarcraftPlayer.GetAbilityLevel(2), 80))
                 {
                     _hasCheatedDeath = true;
                     WarcraftPlugin.Instance.AddTimer(2f, () =>
