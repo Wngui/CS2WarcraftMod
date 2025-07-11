@@ -200,6 +200,8 @@
   "shadowblade.venomstrike.victim": "{Green}Poisoned for {DarkRed}{0} {Green}damage!",
   "dwarf_engineer.buildtool": "Build Tool",
   "dwarf_engineer.pickaxe": "Pickaxe",
+  "deathweaver.revive": "{Green}You have been raised from the dead!",
+  "deathweaver.spawn.rifle": "{Green}Spawned with an assault rifle!",
   "dwarf_engineer.build.tooltip": "{Green}[Left Click]{Default} Build {Grey}| {DarkBlue}[Right Click]{Default} Change {Grey}| {Red}[R]{Default} Rotate",
 
   //Items
