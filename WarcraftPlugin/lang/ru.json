@@ -83,6 +83,15 @@
   "barbarian.ability.3": "Жажда крови", // Bloodlust
   "barbarian.ability.3.description": "На 10с: бесконечные патроны, +30% скорости и регенерация здоровья.", // 10s: infinite ammo, +30% speed, health regen.
 
+  "deathweaver.ability.0": "Cripple", // Cripple
+  "deathweaver.ability.0.description": "Шанс замедлить врага при атаке.",
+  "deathweaver.ability.1": "Unholy Frenzy", // Unholy Frenzy
+  "deathweaver.ability.1.description": "Шанс нанести дополнительный урон 10-50%.",
+  "deathweaver.ability.2": "Necromancer Master", // Necromancer Master
+  "deathweaver.ability.2.description": "Шанс появиться со штурмовой винтовкой.",
+  "deathweaver.ability.3": "Raise Skeleton", // Raise Skeleton
+  "deathweaver.ability.3.description": "Возрождает случайного союзника.",
+
   "mage.ability.0": "Огненный шар", // Fireball
   "mage.ability.0.description": "Молотовы наносят 40/80/120/160/200 урона при взрыве.", // Molotovs deal 40/80/120/160/200 damage on explosion.
   "mage.ability.1": "Ледяной луч", // Ice Ray
@@ -168,6 +177,8 @@
   "mage.frozen": "{Blue}[ЗАМОРОЖЕН]{Default}", // [FROZEN]
   "necromancer.cheatdeath": "{DarkRed}Вы избежали смерти, пока что...", // You cheated death... for now
   "necromancer.lifedrain": "{0} {Red}высосал {1} HP из вас!", // {0} drained {1} HP from you!
+  "deathweaver.revive": "{Green}Вы подняты из мертвых!", // revived
+  "deathweaver.spawn.rifle": "{Green}Вы появились со штурмовой винтовкой!", // Spawned with an assault rifle!
   "paladin.revive": "{Green}Вы были воскрешены!", // You have been resurrected!
   "paladin.revive.other": "{Green}{0}{Default} был воскрешен {Gold}{1}", // {0} was resurrected by {1}
   "paladin.revive.none": "{Red}Нет павших союзников для воскрешения!", // No fallen allies to resurrect!
