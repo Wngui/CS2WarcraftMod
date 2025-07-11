@@ -140,9 +140,8 @@ namespace WarcraftPlugin.Classes
         public override void OnTick()
         {
             if (!Victim.IsAlive()) { Destroy(); return; }
-            var remaining = Victim.PlayerPawn.Value.Health - damage;
-            KillFeedIcon? icon = remaining <= 0 ? KillFeedIcon.inferno : null;
-            Victim.TakeDamage(damage, Owner, icon);
+
+            Victim.TakeDamage(damage, Owner, KillFeedIcon.inferno);
 
             var abilityName = Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName;
             Owner.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} +{damage} dmg");
