@@ -490,7 +490,10 @@ namespace WarcraftPlugin.Helpers
             if (!victim.IsAlive() || !victim.Pawn.IsValid) return;
             var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
             if (attackerClass != null) attackerClass.LastHurtOther = Server.CurrentTime;
-            if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
+            if (killFeedIcon != null) {
+                var isLethalDamage = (victim.PlayerPawn.Value.Health - damage) <= 0;
+                attackerClass?.SetKillFeedIcon(isLethalDamage ? killFeedIcon : null);
+            }
 
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);
             Marshal.FreeHGlobal(ptr);

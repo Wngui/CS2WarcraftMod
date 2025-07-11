@@ -333,16 +333,14 @@ namespace WarcraftPlugin.Events
 
             if (victim.IsValid && attacker.IsValid)
             {
-                if (attacker != victim)
-                {
-                    var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
-                    var victimClass = victim.GetWarcraftPlayer()?.GetClass();
-                    WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
-                    victimClass?.InvokeEvent(@event, HookMode.Pre);
-                    @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
-                }
+                var attackerClass = attacker.GetWarcraftPlayer()?.GetClass();
+                var victimClass = victim.GetWarcraftPlayer()?.GetClass();
+                WarcraftPlugin.Instance.EffectManager.DestroyEffects(victim, EffectDestroyFlags.OnDeath);
+                victimClass?.InvokeEvent(@event, HookMode.Pre);
+                @event.Weapon = attackerClass?.GetKillFeedIcon()?.ToString() ?? @event.Weapon;
                 victim.GetWarcraftPlayer()?.ClearItems();
             }
+
             return HookResult.Continue;
         }
 

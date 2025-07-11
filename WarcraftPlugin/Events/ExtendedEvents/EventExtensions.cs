@@ -26,7 +26,11 @@ namespace WarcraftPlugin.Events.ExtendedEvents
                 @event.DmgArmor += damageArmor;
 
                 var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
-                if (killFeedIcon != null) attackerClass?.SetKillFeedIcon(killFeedIcon);
+                if (killFeedIcon != null)
+                {
+                    var isLethalDamage = (victim.PlayerPawn.Value.Health - damageHealth) <= 0;
+                    attackerClass?.SetKillFeedIcon(isLethalDamage ? killFeedIcon : null);
+                }
 
                 if (!string.IsNullOrEmpty(abilityName))
                 {
