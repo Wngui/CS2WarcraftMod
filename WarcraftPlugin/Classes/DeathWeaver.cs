@@ -7,14 +7,15 @@ using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Events.ExtendedEvents;
+using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Core.Effects;
 using System.Linq;
 
 namespace WarcraftPlugin.Classes
 {
-    internal class NecromancerClassic : WarcraftClass
+    internal class DeathWeaver : WarcraftClass
     {
-        public override string DisplayName => "Necromancer Classic";
+        public override string DisplayName => "DeathWeaver";
         public override Color DefaultColor => Color.MediumPurple;
 
         public override List<IWarcraftAbility> Abilities =>
@@ -49,6 +50,7 @@ namespace WarcraftPlugin.Classes
                 string weapon = Player.Team == CsTeam.CounterTerrorist ? "weapon_m4a1" : "weapon_ak47";
                 var gun = new CCSWeaponBaseGun(Player.GiveNamedItem(weapon));
                 gun.Clip1 = gun.GetVData<CBasePlayerWeaponVData>().MaxClip1 * 2;
+                Player.PrintToChat(" " + Localizer["deathweaver.spawn.rifle"]);
             }
         }
 
