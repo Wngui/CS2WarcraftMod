@@ -39,9 +39,6 @@ namespace WarcraftPlugin.Classes
                 new InnerVitalityEffect(Player, WarcraftPlayer.GetAbilityLevel(0)).Start();
             }
 
-            // Burning Spear no longer reduces max health on spawn; health cost
-            // is applied each time the ability is used
-
             if (WarcraftPlayer.GetAbilityLevel(2) > 0)
             {
                 new BerserkersBloodEffect(Player, WarcraftPlayer.GetAbilityLevel(2)).Start();
@@ -107,7 +104,7 @@ namespace WarcraftPlugin.Classes
     }
 
     // Heal should occur every 3 seconds instead of every second
-    internal class InnerVitalityEffect(CCSPlayerController owner, int abilityLevel) : WarcraftEffect(owner, duration:9999f, onTickInterval:3f)
+    internal class InnerVitalityEffect(CCSPlayerController owner, int abilityLevel) : WarcraftEffect(owner, onTickInterval:3f)
     {
         public override void OnStart() { }
         public override void OnTick()
@@ -150,7 +147,7 @@ namespace WarcraftPlugin.Classes
         public override void OnFinish() { }
     }
 
-    internal class BerserkersBloodEffect(CCSPlayerController owner, int level) : WarcraftEffect(owner, duration:9999f, onTickInterval:0.5f)
+    internal class BerserkersBloodEffect(CCSPlayerController owner, int level) : WarcraftEffect(owner, onTickInterval:0.5f)
     {
         private float _baseModifier = 1f;
         public override void OnStart()
