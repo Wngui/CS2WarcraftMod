@@ -65,6 +65,7 @@
   "barbarian": "Barbarian",
   "mage": "Mage",
   "necromancer": "Necromancer",
+  "deathweaver": "DeathWeaver",
   "paladin": "Paladin",
   "ranger": "Ranger",
   "rogue": "Rogue",
@@ -82,7 +83,16 @@
   "barbarian.ability.2.description": "Chance to throw an exploding barrel when firing (around 3\u201313% per shot depending on weapon).",
   "barbarian.ability.3": "Bloodlust",
   "barbarian.ability.3.description": "For 10s gain infinite ammo, 30% more speed and constant health regeneration.",
-
+  
+  "deathweaver.ability.0": "Cripple",
+  "deathweaver.ability.0.description": "25% chance to slow an enemy for 1.5/2/2.5/3/3.5 seconds.",
+  "deathweaver.ability.1": "Unholy Frenzy",
+  "deathweaver.ability.1.description": "25% chance to deal 10/20/30/40/50% bonus damage.",
+  "deathweaver.ability.2": "Necromancer Master",
+  "deathweaver.ability.2.description": "65/70/75/80/85% chance to spawn with an assault rifle.",
+  "deathweaver.ability.3": "Raise Skeleton",
+  "deathweaver.ability.3.description": "Revive a random ally.",
+  
   "mage.ability.0": "Fireball",
   "mage.ability.0.description": "Infuses molotovs with fire magic, causing a huge explosion on impact (40/80/120/160/200 damage).",
   "mage.ability.1": "Ice Beam",
