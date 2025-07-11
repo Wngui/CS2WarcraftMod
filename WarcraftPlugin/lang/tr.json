@@ -83,6 +83,15 @@
   "barbarian.ability.3": "Kan Arzusu", // Bloodlust
   "barbarian.ability.3.description": "10s boyunca: Sonsuz mermi, %30 daha hızlı ve sürekli can yenileme.", // For 10s: infinite ammo, 30% faster, and constant health regen.
 
+  "deathweaver.ability.0": "Cripple",
+  "deathweaver.ability.0.description": "Saldırdığında düşmanı yavaşlatma şansı.",
+  "deathweaver.ability.1": "Unholy Frenzy",
+  "deathweaver.ability.1.description": "10-50% ekstra hasar verme şansı.",
+  "deathweaver.ability.2": "Necromancer Master",
+  "deathweaver.ability.2.description": "Saldırı tüfeği ile başlama şansı.",
+  "deathweaver.ability.3": "Raise Skeleton",
+  "deathweaver.ability.3.description": "Rastgele bir takım arkadaşını diriltir.",
+
   "mage.ability.0": "Ateş Topu", // Fireball
   "mage.ability.0.description": "Molotoflar 40/80/120/160/200 hasar veren büyük patlama yapar.", // Molotovs create a big explosion dealing 40/80/120/160/200 damage.
   "mage.ability.1": "Buz Işını", // Ice Beam
@@ -166,6 +175,8 @@
 
   //Stock class extras // Sınıf ekstraları
   "mage.frozen": "{Blue}[DONDURULDU]{Default}", // [FROZEN]
+  "deathweaver.revive": "{Green}Dirildin!",
+  "deathweaver.spawn.rifle": "{Green}Bir taarruz tüfeği ile doğdun!",
   "necromancer.cheatdeath": "{DarkRed}Ölümden şimdilik kurtuldun...", // You cheated death for now...
   "necromancer.lifedrain": "{0} {Red}sendan {1} HP çaldı!", // {0} drained {1} HP from you!
   "paladin.revive": "{Green}Dirildin!", // You have been revived!
