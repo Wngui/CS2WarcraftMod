@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
@@ -28,10 +26,10 @@ namespace WarcraftPlugin.Classes
             new WarcraftCooldownAbility("Ghost Walk", "Completely invisible for 3 seconds", 15f)
         ];
 
-        private readonly float[] _scaleLevels = {1f, 0.85f, 0.80f, 0.75f, 0.70f, 0.65f};
-        private readonly float[] _speedLevels = {1f, 1.15f, 1.20f, 1.25f, 1.30f, 1.35f};
-        private readonly float[] _gravityLevels = {1f, 0.94f, 0.90f, 0.86f, 0.82f, 0.79f};
-        private readonly int[] _knifeBonusMax = {0, 10, 20, 30, 40, 50};
+        private readonly float _scaleMultiplier = 0.5f;
+        private readonly float _speedMultiplier = 0.7f;
+        private readonly float _gravityMultiplier = 0.6f;
+        private readonly int _knifeBonusMultiplier = 10;
 
         public override void Register()
         {
@@ -48,12 +46,18 @@ namespace WarcraftPlugin.Classes
 
                 // apply scale
                 int shrinkLevel = WarcraftPlayer.GetAbilityLevel(0);
-                Player.PlayerPawn.Value.SetScale(_scaleLevels[shrinkLevel]);
+                if (shrinkLevel > 0)
+                {
+                    Player.PlayerPawn.Value.SetScale(_scaleMultiplier * shrinkLevel);
+                }
 
                 // apply speed and gravity
-                int agilityLevel = WarcraftPlayer.GetAbilityLevel(1);
-                Player.PlayerPawn.Value.VelocityModifier = _speedLevels[agilityLevel];
-                Player.PlayerPawn.Value.GravityScale = _gravityLevels[agilityLevel];
+                int lightweight = WarcraftPlayer.GetAbilityLevel(1);
+                if (lightweight > 0)
+                {
+                    Player.PlayerPawn.Value.VelocityModifier += _speedMultiplier * lightweight;
+                    Player.PlayerPawn.Value.GravityScale -= _gravityMultiplier * lightweight;
+                }
             });
         }
 
@@ -66,7 +70,7 @@ namespace WarcraftPlugin.Classes
             if (level <= 0) return;
             if (Random.Shared.NextDouble() <= 0.4)
             {
-                int bonus = Random.Shared.Next(1, _knifeBonusMax[level] + 1);
+                int bonus = Random.Shared.Next(1, level * _knifeBonusMultiplier);
                 @event.AddBonusDamage(bonus, abilityName: GetAbility(2).DisplayName);
             }
         }
