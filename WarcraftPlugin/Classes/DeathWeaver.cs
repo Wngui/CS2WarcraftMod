@@ -7,7 +7,6 @@ using CounterStrikeSharp.API.Modules.Utils;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 using WarcraftPlugin.Events.ExtendedEvents;
-using CounterStrikeSharp.API.Modules.Timers;
 using WarcraftPlugin.Core.Effects;
 using System.Linq;
 
@@ -26,11 +25,7 @@ namespace WarcraftPlugin.Classes
             new WarcraftCooldownAbility("Raise Skeleton", "Revive a random ally.", 30f)
         ];
 
-        private readonly Dictionary<int, float> _crippleDurations = new()
-        {
-            {1, 1.5f}, {2, 2.0f}, {3, 2.5f}, {4, 3.0f},
-            {5, 3.5f}, {6, 4.0f}, {7, 4.5f}, {8, 5.0f}
-        };
+        private readonly float _crippleDurationModifier = 1.5f;
 
         public override void Register()
         {
@@ -61,7 +56,7 @@ namespace WarcraftPlugin.Classes
             var crippleLevel = WarcraftPlayer.GetAbilityLevel(0);
             if (crippleLevel > 0 && Random.Shared.Next(100) < 25)
             {
-                var duration = _crippleDurations[crippleLevel];
+                var duration = crippleLevel * _crippleDurationModifier;
                 new CrippleEffect(Player, hurt.Userid, duration).Start();
             }
 

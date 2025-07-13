@@ -53,7 +53,7 @@ namespace WarcraftPlugin.Classes
             if (level > 0)
             {
                 var origin = @event.Userid.PlayerPawn.Value.AbsOrigin;
-                var radius = 150f;
+                var radius = 75f;
                 var enemies = Utilities.GetPlayers()
                     .Where(p => p.PawnIsAlive && !p.AllyOf(Player))
                     .Where(p => (p.PlayerPawn.Value.AbsOrigin - origin).Length() <= radius)
@@ -152,7 +152,7 @@ namespace WarcraftPlugin.Classes
         private float _baseModifier = 1f;
         public override void OnStart()
         {
-            if (Owner.PlayerPawn?.Value != null)
+            if (Owner.IsAlive())
             {
                 _baseModifier = Owner.PlayerPawn.Value.VelocityModifier;
             }
@@ -168,7 +168,7 @@ namespace WarcraftPlugin.Classes
         }
         public override void OnFinish()
         {
-            if (Owner.PlayerPawn?.Value != null)
+            if (Owner.IsAlive())
             {
                 Owner.PlayerPawn.Value.VelocityModifier = _baseModifier;
             }

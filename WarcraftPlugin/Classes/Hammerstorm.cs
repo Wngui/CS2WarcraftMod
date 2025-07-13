@@ -44,7 +44,7 @@ namespace WarcraftPlugin.Classes
                 {
                     var healthBonus = 10 + (level - 1) * 5; //10/15/20/25/30
                     Player.SetHp(Player.PlayerPawn.Value.Health + healthBonus);
-                    speed += new float[] {0.06f,0.09f,0.12f,0.15f,0.18f}[level-1];
+                    speed += 0.06f + (level * 0.03f);
                 }
                 Player.PlayerPawn.Value.VelocityModifier = speed;
             });
@@ -58,7 +58,7 @@ namespace WarcraftPlugin.Classes
             if (stormLevel > 0 && Random.Shared.Next(100) < 25)
             {
                 var radius = 150 + 25 * stormLevel;
-                var damage = new int[] {5,8,11,14,17}[stormLevel-1];
+                var damage = 5 + 3 * stormLevel;
                 var players = Utilities.GetPlayers().Where(x => x.PawnIsAlive && x.Team != Player.Team);
                 foreach (var p in players)
                 {
@@ -73,7 +73,7 @@ namespace WarcraftPlugin.Classes
             var cleaveLevel = WarcraftPlayer.GetAbilityLevel(1);
             if (cleaveLevel > 0 && Random.Shared.Next(100) < 25)
             {
-                var splashPct = new float[] {0.10f,0.15f,0.20f,0.25f,0.30f}[cleaveLevel-1];
+                var splashPct = 0.1f + 0.05f * cleaveLevel;
                 var radius = 150;
                 var players = Utilities.GetPlayers().Where(x => x.PawnIsAlive && x.Team != Player.Team && x.UserId != @event.Userid.UserId);
                 foreach (var p in players)
