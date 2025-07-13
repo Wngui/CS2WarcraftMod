@@ -63,8 +63,7 @@ namespace WarcraftPlugin.Classes
             var frenzyLevel = WarcraftPlayer.GetAbilityLevel(1);
             if (frenzyLevel > 0 && Random.Shared.Next(100) < 25)
             {
-                var multiplier = 1.0f + 0.1f * Math.Min(frenzyLevel, 5);
-                var bonusDamage = (int)(hurt.DmgHealth * (multiplier - 1.0f));
+                var bonusDamage = (int)(hurt.DmgHealth * (0.1f * frenzyLevel));
                 if (bonusDamage > 0)
                 {
                     hurt.AddBonusDamage(bonusDamage, abilityName: GetAbility(1).DisplayName);
