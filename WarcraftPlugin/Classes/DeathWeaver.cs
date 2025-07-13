@@ -1,14 +1,16 @@
-using System;
-using System.Drawing;
-using System.Collections.Generic;
-using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Core.Preload;
+using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
-using WarcraftPlugin.Events.ExtendedEvents;
-using WarcraftPlugin.Core.Effects;
-using System.Linq;
 
 namespace WarcraftPlugin.Classes
 {
@@ -25,7 +27,7 @@ namespace WarcraftPlugin.Classes
             new WarcraftCooldownAbility("Raise Skeleton", "Revive a random ally.", 30f)
         ];
 
-        private readonly float _crippleDurationModifier = 1.5f;
+        private readonly float _crippleDurationModifier = 0.5f;
 
         public override void Register()
         {
@@ -56,7 +58,7 @@ namespace WarcraftPlugin.Classes
             var crippleLevel = WarcraftPlayer.GetAbilityLevel(0);
             if (crippleLevel > 0 && Random.Shared.Next(100) < 25)
             {
-                var duration = crippleLevel * _crippleDurationModifier;
+                var duration = 1 + crippleLevel * _crippleDurationModifier;
                 new CrippleEffect(Player, hurt.Userid, duration).Start();
             }
 
@@ -82,6 +84,12 @@ namespace WarcraftPlugin.Classes
                 playerToRevive.Respawn();
                 playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(10, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
                 playerToRevive.PrintToChat($" {ChatColors.Green}Raised by {ChatColors.Default}{Player.PlayerName}!");
+
+                Server.NextFrame(() =>
+                {
+                    var particle = Warcraft.SpawnParticle(playerToRevive.EyePosition(-60), "particles/explosions_fx/explosion_smokegrenade_init.vpcf", 2);
+                    particle.SetParent(playerToRevive.PlayerPawn.Value);
+                });
             }
             else
             {
@@ -96,6 +104,7 @@ namespace WarcraftPlugin.Classes
             private readonly CCSPlayerController _victim = victim;
             private float _originalSpeed;
             private float _originalModifier;
+            private CParticleSystem _particle;
 
             public override void OnStart()
             {
@@ -106,15 +115,24 @@ namespace WarcraftPlugin.Classes
                 _victim.PlayerPawn.Value.VelocityModifier = _originalModifier * 0.7f;
                 Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(0).DisplayName}{ChatColors.Default} crippled {_victim.GetRealPlayerName()}");
                 _victim.PrintToChat($" {ChatColors.Red}Crippled by {ChatColors.Green}{Owner.PlayerName}");
+                _particle = Warcraft.SpawnParticle(_victim.EyePosition(-60), "particles/water_impact/water_foam_01c.vpcf", Duration);
+                _particle.SetParent(_victim.PlayerPawn.Value);
             }
 
-            public override void OnTick() { }
+            public override void OnTick()
+            {
+                if (!_victim.IsAlive()) { Destroy(); return; }
+            }
 
             public override void OnFinish()
             {
-                if (!_victim.IsAlive()) return;
-                _victim.PlayerPawn.Value.MovementServices.Maxspeed = _originalSpeed;
-                _victim.PlayerPawn.Value.VelocityModifier = _originalModifier;
+                if (_victim.IsAlive())
+                {
+                    _victim.PlayerPawn.Value.MovementServices.Maxspeed = _originalSpeed;
+                    _victim.PlayerPawn.Value.VelocityModifier = _originalModifier;
+                }
+
+                _particle.RemoveIfValid();
             }
         }
     }
