@@ -9,8 +9,6 @@ using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
-using static g3.RoundRectGenerator;
-using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
@@ -94,7 +92,7 @@ namespace WarcraftPlugin.Classes
                 .FirstOrDefault(p => p.PlayerPawn.Value.CollisionBox().Contains(trace) ||
                                      (p.PlayerPawn.Value.AbsOrigin - trace).Length() <= 50);
             if (target == null) {
-                Player.PrintToChat($" {ChatColors.Red}No valid target found for {ChatColors.Green}{GetAbility(3).DisplayName}");
+                Player.PrintToChat($" {Localizer["effect.no.target", GetAbility(3).DisplayName]}");
                 return;
             } 
 

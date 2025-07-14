@@ -16,7 +16,7 @@ namespace WarcraftPlugin.Classes
 {
     internal class DeathWeaver : WarcraftClass
     {
-        public override string DisplayName => "DeathWeaver";
+        public override string DisplayName => "Death Weaver";
         public override Color DefaultColor => Color.MediumPurple;
 
         public override List<IWarcraftAbility> Abilities =>
@@ -83,7 +83,10 @@ namespace WarcraftPlugin.Classes
                 var playerToRevive = deadTeamPlayers.ElementAt(Random.Shared.Next(deadTeamPlayers.Count()));
                 playerToRevive.Respawn();
                 playerToRevive.PlayerPawn.Value.Teleport(Player.CalculatePositionInFront(10, 60), Player.PlayerPawn.Value.EyeAngles, new Vector());
-                playerToRevive.PrintToChat($" {ChatColors.Green}Raised by {ChatColors.Default}{Player.PlayerName}!");
+
+                playerToRevive.PrintToChat(" " + Localizer["paladin.revive"]);
+                Utilities.GetPlayers().ForEach(x =>
+                    x.PrintToChat(" " + Localizer["paladin.revive.other", playerToRevive.GetRealPlayerName(), Player.GetRealPlayerName()]));
 
                 Server.NextFrame(() =>
                 {
@@ -113,8 +116,10 @@ namespace WarcraftPlugin.Classes
                 _originalModifier = _victim.PlayerPawn.Value.VelocityModifier;
                 _victim.PlayerPawn.Value.MovementServices.Maxspeed = _originalSpeed * 0.7f;
                 _victim.PlayerPawn.Value.VelocityModifier = _originalModifier * 0.7f;
-                Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(0).DisplayName}{ChatColors.Default} crippled {_victim.GetRealPlayerName()}");
-                _victim.PrintToChat($" {ChatColors.Red}Crippled by {ChatColors.Green}{Owner.PlayerName}");
+
+                Owner.PrintToChat($" {Localizer["death_weaver.cripple.other", _victim.GetRealPlayerName()]}");
+                _victim.PrintToChat($" {Localizer["death_weaver.cripple", Owner.GetRealPlayerName()]}");
+
                 _particle = Warcraft.SpawnParticle(_victim.EyePosition(-10), "particles/maps/de_dust/dust_burning_engine_fire_glow.vpcf", Duration);
                 _particle.SetParent(_victim.PlayerPawn.Value);
             }

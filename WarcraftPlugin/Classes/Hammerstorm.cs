@@ -83,8 +83,6 @@ namespace WarcraftPlugin.Classes
                     {
                         var bonus = @event.DmgHealth * splashPct;
                         p.TakeDamage(bonus, Player, KillFeedIcon.hammer);
-                        p.PrintToChat($" {ChatColors.Red}+{(int)bonus} dmg from {ChatColors.Green}{GetAbility(1).DisplayName}");
-                        Player.PrintToChat($" {ChatColors.Green}{GetAbility(1).DisplayName}{ChatColors.Default} dealt {(int)bonus} splash dmg to {p.GetRealPlayerName()}");
                     }
                 }
 

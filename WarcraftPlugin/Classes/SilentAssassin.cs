@@ -22,7 +22,6 @@ namespace WarcraftPlugin.Classes
             new WarcraftAbility("Shrink", "Reduce model size by 15/20/25/30/35%"),
             new WarcraftAbility("Lightweight", "Increase speed and reduce gravity"),
             new WarcraftAbility("Assassin's Blade", "40% chance to add bonus knife damage"),
-            // Ultimate lasts 3 seconds with a 15 second cooldown
             new WarcraftCooldownAbility("Ghost Walk", "Completely invisible for 3 seconds", 15f)
         ];
 
