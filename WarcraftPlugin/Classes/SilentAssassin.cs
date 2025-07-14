@@ -27,8 +27,8 @@ namespace WarcraftPlugin.Classes
         ];
 
         private readonly float _scaleMultiplier = 0.05f;
-        private readonly float _speedMultiplier = 0.7f;
-        private readonly float _gravityMultiplier = 0.6f;
+        private readonly float _speedMultiplier = 0.07f;
+        private readonly float _gravityMultiplier = 0.06f;
         private readonly int _knifeBonusMultiplier = 10;
 
         public override void Register()
