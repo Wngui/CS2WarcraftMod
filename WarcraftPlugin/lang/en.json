@@ -142,7 +142,7 @@
   "rogue.ability.3.description": "When nearing death, you will automatically drop a smokebomb, letting you cheat death.",
 
   "shapeshifter.ability.0": "Adaptive Disguise",
-  "shapeshifter.ability.0.description": "8/16/24/32/40% chance to spawn disguised as an enemy.",
+  "shapeshifter.ability.0.description": "8-40% chance to spawn disguised as an enemy.",
   "shapeshifter.ability.1": "Doppelganger",
   "shapeshifter.ability.1.description": "Create a temporary inanimate clone of yourself, lasting 5/10/15/20/25 seconds.",
   "shapeshifter.ability.2": "Imposter Syndrome",
