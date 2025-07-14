@@ -231,8 +231,10 @@
   "dwarf_engineer.buildtool": "Build Tool",
   "dwarf_engineer.pickaxe": "Pickaxe",
   "death_weaver.spawn.rifle": "{Green}Spawned with an assault rifle!",
-  "death_weaver.cripple.other": "{Green}Crippled {Default}{0}",
-  "death_weaver.cripple": "{Red}Crippled by {Default}{0}",
+  "death_weaver.cripple": "{Green}Crippled {Default}{0}",
+  "death_weaver.cripple.victim": "{Red}Crippled by {Default}{0}",
+  "sacred_warrior.burningspear": "{Green}Burning {0}",
+  "sacred_warrior.burningspear.victim": "{Orange}Burning from {Default}{0}",
   "dwarf_engineer.build.tooltip": "{Green}[Left Click]{Default} Build {Grey}| {DarkBlue}[Right Click]{Default} Change {Grey}| {Red}[R]{Default} Rotate",
 
   //Items

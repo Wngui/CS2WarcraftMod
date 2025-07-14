@@ -1,6 +1,5 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -82,7 +81,8 @@ namespace WarcraftPlugin.Classes
                     if ((p.PlayerPawn.Value.AbsOrigin - @event.Userid.PlayerPawn.Value.AbsOrigin).Length() <= radius)
                     {
                         var bonus = @event.DmgHealth * splashPct;
-                        p.TakeDamage(bonus, Player, KillFeedIcon.hammer);
+                        var abilityName = GetAbility(1).DisplayName;
+                        p.TakeDamage(bonus, Player, KillFeedIcon.hammer, abilityName: abilityName);
                     }
                 }
 

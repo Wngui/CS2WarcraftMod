@@ -121,7 +121,7 @@ namespace WarcraftPlugin.Classes
             if (pawn.Health < pawn.MaxHealth * 0.4f) heal *= 2;
             if (pawn.Health < pawn.MaxHealth)
             {
-                Owner.SetHp((int)System.Math.Min(pawn.Health + heal, pawn.MaxHealth));
+                Owner.SetHp(Math.Min(pawn.Health + heal, pawn.MaxHealth));
             }
         }
         public override void OnFinish() { }
@@ -137,8 +137,8 @@ namespace WarcraftPlugin.Classes
         {
             if (Victim.IsAlive())
             {
-                Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName}{ChatColors.Default} burning {Victim.GetRealPlayerName()}");
-                Victim.PrintToChat($" {ChatColors.Red}Burning from {ChatColors.Green}{Owner.PlayerName}");
+                Owner.PrintToChat($" {Localizer["sacred_warrior.burningspear", Victim.GetRealPlayerName()]}");
+                Victim.PrintToChat($" {Localizer["sacred_warrior.burningspear.victim", Owner.GetRealPlayerName()]}");
 
                 _particle = Warcraft.SpawnParticle(Victim.PlayerPawn.Value.AbsOrigin, "particles/burning_fx/barrel_burning_engine_fire_static.vpcf", Duration);
                 _particle.SetParent(Victim.PlayerPawn.Value);
@@ -148,11 +148,8 @@ namespace WarcraftPlugin.Classes
         {
             if (!Victim.IsAlive()) { Destroy(); return; }
 
-            Victim.TakeDamage(damage, Owner, KillFeedIcon.inferno);
-
             var abilityName = Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName;
-            Owner.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} +{damage} dmg");
-            Victim.PrintToChat($" {ChatColors.Red}+{damage} dmg from {ChatColors.Green}{abilityName}");
+            Victim.TakeDamage(damage, Owner, KillFeedIcon.inferno, abilityName: abilityName);
         }
         public override void OnFinish() { _particle.RemoveIfValid(); }
     }

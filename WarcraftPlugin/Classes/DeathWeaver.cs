@@ -1,13 +1,11 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Core.Preload;
 using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
@@ -117,8 +115,8 @@ namespace WarcraftPlugin.Classes
                 _victim.PlayerPawn.Value.MovementServices.Maxspeed = _originalSpeed * 0.7f;
                 _victim.PlayerPawn.Value.VelocityModifier = _originalModifier * 0.7f;
 
-                Owner.PrintToChat($" {Localizer["death_weaver.cripple.other", _victim.GetRealPlayerName()]}");
-                _victim.PrintToChat($" {Localizer["death_weaver.cripple", Owner.GetRealPlayerName()]}");
+                Owner.PrintToChat($" {Localizer["death_weaver.cripple", _victim.GetRealPlayerName()]}");
+                _victim.PrintToChat($" {Localizer["death_weaver.cripple.victim", Owner.GetRealPlayerName()]}");
 
                 _particle = Warcraft.SpawnParticle(_victim.EyePosition(-10), "particles/maps/de_dust/dust_burning_engine_fire_glow.vpcf", Duration);
                 _particle.SetParent(_victim.PlayerPawn.Value);

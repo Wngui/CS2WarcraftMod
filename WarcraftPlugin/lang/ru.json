@@ -208,8 +208,8 @@
   "mage.frozen": "{Blue}[ЗАМОРОЖЕН]{Default}", // [FROZEN]
   "necromancer.cheatdeath": "{DarkRed}Вы избежали смерти, пока что...", // You cheated death... for now
   "necromancer.lifedrain": "{0} {Red}высосал {1} HP из вас!", // {0} drained {1} HP from you!
-  "death_weaver.cripple.other": "{Green}Обездвижен {Default}{0}",
-  "death_weaver.cripple": "{Red}Обездвижен от {Default}{0}",
+  "death_weaver.cripple": "{Green}Обездвижен {Default}{0}",
+  "death_weaver.cripple.victim": "{Red}Обездвижен от {Default}{0}",
   "death_weaver.spawn.rifle": "{Green}Вы появились со штурмовой винтовкой!", // Spawned with an assault rifle!
   "paladin.revive": "{Green}Вы были воскрешены!", // You have been resurrected!
   "paladin.revive.other": "{Green}{0}{Default} был воскрешен {Gold}{1}", // {0} was resurrected by {1}
@@ -234,6 +234,8 @@
   "dwarf_engineer.buildtool": "Инструмент строителя", // Builder tool
   "dwarf_engineer.pickaxe": "Кирка", // Pickaxe
   "dwarf_engineer.build.tooltip": "{Green}[ЛКМ]{Default} Строить {Grey}| {DarkBlue}[ПКМ]{Default} Сменить {Grey}| {Red}[R]{Default} Повернуть", // [LMB] Build | [RMB] Switch | [R] Rotate
+  "sacred_warrior.burningspear": "{Green}Горение {0}",
+  "sacred_warrior.burningspear.victim": "{Orange}Горит от {Default}{0}",
 
   //Items
   "item.owned": "Предметы: {0}", // Items: {0}

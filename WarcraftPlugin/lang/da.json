@@ -211,8 +211,8 @@
   "paladin.revive": "{Green}Du er blevet genoplivet!", // You have been revived!
   "paladin.revive.other": "{Green}{0}{Default} er blevet genoplivet af {Gold}{1}", // {0} has been revived by {1}
   "paladin.revive.none": "{Red}Ingen døde allierede at genoplive!", // No dead allies to revive!
-  "death_weaver.cripple.other": "{Green}Lammet {Default}{0}",
-  "death_weaver.cripple": "{Red}Lammet af {Default}{0}",
+  "death_weaver.cripple": "{Green}Lammet {Default}{0}",
+  "death_weaver.cripple.victim": "{Red}Lammet af {Default}{0}",
   "death_weaver.spawn.rifle": "{Green}Spawnet med et stormgevær!",
   "ranger.dash.cooldown": "{Red}Dash{Default} på cooldown!", // Dash on cooldown!
   "ranger.dash.ready": "{Green}Dash{Default} klar!", // Dash ready!
@@ -233,6 +233,8 @@
   "dwarf_engineer.buildtool": "Byggeredskab", // Build Tool
   "dwarf_engineer.pickaxe": "Stenhakke", // Pickaxe
   "dwarf_engineer.build.tooltip": "{Green}[Venstreklik]{Default} Byg {Grey}| {DarkBlue}[Højreklik]{Default} Skift {Grey}| {Red}[R]{Default} Roter", // [Left click] Build | [Right click] Switch | [R] Rotate
+  "sacred_warrior.burningspear": "{Green}Brændende {0}",
+  "sacred_warrior.burningspear.victim": "{Orange}Brænder fra {Default}{0}",
 
   //Items
   "item.owned": "Genstande: {0}",
