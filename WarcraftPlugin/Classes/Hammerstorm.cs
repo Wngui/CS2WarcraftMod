@@ -1,15 +1,15 @@
-using System;
-using System.Drawing;
-using System.Linq;
-using System.Collections.Generic;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Core.Effects.Shared;
+using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
-using WarcraftPlugin.Core.Effects;
-using WarcraftPlugin.Events.ExtendedEvents;
-using WarcraftPlugin.Core.Effects.Shared;
 
 namespace WarcraftPlugin.Classes
 {
@@ -57,17 +57,18 @@ namespace WarcraftPlugin.Classes
             var stormLevel = WarcraftPlayer.GetAbilityLevel(0);
             if (stormLevel > 0 && Random.Shared.Next(100) < 25)
             {
-                var radius = 150 + 25 * stormLevel;
-                var damage = 5 + 3 * stormLevel;
+                var radius = 50 + 10 * stormLevel;
                 var players = Utilities.GetPlayers().Where(x => x.PawnIsAlive && x.Team != Player.Team);
                 foreach (var p in players)
                 {
                     if ((p.PlayerPawn.Value.AbsOrigin - @event.Userid.PlayerPawn.Value.AbsOrigin).Length() <= radius)
                     {
                         p.Stun(0.3f, Player, GetAbility(0).DisplayName);
-                        p.TakeDamage(damage, Player, KillFeedIcon.hammer);
                     }
                 }
+
+                var particle = Warcraft.SpawnParticle(@event.Userid.EyePosition(-20), "particles/ui/ui_experience_award_innerpoint.vpcf", 1);
+                particle.SetParent(@event.Userid.PlayerPawn.Value);
             }
 
             var cleaveLevel = WarcraftPlayer.GetAbilityLevel(1);
@@ -86,6 +87,9 @@ namespace WarcraftPlugin.Classes
                         Player.PrintToChat($" {ChatColors.Green}{GetAbility(1).DisplayName}{ChatColors.Default} dealt {(int)bonus} splash dmg to {p.GetRealPlayerName()}");
                     }
                 }
+
+                var particle = Warcraft.SpawnParticle(@event.Userid.EyePosition(-20), "particles/explosions_fx/explosion_hegrenade_water_ripple.vpcf", 1);
+                particle.SetParent(@event.Userid.PlayerPawn.Value);
             }
 
             if (_godStrength)
@@ -113,6 +117,7 @@ namespace WarcraftPlugin.Classes
             public override void OnStart()
             {
                 _class._godStrength = true;
+                Owner.Blind(Duration-3, Color.FromArgb(50, 255, 20, 0));
             }
 
             public override void OnTick() { }
@@ -120,6 +125,7 @@ namespace WarcraftPlugin.Classes
             public override void OnFinish()
             {
                 _class._godStrength = false;
+                Owner.Unblind();
             }
         }
     }

@@ -22,6 +22,7 @@ namespace WarcraftPlugin.Core.Effects.Shared
     {
         private float _originalSpeed;
         private float _originalModifier;
+        private CParticleSystem _particle;
         private readonly CCSPlayerController _attacker;
         private readonly string _abilityName;
 
@@ -40,6 +41,9 @@ namespace WarcraftPlugin.Core.Effects.Shared
             _originalModifier = pawn.VelocityModifier;
             pawn.MovementServices.Maxspeed = 0;
             pawn.VelocityModifier = 0;
+
+            _particle = Warcraft.SpawnParticle(Owner.EyePosition(-60), "particles/ui/ammohealthcenter/ui_hud_kill_streaks_circleglow.vpcf", Duration);
+            _particle.SetParent(pawn);
 
             if (!string.IsNullOrEmpty(_abilityName))
             {

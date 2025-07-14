@@ -1,14 +1,16 @@
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API;
-using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using WarcraftPlugin.Core.Effects;
+using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
-using WarcraftPlugin.Core.Effects;
-using System.Drawing;
-using WarcraftPlugin.Events.ExtendedEvents;
-using System.Collections.Generic;
-using System.Linq;
+using static g3.RoundRectGenerator;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace WarcraftPlugin.Classes
 {
@@ -20,9 +22,9 @@ namespace WarcraftPlugin.Classes
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Inner Vitality", "Passively recover 1/2/3/4/5 HP. When below 40% you heal twice as fast"),
-            new WarcraftAbility("Burning Spear", "Passively lose 5% maxHP, but set enemies ablaze. Deals 1/2/3/4/5 DPS for next 3 seconds. Stacks 3 times"),
-            new WarcraftAbility("Berserkers Blood", "Gain 1/2/3/4 percent attack speed for each 7 percent of your health missing"),
-            new WarcraftCooldownAbility("Life Break", "Damage yourself (20% of maxHP) to deal a great amount of damage (40% of victim's maxHP)", 40f)
+            new WarcraftAbility("Burning Spear", "Lose 5% max HP, but set enemies ablaze. Deals 1/2/3/4/5 DPS for 3 seconds. Stacks 3 times"),
+            new WarcraftAbility("Berserkers Blood", "Gain 1/2/3/4% move speed for each 7 percent of your health missing"),
+            new WarcraftCooldownAbility("Life Break", "Damage yourself (20% of max HP) to deal a great amount of damage (40% of victim's max HP)", 40f)
         ];
 
         public override void Register()
@@ -91,14 +93,20 @@ namespace WarcraftPlugin.Classes
                 .OrderBy(p => (p.PlayerPawn.Value.AbsOrigin - trace).Length())
                 .FirstOrDefault(p => p.PlayerPawn.Value.CollisionBox().Contains(trace) ||
                                      (p.PlayerPawn.Value.AbsOrigin - trace).Length() <= 50);
-            if (target == null) return;
+            if (target == null) {
+                Player.PrintToChat($" {ChatColors.Red}No valid target found for {ChatColors.Green}{GetAbility(3).DisplayName}");
+                return;
+            } 
 
             var selfDamage = (int)(Player.PlayerPawn.Value.MaxHealth * 0.2f);
             var damage = (int)(target.PlayerPawn.Value.MaxHealth * 0.4f);
 
             Player.TakeDamage(selfDamage, Player, KillFeedIcon.inferno);
             target.TakeDamage(damage, Player, KillFeedIcon.inferno);
-            Warcraft.SpawnParticle(target.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_hegrenade.vpcf", 2);
+
+            Warcraft.DrawLaserBetween(Player.EyePosition(-10), target.EyePosition(-10), Color.DarkOrange);
+            Warcraft.SpawnParticle(target.PlayerPawn.Value.AbsOrigin, "particles/explosions_fx/explosion_hegrenade.vpcf", 1);
+            Warcraft.SpawnParticle(Player.PlayerPawn.Value.AbsOrigin, "particles/inferno_fx/firework_crate_ground_low_02.vpcf", 1);
             StartCooldown(3);
         }
     }
@@ -125,13 +133,17 @@ namespace WarcraftPlugin.Classes
         : WarcraftEffect(owner, duration, destroyOnDeath: false, onTickInterval:1f)
     {
         public CCSPlayerController Victim = victim;
+        private CParticleSystem _particle;
+
         public override void OnStart()
         {
             if (Victim.IsAlive())
             {
-                Warcraft.SpawnParticle(Victim.PlayerPawn.Value.AbsOrigin, "particles/inferno_fx/inferno_fire.vpcf", Duration);
                 Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(1).DisplayName}{ChatColors.Default} burning {Victim.GetRealPlayerName()}");
                 Victim.PrintToChat($" {ChatColors.Red}Burning from {ChatColors.Green}{Owner.PlayerName}");
+
+                _particle = Warcraft.SpawnParticle(Victim.PlayerPawn.Value.AbsOrigin, "particles/burning_fx/barrel_burning_engine_fire_static.vpcf", Duration);
+                _particle.SetParent(Victim.PlayerPawn.Value);
             }
         }
         public override void OnTick()
@@ -144,7 +156,7 @@ namespace WarcraftPlugin.Classes
             Owner.PrintToChat($" {ChatColors.Green}{abilityName}{ChatColors.Default} +{damage} dmg");
             Victim.PrintToChat($" {ChatColors.Red}+{damage} dmg from {ChatColors.Green}{abilityName}");
         }
-        public override void OnFinish() { }
+        public override void OnFinish() { _particle.RemoveIfValid(); }
     }
 
     internal class BerserkersBloodEffect(CCSPlayerController owner, int level) : WarcraftEffect(owner, onTickInterval:0.5f)

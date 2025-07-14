@@ -115,7 +115,7 @@ namespace WarcraftPlugin.Classes
                 _victim.PlayerPawn.Value.VelocityModifier = _originalModifier * 0.7f;
                 Owner.PrintToChat($" {ChatColors.Green}{Owner.GetWarcraftPlayer().GetClass().GetAbility(0).DisplayName}{ChatColors.Default} crippled {_victim.GetRealPlayerName()}");
                 _victim.PrintToChat($" {ChatColors.Red}Crippled by {ChatColors.Green}{Owner.PlayerName}");
-                _particle = Warcraft.SpawnParticle(_victim.EyePosition(-60), "particles/water_impact/water_foam_01c.vpcf", Duration);
+                _particle = Warcraft.SpawnParticle(_victim.EyePosition(-10), "particles/maps/de_dust/dust_burning_engine_fire_glow.vpcf", Duration);
                 _particle.SetParent(_victim.PlayerPawn.Value);
             }
 

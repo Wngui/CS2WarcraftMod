@@ -26,7 +26,7 @@ namespace WarcraftPlugin.Classes
             new WarcraftCooldownAbility("Ghost Walk", "Completely invisible for 3 seconds", 15f)
         ];
 
-        private readonly float _scaleMultiplier = 0.5f;
+        private readonly float _scaleMultiplier = 0.05f;
         private readonly float _speedMultiplier = 0.7f;
         private readonly float _gravityMultiplier = 0.6f;
         private readonly int _knifeBonusMultiplier = 10;
@@ -48,7 +48,8 @@ namespace WarcraftPlugin.Classes
                 int shrinkLevel = WarcraftPlayer.GetAbilityLevel(0);
                 if (shrinkLevel > 0)
                 {
-                    Player.PlayerPawn.Value.SetScale(_scaleMultiplier * shrinkLevel);
+                    var scale = 1 - (_scaleMultiplier * shrinkLevel);
+                    Player.PlayerPawn.Value.SetScale(scale);
                 }
 
                 // apply speed and gravity
@@ -89,6 +90,7 @@ namespace WarcraftPlugin.Classes
                 if (!Owner.IsAlive()) return;
                 Owner.PrintToCenter(Localizer["rogue.invsible"]);
                 Owner.PlayerPawn.Value.SetColor(Color.FromArgb(0, 255, 255, 255));
+                Owner.AdrenalineSurgeEffect(Duration);
             }
             public override void OnTick() { }
             public override void OnFinish()
