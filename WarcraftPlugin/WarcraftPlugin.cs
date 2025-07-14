@@ -23,7 +23,7 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 6;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 7;
 
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
@@ -37,7 +37,9 @@ namespace WarcraftPlugin
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
         [JsonPropertyName("TotalLevelRequired")]
         public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
-            { { "shadowblade", 50 } , { "dwarf_engineer", 60 }
+        {
+            {"shadowblade", 50}, {"dwarf_engineer", 60}, {"death_weaver", 70},
+            {"silent_assassin", 80}, {"hammerstorm", 90}, {"sacred_warrior", 100}
         };
     }
 
@@ -209,7 +211,7 @@ namespace WarcraftPlugin
             foreach (var alias in factoryResetAliases)
                 AddUniqueCommand(alias, "reset levels", CommandFactoryReset);
 
-            List<string> addXpAliases = 
+            List<string> addXpAliases =
                 [
                 "addxp", "givexp", "xpadd",
                 ..Localizer["command.addxp"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
