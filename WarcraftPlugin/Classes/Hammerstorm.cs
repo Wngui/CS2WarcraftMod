@@ -111,11 +111,14 @@ namespace WarcraftPlugin.Classes
         internal class GodsStrengthEffect(Hammerstorm cls, CCSPlayerController owner, float duration) : WarcraftEffect(owner, duration)
         {
             private readonly Hammerstorm _class = cls;
+            private CParticleSystem _particle;
 
             public override void OnStart()
             {
                 _class._godStrength = true;
                 Owner.Blind(Duration-3, Color.FromArgb(50, 255, 20, 0));
+                _particle = Warcraft.SpawnParticle(Owner.EyePosition(-20), "particles/maps/de_dust/dust_burning_engine_fire_glow.vpcf", Duration);
+                _particle.SetParent(Owner.PlayerPawn.Value);
             }
 
             public override void OnTick() { }
@@ -124,6 +127,7 @@ namespace WarcraftPlugin.Classes
             {
                 _class._godStrength = false;
                 Owner.Unblind();
+                _particle.RemoveIfValid();
             }
         }
     }

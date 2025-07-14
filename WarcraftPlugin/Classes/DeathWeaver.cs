@@ -44,8 +44,8 @@ namespace WarcraftPlugin.Classes
             {
                 string weapon = Player.Team == CsTeam.CounterTerrorist ? "weapon_m4a1" : "weapon_ak47";
                 var gun = new CCSWeaponBaseGun(Player.GiveNamedItem(weapon));
-                gun.Clip1 = gun.GetVData<CBasePlayerWeaponVData>().MaxClip1 * 2;
-                Player.PrintToChat(" " + Localizer["deathweaver.spawn.rifle"]);
+                gun.SetColor(Color.Red);
+                Player.PrintToChat(" " + Localizer["death_weaver.spawn.rifle"]);
             }
         }
 
@@ -118,7 +118,7 @@ namespace WarcraftPlugin.Classes
                 Owner.PrintToChat($" {Localizer["death_weaver.cripple", _victim.GetRealPlayerName()]}");
                 _victim.PrintToChat($" {Localizer["death_weaver.cripple.victim", Owner.GetRealPlayerName()]}");
 
-                _particle = Warcraft.SpawnParticle(_victim.EyePosition(-10), "particles/maps/de_dust/dust_burning_engine_fire_glow.vpcf", Duration);
+                _particle = Warcraft.SpawnParticle(_victim.PlayerPawn.Value.AbsOrigin, "particles/water_impact/water_foam_01c.vpcf", Duration);
                 _particle.SetParent(_victim.PlayerPawn.Value);
             }
 

@@ -90,9 +90,9 @@
   "death_weaver.ability.0": "Cripple",
   "death_weaver.ability.0.description": "25% chance to slow an enemy for 1.5/2/2.5/3/3.5 seconds.",
   "death_weaver.ability.1": "Unholy Frenzy",
-  "death_weaver.ability.1.description": "25% chance to deal 10/20/30/40/50% bonus damage.",
+  "death_weaver.ability.1.description": "25% chance to deal 10-50% bonus damage.",
   "death_weaver.ability.2": "Necromancer Master",
-  "death_weaver.ability.2.description": "65/70/75/80/85% chance to spawn with an assault rifle.",
+  "death_weaver.ability.2.description": "65-85% chance to spawn with an assault rifle.",
   "death_weaver.ability.3": "Raise Skeleton",
   "death_weaver.ability.3.description": "Revive a random ally.",
 
@@ -193,7 +193,7 @@
   "sacred_warrior.ability.2": "Berserker's Blood",
   "sacred_warrior.ability.2.description": "Gain 1/2/3/4% move speed for each 7 percent of your health missing.",
   "sacred_warrior.ability.3": "Life Break",
-  "sacred_warrior.ability.3.description": "Damage yourself (20% of max HP) to deal a great amount of damage (40% of victim's max HP). Cooldown: 40s",
+  "sacred_warrior.ability.3.description": "Damage 40% of victim's max HP at the cost of 20% of your own. Cooldown: 40s",
 
   "silent_assassin.ability.0": "Shrink",
   "silent_assassin.ability.0.description": "Reduce model size by 15/20/25/30/35%.",
