@@ -467,7 +467,9 @@ namespace WarcraftPlugin.Helpers
         /// <param name="killFeedIcon">The icon to display in the kill feed. Attacker must be set</param>
         /// <param name="inflictor">The entity causing the damage, if different from the attacker.</param>
         /// <param name="penetrationKill">Indicates if the damage was caused by a penetration.</param>
-        public static void TakeDamage(this CCSPlayerController victim, float damage, CCSPlayerController attacker, KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false)
+        public static void TakeDamage(this CCSPlayerController victim, float damage, CCSPlayerController attacker,
+            KillFeedIcon? killFeedIcon = null, CCSPlayerController inflictor = null, bool penetrationKill = false,
+            string abilityName = null)
         {
             if (!attacker.IsAlive()) return;
             var size = Schema.GetClassSize("CTakeDamageInfo");
@@ -488,11 +490,24 @@ namespace WarcraftPlugin.Helpers
             damageInfo.NumObjectsPenetrated = penetrationKill ? 1 : 0;
 
             if (!victim.IsAlive() || !victim.Pawn.IsValid) return;
+
             var attackerClass = attacker?.GetWarcraftPlayer()?.GetClass();
             if (attackerClass != null) attackerClass.LastHurtOther = Server.CurrentTime;
-            if (killFeedIcon != null) {
+            if (killFeedIcon != null)
+            {
                 var isLethalDamage = (victim.PlayerPawn.Value.Health - damage) <= 0;
                 attackerClass?.SetKillFeedIcon(isLethalDamage ? killFeedIcon : null);
+            }
+
+            if (!string.IsNullOrEmpty(abilityName))
+            {
+                if (damage > 0)
+                {
+                    if (attacker != null && attacker.IsValid)
+                        attacker?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.health.attacker", damage, abilityName]}");
+                    if (victim != null && victim.IsValid)
+                        victim?.PrintToChat($" {WarcraftPlugin.Instance.Localizer["bonus.damage.health.victim", damage, abilityName]}");
+                }
             }
 
             VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Invoke(victim.Pawn.Value, damageInfo);
