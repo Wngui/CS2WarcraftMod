@@ -111,8 +111,8 @@ namespace WarcraftPlugin
                 SteamId = 0,
                 RaceName = randomClass.InternalName,
                 CurrentXp = 0,
-                CurrentLevel = 1,
-                AmountToLevel = XpSystem.GetXpForLevel(1)
+                CurrentLevel = 0,
+                AmountToLevel = XpSystem.GetXpForLevel(0)
             };
 
             var wcPlayer = new WarcraftPlayer(player);
@@ -400,7 +400,7 @@ namespace WarcraftPlugin
         private void CommandFactoryReset(CCSPlayerController client, CommandInfo commandInfo)
         {
             var wcPlayer = GetWcPlayer(client);
-            wcPlayer.currentLevel = 1;
+            wcPlayer.currentLevel = 0;
             wcPlayer.currentXp = 0;
             CommandResetSkills(client, commandInfo);
             client.PlayerPawn.Value.CommitSuicide(false, false);

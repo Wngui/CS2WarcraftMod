@@ -21,13 +21,13 @@ namespace WarcraftPlugin.Core
             _localizer = localizer;
         }
 
-        private readonly List<int> _levelXpRequirement = new(new int[256]);
+        private readonly List<int> _levelXpRequirement = [.. new int[256]];
 
         internal void GenerateXpCurve(int initial, float modifier, int maxLevel)
         {
-            for (int i = 1; i <= maxLevel; i++)
+            for (int i = 0; i <= maxLevel; i++)
             {
-                if (i == 1)
+                if (i == 0)
                     _levelXpRequirement[i] = initial;
                 else
                     _levelXpRequirement[i] = Convert.ToInt32(_levelXpRequirement[i - 1] * modifier);

@@ -33,7 +33,7 @@ namespace WarcraftPlugin.Core
                   `steamid` UNSIGNED BIG INT NOT NULL,
                   `racename` VARCHAR(32) NOT NULL,
                   `currentXP` INT NULL DEFAULT 0,
-                  `currentLevel` INT NULL DEFAULT 1,
+                  `currentLevel` INT NULL DEFAULT 0,
                   `amountToLevel` INT NULL DEFAULT 100,
                   `ability1level` TINYINT NULL DEFAULT 0,
                   `ability2level` TINYINT NULL DEFAULT 0,
@@ -89,8 +89,8 @@ namespace WarcraftPlugin.Core
             if (!raceInformationExists)
             {
                 _connection.Execute(@"
-                insert into `raceinformation` (steamid, racename)
-                values (@steamid, @racename);",
+                insert into `raceinformation` (steamid, racename, currentLevel)
+                values (@steamid, @racename, 0);",
                     new { steamid = player.SteamID, racename = dbPlayer.CurrentRace });
             }
 

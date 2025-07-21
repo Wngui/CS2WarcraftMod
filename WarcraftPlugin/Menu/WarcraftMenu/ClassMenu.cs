@@ -31,7 +31,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 {
                     DisplayName = warcraftClass?.LocalizedDisplayName,
                     InternalName = warcraftClass?.InternalName,
-                    CurrentLevel = classInformation != null ? classInformation.CurrentLevel : 1,
+                    CurrentLevel = classInformation != null ? classInformation.CurrentLevel : 0,
                     CurrentXp = classInformation?.CurrentXp ?? 0,
                     DefaultColor = warcraftClass.DefaultColor,
                     TotalLevelRequired = WarcraftPlugin.Instance.Config.TotalLevelRequired
