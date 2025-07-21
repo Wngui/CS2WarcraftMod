@@ -253,21 +253,26 @@ namespace WarcraftPlugin.Classes
         {
             public string ModelPath { get; set; }
             public Vector Offset { get; set; } = new Vector(0, 0, 0);
+            public Vector RotationOffset { get; set; } = new Vector(0, 0, 0);
+            public bool EnableGravity { get; set; } = true;
         }
 
+        private const float PropHealthScalingFactor = 100f; //Higher number = less health
         internal static readonly List<Prop> Props =
         [
+            //Sloped
+            new Prop{ModelPath = "models/props/hr_massive/wood_fence/wood_fence_128.vmdl",
+                EnableGravity = false,
+                RotationOffset = new Vector(40,0,0),
+                Offset = new Vector(0,0,-30)},
+
+            //Vertical
+            new Prop{ModelPath = "models/props/hr_massive/wood_fence/wood_fence_128.vmdl",
+                EnableGravity = false,
+                Offset = new Vector(0,20,-40)},
             new Prop{ModelPath = "models/props/de_dust/hr_dust/dust_crates/dust_crate_style_01_32x32x32.vmdl"},
             new Prop{ModelPath = "models/props/de_dust/dust_rusty_barrel.vmdl" },
-            new Prop{ModelPath = "models/props/de_inferno/hr_i/barrel_a/barrel_a_full.vmdl" },
-            new Prop{ModelPath = "models/de_anubis/trims/mudbrick_roof_trim01_128.vmdl", Offset = new (60,0,0)},
-            new Prop{ModelPath = "models/de_anubis/trims/mudbrick_roof_trim01a_64_01.vmdl", Offset = new (30,0,0)},
-            new Prop{ModelPath = "models/props/hr_massive/wood_fence/wood_fence_128.vmdl"},
-            new Prop{ModelPath = "models/props/de_vertigo/wood_pallet_01.vmdl",Offset = new (0,0,20)},
-            new Prop{ModelPath = "models/props/de_inferno/chairantique_static.vmdl"},
             new Prop{ModelPath = "models/props/de_inferno/furniturecouch001a.vmdl"},
-            new Prop{ModelPath = "models/props/cs_office/vending_machine.vmdl"},
-            new Prop{ModelPath = "models/chicken/chicken_roasted.vmdl",Offset = new (0,0,20)},
             new Prop{ModelPath = "models/de_overpass/stuffed_animals/stuffed_elephant.vmdl"},
             new Prop{ModelPath = "weapons/models/c4/weapon_c4.vmdl", Offset = new (0,0,30)},
         ];
@@ -299,7 +304,8 @@ namespace WarcraftPlugin.Classes
         {
             Vector velocity = Warcraft.CalculateTravelVelocity(_blueprintProp.AbsOrigin, BlueprintPosition(), 0.1f);
             var eyeAngles = Owner.PlayerPawn.Value.EyeAngles;
-            QAngle rotation = new(0, eyeAngles.Y + _yawOffset, 0);
+            var currentDef = Props[_currentPropIndex];
+            QAngle rotation = new(eyeAngles.X + currentDef.RotationOffset.X, eyeAngles.Y + _yawOffset + currentDef.RotationOffset.Y, eyeAngles.Z + currentDef.RotationOffset.Z);
             _blueprintProp.Teleport(null, rotation, velocity);
 
             if (Server.CurrentTime - _lastActionTick < 0.3) return;
@@ -348,11 +354,17 @@ namespace WarcraftPlugin.Classes
                 prop.Teleport(_blueprintProp.AbsOrigin, _blueprintProp.AbsRotation);
                 prop.SetModel(currentDef.ModelPath);
 
+                if (!currentDef.EnableGravity)
+                {
+                    prop.AcceptInput("DisableMotion", prop, prop);
+                }
+
                 Server.NextWorldUpdate(() =>
                 {
                     prop.Collision.CollisionAttribute.InteractsAs = 136446081;
                     prop.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_PUSHAWAY;
-                    prop.Health = 50;
+                    var propHealth = prop.CollisionBox().Volume / PropHealthScalingFactor;
+                    prop.Health = (int)Math.Max(1f, propHealth);
                     prop.TakeDamageFlags = TakeDamageFlags_t.DFLAG_NONE;
                     prop.ExplodeRadius = 1f;
                 });
