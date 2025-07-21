@@ -242,7 +242,11 @@ namespace WarcraftPlugin.Events
 
                     if (!warcraftPlayer.IsMaxLevel)
                     {
-                        player.PrintToChat($" {_plugin.Localizer["xp.roundinfo", warcraftPlayer.currentXp, warcraftPlayer.amountToLevel]}");
+                        player.PrintToChat($" {_plugin.Localizer["xp.roundinfo", 
+                            warcraftPlayer?.GetClass()?.LocalizedDisplayName, 
+                            warcraftPlayer.currentLevel,
+                            warcraftPlayer.currentXp, 
+                            warcraftPlayer.amountToLevel]}");
                     }
                 }
             });

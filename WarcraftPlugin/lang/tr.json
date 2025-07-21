@@ -32,7 +32,7 @@
   "xp.kill": "{Gold}+{0} XP {Default}{Green}{1}{Default}'yi öldürdüğün için {2}{3}{4}", // +{0} XP for killing {1} {2}{3}{4}
   "xp.add": "{1} oyuncusuna {0} XP eklendi", // {0} XP added to player {1}
   "xp.roundwin": "{Gold}+{0} XP {Default}raundu kazandığın için", // +{0} XP for winning the round
-  "xp.roundinfo": "{0}/{1}xp", // {0}/{1}xp
+  "xp.roundinfo": "{Gold}{0} {Grey}| {White}Seviye {White}{1} {Grey}| {Lime}{2}{Default}/{Green}{3}{Default} XP",
   "ability.ready": "{0} hazır!", // {0} ready!
   "ultimate.countdown": "Ulti hazır olmasına {0}s kaldı", // {0}s until ultimate is ready
   "no.ultimate": "Ulti seviyesi yok", // No ultimate level

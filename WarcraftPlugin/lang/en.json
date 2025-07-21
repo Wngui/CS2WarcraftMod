@@ -32,7 +32,7 @@
   "xp.kill": "{Gold}+{0} XP {Default}for killing {Green}{1} {Default}{2}{3}{4}",
   "xp.add": "Adding {0} xp to player {1}",
   "xp.roundwin": "{Gold}+{0} XP {Default}for winning the round",
-  "xp.roundinfo": "{0}/{1}xp",
+  "xp.roundinfo": "{Gold}{0} {Grey}| {White}Level {White}{1} {Grey}| {Lime}{2}{Default}/{Green}{3}{Default} XP",
   "ability.ready": "{0} is ready!",
   "ultimate.countdown": "Ultimate ready in {0}s",
   "no.ultimate": "No levels in ultimate",

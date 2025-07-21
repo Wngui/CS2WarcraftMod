@@ -32,7 +32,7 @@
   "xp.kill": "{Gold}+{0} XP {Default}за убийство {Green}{1} {Default}{2}{3}{4}", // +{0} XP for killing {1} {2}{3}{4}
   "xp.add": "Добавление {0} опыта игроку {1}", // Adding {0} XP to player {1}
   "xp.roundwin": "{Gold}+{0} XP {Default}за победу в раунде", // +{0} XP for round win
-  "xp.roundinfo": "{0}/{1} опыта", // {0}/{1}xp
+  "xp.roundinfo": "{Gold}{0} {Grey}| {White}Уровень {White}{1} {Grey}| {Lime}{2}{Default}/{Green}{3}{Default} ОП",
   "ability.ready": "{0} готово!", // {0} ready!
   "ultimate.countdown": "Ультимейт готов через {0}с", // Ultimate ready in {0}s
   "no.ultimate": "Нет уровней в ультимейте", // No ultimate levels
