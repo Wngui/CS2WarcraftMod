@@ -21,7 +21,7 @@ internal abstract class ShopItem
         Localizer != null && Localizer.Exists($"item.{InternalName}.description")
             ? Localizer[$"item.{InternalName}.description"]
             : Description;
-    internal abstract int Price { get; }
+    internal abstract int Price { get; set; }
 
     /// <summary>
     /// Indicates whether the item should be consumed instantly on purchase.
@@ -32,7 +32,7 @@ internal abstract class ShopItem
     /// <summary>
     /// The display color of the item.
     /// </summary>
-    internal virtual Color Color => Color.White; // Default: white
+    internal virtual Color Color { get; set; } = Color.White; // Default: white
 
     internal abstract void Apply(CCSPlayerController player);
 

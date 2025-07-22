@@ -14,25 +14,7 @@ internal static class ShopMenu
         var menu = MenuManager.CreateMenu($"<font color='lightgrey' class='{FontSizes.FontSizeM}'>" + ShopItem.Localizer["menu.shop"] + "</font>", 4);
         var plugin = WarcraftPlugin.Instance;
 
-        var items = new ShopItem[]
-        {
-            new BootsOfSpeed(),
-            new SockOfFeathers(),
-            new RingOfRegeneration(),
-            new MaskOfDeath(),
-            new AmuletOfTheCat(),
-            new DaggerOfVenom(),
-            new MoneySiphonScepter(),
-            new OrbOfFrost(),
-            new TalismanOfEvasion(),
-            new AmuletOfVitality(),
-            new GlovesOfWrath(),
-            new GlovesOfCloud(),
-            new GlovesOfDazzle(),
-
-            new TomeOfExperience(),
-            new TomeOfGambling()
-        };
+        var items = Shop.Items;
 
         foreach (var item in items.OrderBy(x => x.Price))
         {

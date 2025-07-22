@@ -8,15 +8,16 @@ internal class TomeOfExperience : ShopItem
 {
     protected override string Name => "Tome of Experience";
     protected override string Description => "Gain 150XP";
-    internal override int Price => 4000;
+    internal override int Price { get; set; } = 4000;
     internal override bool IsInstant => true;
-    internal override Color Color => Color.Brown;
+    internal override Color Color { get; set; } = Color.Brown;
+
+    internal int XpGain { get; set; } = 150;
 
     internal override void Apply(CCSPlayerController player)
     {
-        const int xpGain = 150;
-        WarcraftPlugin.Instance.XpSystem.AddXp(player, xpGain);
-        player.PrintToChat($" {ChatColors.Gold}+{xpGain} XP{ChatColors.Default}");
+        WarcraftPlugin.Instance.XpSystem.AddXp(player, XpGain);
+        player.PrintToChat($" {ChatColors.Gold}+{XpGain} XP{ChatColors.Default}");
     }
 }
 

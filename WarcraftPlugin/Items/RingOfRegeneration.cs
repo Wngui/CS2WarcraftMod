@@ -9,15 +9,17 @@ internal class RingOfRegeneration : ShopItem
 {
     protected override string Name => "Ring of Regeneration";
     protected override string Description => "Regen 1 HP each sec.";
-    internal override int Price => 3000;
-    internal override Color Color => Color.FromArgb(255, 50, 205, 50); // LimeGreen for regeneration/healing
+    internal override int Price { get; set; } = 3000;
+    internal override Color Color { get; set; } = Color.FromArgb(255, 50, 205, 50); // LimeGreen for regeneration/healing
+
+    internal int RegenPerSecond { get; set; } = 1;
 
     internal override void Apply(CCSPlayerController player)
     {
-        new RingOfRegenerationEffect(player).Start();
+        new RingOfRegenerationEffect(player, RegenPerSecond).Start();
     }
 
-    private class RingOfRegenerationEffect(CCSPlayerController owner) : WarcraftEffect(owner, onTickInterval: 1f)
+    private class RingOfRegenerationEffect(CCSPlayerController owner, int regenPerSecond) : WarcraftEffect(owner, onTickInterval: 1f)
     {
         public override void OnStart() { }
 
@@ -27,7 +29,7 @@ internal class RingOfRegeneration : ShopItem
             var pawn = Owner.PlayerPawn.Value;
             if (pawn.Health < pawn.MaxHealth)
             {
-                Owner.SetHp(pawn.Health + 1);
+                Owner.SetHp(pawn.Health + regenPerSecond);
             }
         }
 

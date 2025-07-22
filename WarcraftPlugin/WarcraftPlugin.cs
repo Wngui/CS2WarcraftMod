@@ -23,8 +23,7 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 7;
-
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 8;
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
         [JsonPropertyName("DefaultClass")] public string DefaultClass { get; set; }
@@ -41,6 +40,31 @@ namespace WarcraftPlugin
             {"shadowblade", 50}, {"dwarf_engineer", 60}, {"death_weaver", 70},
             {"silent_assassin", 80}, {"hammerstorm", 90}, {"sacred_warrior", 100}
         };
+        [JsonPropertyName("ItemOverrides")]
+        public Dictionary<string, ItemOverride> ItemOverrides { get; set; } = new()
+        {
+            ["boots_of_speed"] = new() { Overrides = new() { ["Price"] = "2500", ["SpeedModifier"] = "1.2" }, IsDisabled = false },
+            ["tome_of_experience"] = new() { Overrides = new() { ["Price"] = "4000", ["XpGain"] = "150" }, IsDisabled = false},
+            ["tome_of_gambling"] = new() { Overrides = new() { ["Price"] = "8000", ["XpGainMin"] = "150", ["XpGainMax"] = "450" }, IsDisabled = false},
+            ["amulet_of_the_cat"] = new() { Overrides = new() { ["Price"] = "4000" }, IsDisabled = false },
+            ["amulet_of_vitality"] = new() { Overrides = new() { ["Price"] = "3500", ["HealthBonus"] = "50" }, IsDisabled = false },
+            ["dagger_of_venom"] = new() { Overrides = new() { ["Price"] = "2500", ["PoisonDuration"] = "5", ["PoisonDamage"] = "1" }, IsDisabled = false },
+            ["orb_of_frost"] = new() { Overrides = new() { ["Price"] = "3500", ["SlowChance"] = "0.33", ["SlowModifier"] = "0.67", ["SlowDuration"] = "2" }, IsDisabled = false },
+            ["sock_of_feathers"] = new() { Overrides = new() { ["Price"] = "1500", ["GravityModifier"] = "0.5" }, IsDisabled = false },
+            ["talisman_of_evasion"] = new() { Overrides = new() { ["Price"] = "4000", ["EvasionChance"] = "0.2" }, IsDisabled = false },
+            ["ring_of_regeneration"] = new() { Overrides = new() { ["Price"] = "3000", ["RegenPerSecond"] = "1" }, IsDisabled = false },
+            ["money_siphon_scepter"] = new() { Overrides = new() { ["Price"] = "3000", ["MoneyStealPercent"] = "0.02f" }, IsDisabled = false },
+            ["mask_of_death"] = new() { Overrides = new() { ["Price"] = "4000", ["LifeStealChance"] = "0.5", ["LifeStealPercent"] = "0.15" }, IsDisabled = false },
+            ["gloves_of_cloud"] = new() { Overrides = new() { ["Price"] = "3000", ["GrenadeType"] = "weapon_smokegrenade", ["GrenadeInterval"] = "12" }, IsDisabled = false },
+            ["gloves_of_dazzle"] = new() { Overrides = new() { ["Price"] = "3000", ["GrenadeType"] = "weapon_flashbang", ["GrenadeInterval"] = "12" }, IsDisabled = false },
+            ["gloves_of_wrath"] = new() { Overrides = new() { ["Price"] = "3000", ["GrenadeType"] = "weapon_hegrenade", ["GrenadeInterval"] = "12" }, IsDisabled = false },
+        };
+    }
+
+    public class ItemOverride
+    {
+        public bool IsDisabled { get; set; } = false;
+        public Dictionary<string, string> Overrides { get; set; } = [];
     }
 
     public static class WarcraftPlayerExtensions

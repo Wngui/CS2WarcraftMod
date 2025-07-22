@@ -9,15 +9,17 @@ internal class SockOfFeathers : ShopItem
 {
     protected override string Name => "Sock of Feathers";
     protected override string Description => "Decrease Gravity by 50%";
-    internal override int Price => 1500;
-    internal override Color Color => Color.FromArgb(255, 0, 206, 209); // DarkTurquoise for movement/utility
+    internal override int Price { get; set; } = 1500;
+    internal override Color Color { get; set; } = Color.FromArgb(255, 0, 206, 209); // DarkTurquoise for movement/utility
+
+    internal float GravityModifier { get; set; } = 0.5f;
 
     internal override void Apply(CCSPlayerController player)
     {
-        new SockOfFeathersEffect(player).Start();
+        new SockOfFeathersEffect(player, GravityModifier).Start();
     }
 
-    private class SockOfFeathersEffect(CCSPlayerController owner) : WarcraftEffect(owner)
+    private class SockOfFeathersEffect(CCSPlayerController owner, float gravityModifier) : WarcraftEffect(owner)
     {
         private float _originalGravityScale;
 
@@ -25,7 +27,7 @@ internal class SockOfFeathers : ShopItem
         {
             if (!Owner.IsAlive()) return;
             _originalGravityScale = Owner.PlayerPawn.Value.GravityScale;
-            Owner.PlayerPawn.Value.GravityScale = _originalGravityScale * 0.5f;
+            Owner.PlayerPawn.Value.GravityScale = _originalGravityScale * gravityModifier;
         }
 
         public override void OnTick() { }

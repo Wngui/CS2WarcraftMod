@@ -11,16 +11,19 @@ internal class GlovesOfCloud : ShopItem
 {
     protected override string Name => "Gloves of Cloud";
     protected override string Description => "Receive a Smoke grenade every 12s";
-    internal override int Price => 3000;
-    internal override Color Color => Color.FromArgb(255, 169, 169, 169); // DarkGray for utility/smoke
+    internal override int Price { get; set; } = 3000;
+    internal override Color Color { get; set; } = Color.FromArgb(255, 169, 169, 169); // DarkGray for utility/smoke
+
+    internal float GrenadeInterval { get; set; } = 12f;
+    internal string GrenadeType { get; set; } = "weapon_smokegrenade";
 
     internal override void Apply(CCSPlayerController player)
     {
-        new GrenadeSupplyEffect(player, "weapon_smokegrenade", ShopItem.Localizer["item.gloves_of_cloud.grenade_name"]).Start();
+        new GrenadeSupplyEffect(player, GrenadeType, GrenadeInterval, Localizer["item.gloves_of_cloud.grenade_name"]).Start();
     }
 
-    private class GrenadeSupplyEffect(CCSPlayerController owner, string grenadeName, string displayName)
-        : WarcraftEffect(owner, onTickInterval: 12f)
+    private class GrenadeSupplyEffect(CCSPlayerController owner, string grenadeName, float grenadeInterval, string displayName)
+        : WarcraftEffect(owner, onTickInterval: grenadeInterval)
     {
         private readonly string _grenadeName = grenadeName;
         private readonly string _displayName = displayName;

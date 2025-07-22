@@ -9,15 +9,16 @@ internal class AmuletOfVitality : ShopItem
 {
     protected override string Name => "Amulet of Vitality";
     protected override string Description => "Increase max HP by 50";
-    internal override int Price => 3500;
-    internal override Color Color => Color.FromArgb(255, 255, 69, 0); // OrangeRed for vitality/health
+    internal override int Price { get; set; } = 3500;
+    internal override Color Color { get; set; } = Color.FromArgb(255, 255, 69, 0); // OrangeRed for vitality/health
+    internal int HealthBonus { get; set; } = 50;
 
     internal override void Apply(CCSPlayerController player)
     {
-        new AmuletOfVitalityEffect(player).Start();
+        new AmuletOfVitalityEffect(player, HealthBonus).Start();
     }
 
-    private class AmuletOfVitalityEffect(CCSPlayerController owner) : WarcraftEffect(owner)
+    private class AmuletOfVitalityEffect(CCSPlayerController owner, int healthBonus) : WarcraftEffect(owner)
     {
         private int _originalMaxHealth;
 
@@ -26,8 +27,8 @@ internal class AmuletOfVitality : ShopItem
             if (!Owner.IsAlive()) return;
             var pawn = Owner.PlayerPawn.Value;
             _originalMaxHealth = pawn.MaxHealth;
-            pawn.MaxHealth = _originalMaxHealth + 50;
-            var newHealth = pawn.Health + 50;
+            pawn.MaxHealth = _originalMaxHealth + healthBonus;
+            var newHealth = pawn.Health + healthBonus;
             Owner.SetHp((int)newHealth);
         }
 
