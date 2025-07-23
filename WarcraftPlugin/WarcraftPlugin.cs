@@ -1,30 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CounterStrikeSharp.API;
+﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
-using WarcraftPlugin.Helpers;
-using CounterStrikeSharp.API.Modules.Admin;
-using WarcraftPlugin.Adverts;
+using CounterStrikeSharp.API.Modules.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json.Serialization;
-using WarcraftPlugin.Events;
-using WarcraftPlugin.Menu;
-using WarcraftPlugin.Menu.WarcraftMenu;
+using WarcraftPlugin.Adverts;
 using WarcraftPlugin.Core;
-using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core.Preload;
+using WarcraftPlugin.Events;
+using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Items;
 using WarcraftPlugin.lang;
-using CounterStrikeSharp.API.Modules.Utils;
+using WarcraftPlugin.Menu;
+using WarcraftPlugin.Menu.WarcraftMenu;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 7;
-
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 8;
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
         [JsonPropertyName("DefaultClass")] public string DefaultClass { get; set; }
@@ -41,6 +42,10 @@ namespace WarcraftPlugin
             {"shadowblade", 50}, {"dwarf_engineer", 60}, {"death_weaver", 70},
             {"silent_assassin", 80}, {"hammerstorm", 90}, {"sacred_warrior", 100}
         };
+        [JsonPropertyName("ItemOverrides")]
+        public Dictionary<string, Dictionary<string, object>> ItemOverrides { get; set; } =
+            Shop.Items.GetConfigurableProperties();
+                
     }
 
     public static class WarcraftPlayerExtensions
@@ -501,6 +506,7 @@ namespace WarcraftPlugin
         public void OnConfigParsed(Config config)
         {
             Config = config;
+            Shop.Items.ApplyOverrides(config);
         }
 
         public override void Unload(bool hotReload)

@@ -10,9 +10,12 @@ namespace WarcraftPlugin.Items;
 internal class MoneySiphonScepter : ShopItem
 {
     protected override string Name => "Money Siphon Scepter";
-    protected override string Description => "Steal 2% of enemy money on hit";
-    internal override int Price => 3000;
-    internal override Color Color => Color.FromArgb(255, 255, 215, 0); // Gold for money/unique
+    protected override FormattableString Description => $"Steal {MoneyStealPercent*100}% of enemy money on hit";
+    internal override int Price { get; set; } = 3000;
+    internal override Color Color { get; set; } = Color.FromArgb(255, 255, 215, 0); // Gold for money/unique
+
+    [Configurable]
+    internal float MoneyStealPercent { get; set; } = 0.02f;
 
     internal override void Apply(CCSPlayerController player) { }
 
@@ -28,7 +31,7 @@ internal class MoneySiphonScepter : ShopItem
             if (victimServices == null || attackerServices == null) return;
 
             int victimMoney = victimServices.Account;
-            int stealAmount = (int)Math.Floor(victimMoney * 0.02f);
+            int stealAmount = (int)Math.Floor(victimMoney * MoneyStealPercent);
             if (stealAmount <= 0) return;
 
             victimServices.Account -= stealAmount;
@@ -37,8 +40,8 @@ internal class MoneySiphonScepter : ShopItem
             Utilities.SetStateChanged(@event.Userid, "CCSPlayerController", "m_pInGameMoneyServices");
             Utilities.SetStateChanged(@event.Attacker, "CCSPlayerController", "m_pInGameMoneyServices");
 
-            @event.Attacker.PrintToChat($" {ShopItem.Localizer["item.money_siphon_scepter.steal", stealAmount, @event.Userid.PlayerName]}");
-            @event.Userid.PrintToChat($" {ShopItem.Localizer["item.money_siphon_scepter.stolen", stealAmount, @event.Attacker.PlayerName]}");
+            @event.Attacker.PrintToChat($" {Localizer["item.money_siphon_scepter.steal", stealAmount, @event.Userid.PlayerName]}");
+            @event.Userid.PrintToChat($" {Localizer["item.money_siphon_scepter.stolen", stealAmount, @event.Attacker.PlayerName]}");
         }
         catch
         {

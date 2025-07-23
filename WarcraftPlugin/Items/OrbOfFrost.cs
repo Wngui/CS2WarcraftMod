@@ -10,9 +10,16 @@ namespace WarcraftPlugin.Items;
 internal class OrbOfFrost : ShopItem
 {
     protected override string Name => "Orb of Frost";
-    protected override string Description => "33% chance to slow enemy on hit";
-    internal override int Price => 3500;
-    internal override Color Color => Color.FromArgb(255, 0, 191, 255); // DeepSkyBlue for frost/slow
+    protected override FormattableString Description => $"{SlowChance*100}% chance to slow enemy on hit";
+    internal override int Price { get; set; } = 3500;
+    internal override Color Color { get; set; } = Color.FromArgb(255, 0, 191, 255); // DeepSkyBlue for frost/slow
+
+    [Configurable]
+    internal float SlowChance { get; set; } = 0.33f;
+    [Configurable]
+    internal float SlowModifier { get; set; } = 0.67f;
+    [Configurable]
+    internal float SlowDuration { get; set; } = 2.0f; // Duration in seconds
 
     internal override void Apply(CCSPlayerController player) { }
 
@@ -21,13 +28,13 @@ internal class OrbOfFrost : ShopItem
         if (@event.Attacker == null || !@event.Attacker.IsAlive()) return;
         if (@event.Userid == null || !@event.Userid.IsAlive()) return;
 
-        if (Random.Shared.NextDouble() < 0.33)
+        if (Random.Shared.NextDouble() < SlowChance)
         {
-            new FrostSlowEffect(@event.Attacker, @event.Userid, 2f).Start();
+            new FrostSlowEffect(@event.Attacker, @event.Userid, SlowDuration, SlowModifier).Start();
         }
     }
 
-    private class FrostSlowEffect(CCSPlayerController owner, CCSPlayerController victim, float duration)
+    private class FrostSlowEffect(CCSPlayerController owner, CCSPlayerController victim, float duration, float slowModifier)
         : WarcraftEffect(owner, duration)
     {
         private readonly CCSPlayerController _victim = victim;
@@ -40,8 +47,8 @@ internal class OrbOfFrost : ShopItem
             var pawn = _victim.PlayerPawn.Value;
             _originalSpeed = pawn.MovementServices.Maxspeed;
             _originalModifier = pawn.VelocityModifier;
-            pawn.MovementServices.Maxspeed = _originalSpeed * 0.67f;
-            pawn.VelocityModifier = _originalModifier * 0.67f;
+            pawn.MovementServices.Maxspeed = _originalSpeed * slowModifier;
+            pawn.VelocityModifier = _originalModifier * slowModifier;
             _victim.PrintToChat($" {ShopItem.Localizer["item.orb_of_frost.slowed", Owner.PlayerName]}");
         }
 
