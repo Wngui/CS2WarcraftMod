@@ -8,12 +8,12 @@ namespace WarcraftPlugin.Items;
 internal class TalismanOfEvasion : ShopItem
 {
     protected override string Name => "Talisman of Evasion";
-    protected override string Description => "20% chance to evade";
+    protected override FormattableString Description => $"{EvasionChance * 100}% chance to evade";
     internal override int Price { get; set; } = 4000;
-    internal override Color Color { get; set; } = Color.FromArgb(255, 138, 43, 226); // BlueViolet for evasion/rare
+    internal override Color Color { get; set; } = Color.FromArgb(255, 138, 43, 226); // BlueViolet for evasion/rare  
 
     [Configurable]
-    internal double EvasionChance { get; set; } = 0.2; // 20% chance to evade
+    internal double EvasionChance { get; set; } = 0.2; // 20% chance to evade  
 
     internal override void Apply(CCSPlayerController player) { }
 

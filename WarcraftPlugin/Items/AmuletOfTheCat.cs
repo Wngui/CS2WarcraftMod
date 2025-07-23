@@ -12,7 +12,7 @@ namespace WarcraftPlugin.Items;
 internal class AmuletOfTheCat : ShopItem
 {
     protected override string Name => "Amulet of the Cat";
-    protected override string Description => "Silent Footsteps";
+    protected override FormattableString Description => $"Silent Footsteps";
     internal override int Price { get; set; } = 4000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 192, 192, 192); // Silver for stealth/unique
 

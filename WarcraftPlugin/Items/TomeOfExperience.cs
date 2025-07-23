@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using System;
 using System.Drawing;
 
 namespace WarcraftPlugin.Items;
@@ -7,13 +8,13 @@ namespace WarcraftPlugin.Items;
 internal class TomeOfExperience : ShopItem
 {
     protected override string Name => "Tome of Experience";
-    protected override string Description => "Gain 150XP";
+    protected override FormattableString Description => $"Gain {XpGain}XP";
     internal override int Price { get; set; } = 4000;
     internal override bool IsInstant => true;
     internal override Color Color { get; set; } = Color.Brown;
 
     [Configurable]
-    internal int XpGain { get; set; } = 150;
+    internal int XpGain { get; set; } = 50;
 
     internal override void Apply(CCSPlayerController player)
     {

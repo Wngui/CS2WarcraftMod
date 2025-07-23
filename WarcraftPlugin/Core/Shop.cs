@@ -40,7 +40,7 @@ namespace WarcraftPlugin.Core
         {
             if (config?.ItemOverrides != null)
             {
-                foreach (var item in items)
+                foreach (var item in items.ToList()) // Use ToList to avoid modifying the collection during iteration
                 {
                     if (config.ItemOverrides.TryGetValue(item.InternalName, out var overrides))
                     {
@@ -66,18 +66,29 @@ namespace WarcraftPlugin.Core
                                     if (!Equals(oldValue, newValue))
                                     {
                                         property.SetValue(item, newValue);
-                                        Console.WriteLine($"[Shop] Updated property '{property.Name}' of item '{item.InternalName}' from '{oldValue}' to '{newValue}'.");
+                                        //Console.WriteLine($"[Shop] Updated property '{property.Name}' of item '{item.InternalName}' from '{oldValue}' to '{newValue}'.");
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.WriteLine($"[Shop] Failed to update property '{overrideEntry.Key}' of item '{item.InternalName}': {ex.Message}");
+                                    Console.WriteLine($"[Warcraft] Failed to override property '{overrideEntry.Key}' of item '{item.InternalName}': {ex.Message}");
                                 }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"[Warcraft] Failed to override property '{overrideEntry.Key}' of item '{item.InternalName}'");
                             }
                         }
                     }
                 }
             }
+
+            //Remove disabled items from the shop
+            Shop.Items.Where(i => i.IsDisabled).ToList().ForEach(i =>
+            {
+                Console.WriteLine($"[Warcraft] Disabling item: {i.InternalName}");
+                Shop.Items.Remove(i);
+            });
         }
 
         internal static Dictionary<string, Dictionary<string, object>> GetConfigurableProperties(this List<ShopItem> items)

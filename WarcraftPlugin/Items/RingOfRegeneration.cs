@@ -1,4 +1,5 @@
 using CounterStrikeSharp.API.Core;
+using System;
 using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
@@ -8,7 +9,7 @@ namespace WarcraftPlugin.Items;
 internal class RingOfRegeneration : ShopItem
 {
     protected override string Name => "Ring of Regeneration";
-    protected override string Description => "Regen 1 HP each sec.";
+    protected override FormattableString Description => $"Regen {RegenPerSecond} HP each sec.";
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 50, 205, 50); // LimeGreen for regeneration/healing
 

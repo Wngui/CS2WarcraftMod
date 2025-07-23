@@ -10,7 +10,7 @@ namespace WarcraftPlugin.Items;
 internal class MoneySiphonScepter : ShopItem
 {
     protected override string Name => "Money Siphon Scepter";
-    protected override string Description => "Steal 2% of enemy money on hit";
+    protected override FormattableString Description => $"Steal {MoneyStealPercent*100}% of enemy money on hit";
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 215, 0); // Gold for money/unique
 

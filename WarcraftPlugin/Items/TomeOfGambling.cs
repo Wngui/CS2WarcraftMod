@@ -8,15 +8,15 @@ namespace WarcraftPlugin.Items;
 internal class TomeOfGambling : ShopItem
 {
     protected override string Name => "Tome of Gambling";
-    protected override string Description => "Chance to gain 150-450 XP";
+    protected override FormattableString Description => $"Chance to gain {MinXpGain}-{MaxXpGain} XP";
     internal override int Price { get; set; } = 8000;
     internal override bool IsInstant => true;
     internal override Color Color { get; set; } = Color.RosyBrown;
 
     [Configurable]
-    internal int MinXpGain { get; set; } = 150;
+    internal int MinXpGain { get; set; } = 50;
     [Configurable]
-    internal int MaxXpGain { get; set; } = 450;
+    internal int MaxXpGain { get; set; } = 150;
 
     internal override void Apply(CCSPlayerController player)
     {

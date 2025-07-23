@@ -10,7 +10,7 @@ namespace WarcraftPlugin.Items;
 internal class OrbOfFrost : ShopItem
 {
     protected override string Name => "Orb of Frost";
-    protected override string Description => "33% chance to slow enemy on hit";
+    protected override FormattableString Description => $"{SlowChance*100}% chance to slow enemy on hit";
     internal override int Price { get; set; } = 3500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 0, 191, 255); // DeepSkyBlue for frost/slow
 

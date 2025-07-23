@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using System;
 using System.Drawing;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
@@ -10,7 +11,7 @@ namespace WarcraftPlugin.Items;
 internal class GlovesOfCloud : ShopItem
 {
     protected override string Name => "Gloves of Cloud";
-    protected override string Description => "Receive a Smoke grenade every 12s";
+    protected override FormattableString Description => $"Receive a Smoke grenade every {GrenadeInterval}s";
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 169, 169, 169); // DarkGray for utility/smoke
 

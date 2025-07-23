@@ -4,13 +4,14 @@ using WarcraftPlugin.Classes;
 using WarcraftPlugin.Helpers;
 using System.Linq;
 using System.Drawing;
+using System;
 
 namespace WarcraftPlugin.Items;
 
 internal class DaggerOfVenom : ShopItem
 {
     protected override string Name => "Dagger of Venom";
-    protected override string Description => "Poison enemies on hit";
+    protected override FormattableString Description => $"Poison enemies on hit";
     internal override int Price { get; set; } = 2500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 34, 139, 34); // ForestGreen for poison/venom
 

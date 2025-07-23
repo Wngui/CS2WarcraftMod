@@ -2,13 +2,14 @@ using CounterStrikeSharp.API.Core;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
 using System.Drawing;
+using System;
 
 namespace WarcraftPlugin.Items;
 
 internal class SockOfFeathers : ShopItem
 {
     protected override string Name => "Sock of Feathers";
-    protected override string Description => "Decrease Gravity by 50%";
+    protected override FormattableString Description => $"Decrease Gravity by {(1 - GravityModifier) * 100}%";
     internal override int Price { get; set; } = 1500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 0, 206, 209); // DarkTurquoise for movement/utility
 

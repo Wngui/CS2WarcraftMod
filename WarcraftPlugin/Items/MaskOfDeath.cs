@@ -9,7 +9,7 @@ namespace WarcraftPlugin.Items;
 internal class MaskOfDeath : ShopItem
 {
     protected override string Name => "Mask of Death";
-    protected override string Description => "50% Chance to Heal 15% of Weapon Damage dealt";
+    protected override FormattableString Description => $"{LifeStealChance*100}% Chance to Heal {LifeStealPercent*100}% of Weapon Damage dealt";
     internal override int Price { get; set; } = 4000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 220, 20, 60); // Crimson for lifesteal/offensive
 

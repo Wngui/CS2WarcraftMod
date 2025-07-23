@@ -13,18 +13,20 @@ internal abstract class ShopItem
     internal bool IsDisabled { get; set; } = false;
 
     protected virtual string Name { get; }
-    protected virtual string Description { get; }
+    protected virtual FormattableString Description { get; }
 
     internal static IStringLocalizer Localizer => WarcraftPlugin.Instance?.Localizer;
     internal string InternalName => Name.Replace(" ", "_").ToLowerInvariant();
+
     internal string LocalizedName =>
         Localizer != null && Localizer.Exists($"item.{InternalName}.name")
             ? Localizer[$"item.{InternalName}.name"]
             : Name;
+
     internal string LocalizedDescription =>
-        Localizer != null && Localizer.Exists($"item.{InternalName}.description")
-            ? Localizer[$"item.{InternalName}.description"]
-            : Description;
+    Localizer != null && Localizer.Exists($"item.{InternalName}.description")
+        ? Localizer[$"item.{InternalName}.description", Description.GetArguments()]
+        : Description.ToString();
 
     [Configurable]
     internal abstract int Price { get; set; }

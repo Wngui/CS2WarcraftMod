@@ -1,4 +1,5 @@
 using CounterStrikeSharp.API.Core;
+using System;
 using System.Drawing;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Helpers;
@@ -8,7 +9,7 @@ namespace WarcraftPlugin.Items;
 internal class AmuletOfVitality : ShopItem
 {
     protected override string Name => "Amulet of Vitality";
-    protected override string Description => "Increase max HP by 50";
+    protected override FormattableString Description => $"Increase max HP by {HealthBonus}";
     internal override int Price { get; set; } = 3500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 69, 0); // OrangeRed for vitality/health
 

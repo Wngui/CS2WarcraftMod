@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using System;
 using System.Drawing;
 using System.Linq;
 using WarcraftPlugin.Core.Effects;
@@ -10,7 +11,7 @@ namespace WarcraftPlugin.Items;
 internal class GlovesOfWrath : ShopItem
 {
     protected override string Name => "Gloves of Wrath";
-    protected override string Description => "Receive an HE grenade every 12s";
+    protected override FormattableString Description => $"Receive a HE grenade every {GrenadeInterval}s";
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 140, 0); // DarkOrange for offensive/grenade
 
