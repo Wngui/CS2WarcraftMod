@@ -123,7 +123,7 @@ Ultimate can be activated by binding it in the console, example
 - **Ring Of Regeneration** – Regen 1 HP each sec.
 - **Sock Of Feathers** – Decrease Gravity by 50%
 - **Talisman Of Evasion** – 20% chance to evade
-- **Tome Of Experience** – Gain 500XP
+- **Tome Of Experience** – Gain 50XP
 - **Tome Of Gambling** – Chance to gain 50-150 XP
 
 ## Setup
