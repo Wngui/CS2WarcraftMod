@@ -123,8 +123,8 @@ Ultimate can be activated by binding it in the console, example
 - **Ring Of Regeneration** – Regen 1 HP each sec.
 - **Sock Of Feathers** – Decrease Gravity by 50%
 - **Talisman Of Evasion** – 20% chance to evade
-- **Tome Of Experience** – Gain 150XP
-- **Tome Of Gambling** – Chance to gain 150-450 XP
+- **Tome Of Experience** – Gain 500XP
+- **Tome Of Gambling** – Chance to gain 50-150 XP
 
 ## Setup
 
@@ -151,6 +151,14 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "TotalLevelRequired": { // Total level required to unlock class
     "Shadowblade": 48, // Unlocks when you have 48 levels in total 
     "Tinker": 60 // Unlocks when you have 60 levels in total 
+  },
+  "ItemOverrides": { // Configuration of item modifiers, prices and disabling
+    "tome_of_gambling": { // Name of item
+      "Price": 8000, // In-game cash price
+      "MinXpGain": 50, // Modifier, varies per item. 
+      "MaxXpGain": 150, // Modifier, varies per item
+      "IsDisabled": true // Disable item, true/false
+    }
   }
 }
 ```
@@ -161,3 +169,4 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 **csportalsk** - Testing and bug reporting</br>
 **pZyk** - Development</br>
 **Poisoned** - Development
+**NightFury** - Development
