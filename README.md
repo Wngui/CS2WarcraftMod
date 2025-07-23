@@ -168,5 +168,5 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 **Roflmuffin** - CounterStrikeSharp & Base plugin</br>
 **csportalsk** - Testing and bug reporting</br>
 **pZyk** - Development</br>
-**Poisoned** - Development
+**Poisoned** - Development</br>
 **NightFury** - Development
