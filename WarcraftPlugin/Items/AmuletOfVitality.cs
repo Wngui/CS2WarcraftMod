@@ -11,6 +11,8 @@ internal class AmuletOfVitality : ShopItem
     protected override string Description => "Increase max HP by 50";
     internal override int Price { get; set; } = 3500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 69, 0); // OrangeRed for vitality/health
+
+    [Configurable]
     internal int HealthBonus { get; set; } = 50;
 
     internal override void Apply(CCSPlayerController player)

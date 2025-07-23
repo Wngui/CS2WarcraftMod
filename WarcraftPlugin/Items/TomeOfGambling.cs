@@ -11,9 +11,11 @@ internal class TomeOfGambling : ShopItem
     protected override string Description => "Chance to gain 150-450 XP";
     internal override int Price { get; set; } = 8000;
     internal override bool IsInstant => true;
-    internal override Color Color { get; set; } = Color.RosyBrown; 
+    internal override Color Color { get; set; } = Color.RosyBrown;
 
+    [Configurable]
     internal int MinXpGain { get; set; } = 150;
+    [Configurable]
     internal int MaxXpGain { get; set; } = 450;
 
     internal override void Apply(CCSPlayerController player)

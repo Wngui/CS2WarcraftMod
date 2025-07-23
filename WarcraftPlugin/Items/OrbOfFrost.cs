@@ -14,8 +14,11 @@ internal class OrbOfFrost : ShopItem
     internal override int Price { get; set; } = 3500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 0, 191, 255); // DeepSkyBlue for frost/slow
 
+    [Configurable]
     internal float SlowChance { get; set; } = 0.33f;
+    [Configurable]
     internal float SlowModifier { get; set; } = 0.67f;
+    [Configurable]
     internal float SlowDuration { get; set; } = 2.0f; // Duration in seconds
 
     internal override void Apply(CCSPlayerController player) { }

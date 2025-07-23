@@ -12,6 +12,7 @@ internal class SockOfFeathers : ShopItem
     internal override int Price { get; set; } = 1500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 0, 206, 209); // DarkTurquoise for movement/utility
 
+    [Configurable]
     internal float GravityModifier { get; set; } = 0.5f;
 
     internal override void Apply(CCSPlayerController player)

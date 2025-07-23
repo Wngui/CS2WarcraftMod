@@ -14,6 +14,7 @@ internal class MoneySiphonScepter : ShopItem
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 215, 0); // Gold for money/unique
 
+    [Configurable]
     internal float MoneyStealPercent { get; set; } = 0.02f;
 
     internal override void Apply(CCSPlayerController player) { }

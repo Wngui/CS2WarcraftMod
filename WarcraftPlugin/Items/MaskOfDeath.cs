@@ -13,7 +13,9 @@ internal class MaskOfDeath : ShopItem
     internal override int Price { get; set; } = 4000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 220, 20, 60); // Crimson for lifesteal/offensive
 
+    [Configurable]
     internal double LifeStealChance { get; set; } = 0.5;
+    [Configurable]
     internal double LifeStealPercent { get; set; } = 0.15;
 
     internal override void Apply(CCSPlayerController player) { }

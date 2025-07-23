@@ -11,6 +11,8 @@ internal class BootsOfSpeed : ShopItem
     protected override string Description => "Increase Speed by 20%";
     internal override int Price { get; set; } = 2500;
     internal override Color Color { get; set; } = Color.FromArgb(255, 30, 144, 255); // DodgerBlue for speed/movement
+
+    [Configurable]
     public float SpeedModifier { get; set; } = 1.2f; // 20% speed increase
 
     internal override void Apply(CCSPlayerController player)

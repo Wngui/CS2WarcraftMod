@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using Microsoft.Extensions.Localization;
+using System;
 using System.Drawing;
 using WarcraftPlugin.Events.ExtendedEvents;
 using WarcraftPlugin.lang;
@@ -8,6 +9,9 @@ namespace WarcraftPlugin.Items;
 
 internal abstract class ShopItem
 {
+    [Configurable]
+    internal bool IsDisabled { get; set; } = false;
+
     protected virtual string Name { get; }
     protected virtual string Description { get; }
 
@@ -21,6 +25,8 @@ internal abstract class ShopItem
         Localizer != null && Localizer.Exists($"item.{InternalName}.description")
             ? Localizer[$"item.{InternalName}.description"]
             : Description;
+
+    [Configurable]
     internal abstract int Price { get; set; }
 
     /// <summary>
@@ -38,3 +44,6 @@ internal abstract class ShopItem
 
     internal virtual void OnPlayerHurtOther(EventPlayerHurtOther @event) { }
 }
+
+[AttributeUsage(AttributeTargets.Property)]
+public class Configurable : Attribute { }

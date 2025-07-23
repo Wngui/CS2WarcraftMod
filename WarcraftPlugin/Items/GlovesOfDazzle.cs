@@ -14,7 +14,9 @@ internal class GlovesOfDazzle : ShopItem
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 255, 0); // Yellow for utility/flashbang
 
+    [Configurable]
     internal float GrenadeInterval { get; set; } = 12f;
+    [Configurable]
     internal string GrenadeType { get; set; } = "weapon_flashbang";
 
     internal override void Apply(CCSPlayerController player)

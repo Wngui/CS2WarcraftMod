@@ -1,23 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CounterStrikeSharp.API;
+﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
-using WarcraftPlugin.Helpers;
-using CounterStrikeSharp.API.Modules.Admin;
-using WarcraftPlugin.Adverts;
+using CounterStrikeSharp.API.Modules.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json.Serialization;
-using WarcraftPlugin.Events;
-using WarcraftPlugin.Menu;
-using WarcraftPlugin.Menu.WarcraftMenu;
+using WarcraftPlugin.Adverts;
 using WarcraftPlugin.Core;
-using WarcraftPlugin.Models;
 using WarcraftPlugin.Core.Effects;
 using WarcraftPlugin.Core.Preload;
+using WarcraftPlugin.Events;
+using WarcraftPlugin.Helpers;
+using WarcraftPlugin.Items;
 using WarcraftPlugin.lang;
-using CounterStrikeSharp.API.Modules.Utils;
+using WarcraftPlugin.Menu;
+using WarcraftPlugin.Menu.WarcraftMenu;
+using WarcraftPlugin.Models;
 
 namespace WarcraftPlugin
 {
@@ -41,30 +43,9 @@ namespace WarcraftPlugin
             {"silent_assassin", 80}, {"hammerstorm", 90}, {"sacred_warrior", 100}
         };
         [JsonPropertyName("ItemOverrides")]
-        public Dictionary<string, ItemOverride> ItemOverrides { get; set; } = new()
-        {
-            ["boots_of_speed"] = new() { Overrides = new() { ["Price"] = "2500", ["SpeedModifier"] = "1.2" }, IsDisabled = false },
-            ["tome_of_experience"] = new() { Overrides = new() { ["Price"] = "4000", ["XpGain"] = "150" }, IsDisabled = false},
-            ["tome_of_gambling"] = new() { Overrides = new() { ["Price"] = "8000", ["XpGainMin"] = "150", ["XpGainMax"] = "450" }, IsDisabled = false},
-            ["amulet_of_the_cat"] = new() { Overrides = new() { ["Price"] = "4000" }, IsDisabled = false },
-            ["amulet_of_vitality"] = new() { Overrides = new() { ["Price"] = "3500", ["HealthBonus"] = "50" }, IsDisabled = false },
-            ["dagger_of_venom"] = new() { Overrides = new() { ["Price"] = "2500", ["PoisonDuration"] = "5", ["PoisonDamage"] = "1" }, IsDisabled = false },
-            ["orb_of_frost"] = new() { Overrides = new() { ["Price"] = "3500", ["SlowChance"] = "0.33", ["SlowModifier"] = "0.67", ["SlowDuration"] = "2" }, IsDisabled = false },
-            ["sock_of_feathers"] = new() { Overrides = new() { ["Price"] = "1500", ["GravityModifier"] = "0.5" }, IsDisabled = false },
-            ["talisman_of_evasion"] = new() { Overrides = new() { ["Price"] = "4000", ["EvasionChance"] = "0.2" }, IsDisabled = false },
-            ["ring_of_regeneration"] = new() { Overrides = new() { ["Price"] = "3000", ["RegenPerSecond"] = "1" }, IsDisabled = false },
-            ["money_siphon_scepter"] = new() { Overrides = new() { ["Price"] = "3000", ["MoneyStealPercent"] = "0.02f" }, IsDisabled = false },
-            ["mask_of_death"] = new() { Overrides = new() { ["Price"] = "4000", ["LifeStealChance"] = "0.5", ["LifeStealPercent"] = "0.15" }, IsDisabled = false },
-            ["gloves_of_cloud"] = new() { Overrides = new() { ["Price"] = "3000", ["GrenadeType"] = "weapon_smokegrenade", ["GrenadeInterval"] = "12" }, IsDisabled = false },
-            ["gloves_of_dazzle"] = new() { Overrides = new() { ["Price"] = "3000", ["GrenadeType"] = "weapon_flashbang", ["GrenadeInterval"] = "12" }, IsDisabled = false },
-            ["gloves_of_wrath"] = new() { Overrides = new() { ["Price"] = "3000", ["GrenadeType"] = "weapon_hegrenade", ["GrenadeInterval"] = "12" }, IsDisabled = false },
-        };
-    }
-
-    public class ItemOverride
-    {
-        public bool IsDisabled { get; set; } = false;
-        public Dictionary<string, string> Overrides { get; set; } = [];
+        public Dictionary<string, Dictionary<string, object>> ItemOverrides { get; set; } =
+            Shop.Items.GetConfigurableProperties();
+                
     }
 
     public static class WarcraftPlayerExtensions
@@ -525,6 +506,7 @@ namespace WarcraftPlugin
         public void OnConfigParsed(Config config)
         {
             Config = config;
+            Shop.Items.ApplyOverrides(config);
         }
 
         public override void Unload(bool hotReload)

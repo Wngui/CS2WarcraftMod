@@ -12,6 +12,7 @@ internal class RingOfRegeneration : ShopItem
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 50, 205, 50); // LimeGreen for regeneration/healing
 
+    [Configurable]
     internal int RegenPerSecond { get; set; } = 1;
 
     internal override void Apply(CCSPlayerController player)

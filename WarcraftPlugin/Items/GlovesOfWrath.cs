@@ -14,7 +14,9 @@ internal class GlovesOfWrath : ShopItem
     internal override int Price { get; set; } = 3000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 255, 140, 0); // DarkOrange for offensive/grenade
 
+    [Configurable]
     internal float GrenadeInterval { get; set; } = 12f;
+    [Configurable]
     internal string GrenadeType { get; set; } = "weapon_hegrenade";
 
     internal override void Apply(CCSPlayerController player)

@@ -12,6 +12,7 @@ internal class TalismanOfEvasion : ShopItem
     internal override int Price { get; set; } = 4000;
     internal override Color Color { get; set; } = Color.FromArgb(255, 138, 43, 226); // BlueViolet for evasion/rare
 
+    [Configurable]
     internal double EvasionChance { get; set; } = 0.2; // 20% chance to evade
 
     internal override void Apply(CCSPlayerController player) { }
