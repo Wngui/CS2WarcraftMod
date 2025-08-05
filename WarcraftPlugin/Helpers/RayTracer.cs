@@ -23,7 +23,7 @@ namespace WarcraftPlugin.Helpers
         );
 
         private static readonly nint TraceFunc = NativeAPI.FindSignature(Addresses.ServerPath, Environment.OSVersion.Platform == PlatformID.Unix
-            ? "48 B8 ? ? ? ? ? ? ? ? 55 66 0F EF C0 48 89 E5 41 56 41 55 49 89 D5 41 54 49 89 F4 53 48 89 CB 44 89 C9 48 83 EC"
+            ? "48 B8 ? ? ? ? ? ? ? ? 55 66 0F EF C0 48 89 E5 41 57 41 56 49 89 D6"
             : "4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 41 56 41 57 48 81 EC");
 
         private static readonly nint GameTraceManager = NativeAPI.FindSignature(Addresses.ServerPath, Environment.OSVersion.Platform == PlatformID.Unix
