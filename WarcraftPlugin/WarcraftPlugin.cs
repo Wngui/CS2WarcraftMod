@@ -25,7 +25,8 @@ namespace WarcraftPlugin
 {
     public class Config : BasePluginConfig
     {
-        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 8;
+        [JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 9;
+        [JsonPropertyName("BasicPermission")] public string BasicPermission { get; set; } = "";
         [JsonPropertyName("DeactivatedClasses")] public string[] DeactivatedClasses { get; set; } = [];
         [JsonPropertyName("ShowCommandAdverts")] public bool ShowCommandAdverts { get; set; } = true;
         [JsonPropertyName("DefaultClass")] public string DefaultClass { get; set; }
@@ -34,10 +35,15 @@ namespace WarcraftPlugin
         [JsonPropertyName("XpHeadshotModifier")] public float XpHeadshotModifier { get; set; } = 0.15f;
         [JsonPropertyName("XpKnifeModifier")] public float XpKnifeModifier { get; set; } = 0.25f;
         [JsonPropertyName("XpPerRoundWin")] public int XpPerRoundWin { get; set; } = 30;
+        [JsonPropertyName("XpPerRoundLose")] public int XpPerRoundLose { get; set; } = 15;
+        [JsonPropertyName("XpPerExplosion")] public int XpPerExplosion { get; set; } = 20;
+        [JsonPropertyName("XpPerPlanted")] public int XpPerPlanted { get; set; } = 10;
+        [JsonPropertyName("XpPerDefuse")] public int XpPerDefuse { get; set; } = 40;
+        [JsonPropertyName("XpMultiply")] public float XpMultiply { get; set; } = 1;
+        [JsonPropertyName("XpSupportClass")] public int XpSupportClass { get; set; } = 50;
         [JsonPropertyName("EnableLevelDifferenceXp")] public bool EnableLevelDifferenceXp { get; set; } = true;
         [JsonPropertyName("MatchReset")] public bool MatchReset { get; set; } = false;
-        [JsonPropertyName("TotalLevelRequired")]
-        public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
+        [JsonPropertyName("TotalLevelRequired")] public Dictionary<string, int> TotalLevelRequired { get; set; } = new()
         {
             {"shadowblade", 50}, {"dwarf_engineer", 60}, {"death_weaver", 70},
             {"silent_assassin", 80}, {"hammerstorm", 90}, {"sacred_warrior", 100}
@@ -64,9 +70,11 @@ namespace WarcraftPlugin
         public override string ModuleName => "Warcraft";
         public override string ModuleVersion => "DEVELOPMENT";
 
-        public const int MaxLevel = 16;
+        public const int MaxLevel = 100;
+        public const int UltLevel = 16;
         public const int MaxSkillLevel = 5;
         public const int MaxUltimateLevel = 1;
+        public readonly int[] fovSettings = new int[67];
 
         private readonly Dictionary<IntPtr, WarcraftPlayer> WarcraftPlayers = [];
         private EventSystem _eventSystem;
@@ -126,7 +134,7 @@ namespace WarcraftPlugin
             return wcPlayer;
         }
 
-        internal static void RefreshPlayerName(CCSPlayerController player)
+         internal static void RefreshPlayerName(CCSPlayerController player)
         {
             if (player == null || !player.IsValid) return;
             if (Instance.Config.DisableNamePrefix) return;
@@ -136,7 +144,8 @@ namespace WarcraftPlugin
             if (warcraftPlayer == null) return;
 
             var playerNameClean = player.GetRealPlayerName();
-            var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().LocalizedDisplayName}] {playerNameClean}";
+            //var playerNameWithPrefix = $"{warcraftPlayer.GetLevel()} [{warcraftPlayer.GetClass().LocalizedDisplayName}] {playerNameClean}";
+            var playerNameWithPrefix = $"{playerNameClean} - [{warcraftPlayer.GetClass().LocalizedDisplayName} | Lvl. {warcraftPlayer.GetLevel()}]";
 
             player.PlayerName = playerNameWithPrefix;
             Utilities.SetStateChanged(player, "CBasePlayerController", "m_iszPlayerName");
@@ -165,8 +174,8 @@ namespace WarcraftPlugin
 
             _instance ??= this;
 
-            XpSystem = new XpSystem(this, Config, Localizer);
-            XpSystem.GenerateXpCurve(110, 1.07f, MaxLevel);
+            XpSystem = new XpSystem(this, Config, Localizer, _eventSystem);
+            XpSystem.GenerateXpCurve(150, 1.04f, MaxLevel);
 
             _database = new Database();
             classManager = new ClassManager();
@@ -224,6 +233,21 @@ namespace WarcraftPlugin
             foreach (var alias in addXpAliases)
                 AddUniqueCommand(alias, "addxp", CommandAddXp);
 
+            List<string> autoSpell =
+                [
+                "autospell", "as",
+                ..Localizer["command.autospell"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var spell in autoSpell)
+                AddUniqueCommand(spell, "autospell", CommandAutoSpell);
+            List<string> getxp =
+                [
+                "getxp", "xp",
+                ..Localizer["command.autospell"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var xp in getxp)
+                AddUniqueCommand(xp, "getxp", CommandAutoSpell);
+
             List<string> skillsAliases =
             [
                 "skills", "level",
@@ -247,6 +271,14 @@ namespace WarcraftPlugin
             ];
             foreach (var alias in helpAliases)
                 AddUniqueCommand(alias, "list all commands", CommandHelp);
+
+            List<string> ServerhelpAliases =
+            [
+                "help",
+                ..Localizer["command.serverhelp"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ];
+            foreach (var alias in ServerhelpAliases)
+                AddUniqueCommand(alias, "open help menu server", (player, _) => ShowServerMenu(player));
 
             RegisterListener<Listeners.OnClientConnect>(OnClientPutInServerHandler);
             RegisterListener<Listeners.OnMapStart>(OnMapStartHandler);
@@ -293,16 +325,22 @@ namespace WarcraftPlugin
                 AddCommand(name, description, method);
             }
         }
+        private void ShowClassMenu(CCSPlayerController player)
+        {
+            var databaseClassInformation = _database.LoadClassInformationFromDatabase(player);
+            ClassMenu.Show(player, databaseClassInformation);
+        }
 
         private void ShowSkillsMenu(CCSPlayerController player)
         {
             SkillsMenu.Show(GetWcPlayer(player));
         }
 
-        private void ShowClassMenu(CCSPlayerController player)
+        private void ShowServerMenu(CCSPlayerController player)
         {
-            var databaseClassInformation = _database.LoadClassInformationFromDatabase(player);
-            ClassMenu.Show(player, databaseClassInformation);
+            var wcPlayer = GetWcPlayer(player);
+            if (wcPlayer != null)
+                ServerMenu.Show(wcPlayer);
         }
 
         private void ShowShopMenu(CCSPlayerController player)
@@ -311,7 +349,69 @@ namespace WarcraftPlugin
             if (wcPlayer != null)
                 ShopMenu.Show(wcPlayer);
         }
+        public bool HasPermision(CCSPlayerController player, List<string> permissions)
+        {
+            bool bAccess = false;
+            foreach (var perm in permissions)
+            {
+                if (string.IsNullOrEmpty(perm))
+                {
+                    bAccess = true;
+                    break;
+                }
+                if (perm[0] == '@' && AdminManager.PlayerHasPermissions(player, perm))
+                {
+                    bAccess = true;
+                    break;
+                }
+                else if (perm[0] == '#' && AdminManager.PlayerInGroup(player, perm))
+                {
+                    bAccess = true;
+                    break;
+                }
+            }
+            return bAccess;
+        }
+        public int NewMethod(CCSPlayerController attacker, int xpToAdd)
+        {
+            if (HasPermision(attacker, ["@css/xp1"]))
+            {
+                xpToAdd *= 2;
+            }
+            if (HasPermision(attacker, ["@css/xp2"]))
+            {
+                xpToAdd *= 3;
+            }
+            if (HasPermision(attacker, ["@css/xp3"]))
+            {
+                xpToAdd *= 4;
+            }
+            if (HasPermision(attacker, ["@css/xp4"]))
+            {
+                xpToAdd *= 5;
+            }
 
+            return xpToAdd;
+        }
+        public void NewMethod1(CCSPlayerController attacker)
+        {
+            if (HasPermision(attacker, ["@css/xp1"]))
+            {
+                attacker.PrintToChat($"{ChatColors.Gold}VIP{ChatColors.Default} - опыт х2");
+            }
+            if (HasPermision(attacker, ["@css/xp2"]))
+            {
+                attacker.PrintToChat($"{ChatColors.Gold}VIP{ChatColors.Default} - опыт х3");
+            }
+            if (HasPermision(attacker, ["@css/xp3"]))
+            {
+                attacker.PrintToChat($"{ChatColors.Gold}VIP{ChatColors.Default} - опыт х4");
+            }
+            if (HasPermision(attacker, ["@css/xp4"]))
+            {
+                attacker.PrintToChat($"{ChatColors.Gold}VIP{ChatColors.Default} - опыт х5");
+            }
+        }
         [RequiresPermissions("@css/addxp")]
         private void CommandAddXp(CCSPlayerController admin, CommandInfo commandInfo)
         {
@@ -337,6 +437,43 @@ namespace WarcraftPlugin
             XpSystem.AddXp(target, xpToAdd);
         }
 
+        private void CommandAutoSpell(CCSPlayerController player, CommandInfo commandInfo)
+        {
+            var wcPlayer = GetWcPlayer(player);
+            if (fovSettings[player.Slot] == 0)
+            {
+                fovSettings[player.Slot] = 1;
+                wcPlayer.Player.PrintToChat($"{ChatColors.Gold}Автопрокачка Талантов - {ChatColors.Green}Включена!");
+                SkillsMenu.Close(wcPlayer);
+                AutoSpell(player);
+            }
+            else
+            {
+                fovSettings[player.Slot] = 0;
+                wcPlayer.Player.PrintToChat($"{ChatColors.Gold}Автопрокачка Талантов - {ChatColors.Red}Выключена!");
+            }
+        }
+        public void AutoSpell(CCSPlayerController player)
+        {
+            var wcPlayer = GetWcPlayer(player);
+            XpSystem.AutoSpendSkillPoints(wcPlayer);
+        }
+
+        private void CommandGetXp(CCSPlayerController player, CommandInfo commandInfo)
+        {
+            var wcPlayer = GetWcPlayer(player);
+            if (fovSettings[player.Slot] == 0)
+            {
+                fovSettings[player.Slot] = 1;
+                wcPlayer.Player.PrintToChat($"{ChatColors.Gold}Автопрокачка Талантов - {ChatColors.Green}Включена!");
+                AutoSpell(player);
+            }
+            else
+            {
+                fovSettings[player.Slot] = 0;
+                wcPlayer.Player.PrintToChat($"{ChatColors.Gold}Автопрокачка Талантов - {ChatColors.Red}Выключена!");
+            }
+        }
         //[RequiresPermissions("@css/setlevel")]
         //private void CommandSetLevel(CCSPlayerController admin, CommandInfo commandInfo)
         //{

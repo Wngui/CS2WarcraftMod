@@ -1,8 +1,11 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
+using CounterStrikeSharp.API.Modules.Utils;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WarcraftPlugin.Events;
 using WarcraftPlugin.Helpers;
 using WarcraftPlugin.Models;
 
@@ -13,12 +16,15 @@ namespace WarcraftPlugin.Core
         private readonly WarcraftPlugin _plugin;
         private readonly Config _config;
         private readonly IStringLocalizer _localizer;
+        private readonly EventSystem _eventSystem;
 
-        internal XpSystem(WarcraftPlugin plugin, Config config, IStringLocalizer localizer)
+
+        internal XpSystem(WarcraftPlugin plugin, Config config, IStringLocalizer localizer, EventSystem eventSystem)
         {
             _plugin = plugin;
             _config = config;
             _localizer = localizer;
+            _eventSystem = eventSystem;
         }
 
         private readonly List<int> _levelXpRequirement = [.. new int[256]];
@@ -39,12 +45,15 @@ namespace WarcraftPlugin.Core
             return _levelXpRequirement[level];
         }
 
+
         internal void AddXp(CCSPlayerController player, int xpToAdd)
         {
             var wcPlayer = _plugin.GetWcPlayer(player);
             if (wcPlayer == null) return;
 
             if (wcPlayer.GetLevel() >= WarcraftPlugin.MaxLevel) return;
+
+            xpToAdd = _plugin.NewMethod(player, xpToAdd);
 
             wcPlayer.currentXp += xpToAdd;
 
@@ -76,7 +85,8 @@ namespace WarcraftPlugin.Core
             var player = wcPlayer.GetPlayer();
             if (player.IsAlive())
             {
-                player.PlayLocalSound("play sounds/ui/achievement_earned.vsnd");
+                player.PlayLocalSound("sounds/choseButton.vsnd");
+                player.PlayLocalSound("sound/choseButton.vsnd");
                 Warcraft.SpawnParticle(player.PlayerPawn.Value.AbsOrigin, "particles/ui/ammohealthcenter/ui_hud_kill_streaks_glow_5.vpcf", 1);
             }
 
@@ -96,6 +106,7 @@ namespace WarcraftPlugin.Core
 
         internal static int GetFreeSkillPoints(WarcraftPlayer wcPlayer)
         {
+            //TODO Я менял код
             int totalPointsUsed = 0;
 
             var abilityCount = wcPlayer.GetClass().Abilities.Count;
@@ -103,12 +114,20 @@ namespace WarcraftPlugin.Core
             {
                 totalPointsUsed += wcPlayer.GetAbilityLevel(i);
             }
-
+            //TODO Добавил я проверка всего сколько уровней на прокачку если что изменить
             int level = wcPlayer.GetLevel();
-            if (level > WarcraftPlugin.MaxLevel)
+
+            int maxPossiblePoints = Math.Min(level, 16);  // Ключевое изменение!
+            if (level > WarcraftPlugin.UltLevel)
                 level = WarcraftPlugin.MaxSkillLevel;
 
-            return level - totalPointsUsed;
+            if (totalPointsUsed >= maxPossiblePoints)
+            {
+                return 0;
+            }
+            int availablePoints = maxPossiblePoints - totalPointsUsed;
+
+            return availablePoints;
         }
 
         private static readonly Random _random = new();
@@ -127,8 +146,8 @@ namespace WarcraftPlugin.Core
                 var index = available[_random.Next(available.Count)];
                 wcPlayer.GrantAbilityLevel(index);
             }
+            wcPlayer.Player.PrintToChat($"{ChatColors.Gold}[AutoSpell]: {ChatColors.Default}Таланты были распределены автоматически");
         }
-
         internal void CalculateAndAddKillXp(
             CCSPlayerController attacker,
             CCSPlayerController victim,
@@ -139,6 +158,7 @@ namespace WarcraftPlugin.Core
 
             var xpHeadshot = 0f;
             var xpKnife = 0f;
+            //var xpFirstkill = 0f;
 
             if (headshot)
                 xpHeadshot = Convert.ToInt32(_config.XpPerKill * _config.XpHeadshotModifier);
@@ -147,6 +167,10 @@ namespace WarcraftPlugin.Core
             {
                 xpKnife = Convert.ToInt32(_config.XpPerKill * _config.XpKnifeModifier);
             }
+            // if (_eventSystem.firstkill == 0)
+            // {
+            //     xpFirstkill = Convert.ToInt32(_config.XpFirstKill);
+            // }
 
             var xpToAdd = Convert.ToInt32(_config.XpPerKill + xpHeadshot + xpKnife);
             var levelBonus = 0;
@@ -166,12 +190,26 @@ namespace WarcraftPlugin.Core
                     }
                 }
             }
-
+            // var assistXp = Convert.ToInt32(_config.XpPerAssist);
+            // if (assister != null && assister.IsValid && assister != attacker)
+            // {
+            //     AddXp(assister, assistXp);
+            //     var shownAssist = _plugin.NewMethod(assister, assistXp);
+            //     string assistText = $" {_localizer["xp.assist", shownAssist, victim.PlayerName]}";
+            //     assister.PrintToChat(assistText);
+            // }
             AddXp(attacker, xpToAdd);
+            xpToAdd = _plugin.NewMethod(attacker, xpToAdd);
+            _plugin.NewMethod1(attacker);
+            if (_config.XpMultiply > 0)
+            {
+                xpToAdd = (int)((1 + _config.XpMultiply) * xpToAdd);
+            }
 
             string hsBonus = xpHeadshot != 0 ? $"(+{xpHeadshot} {_localizer["xp.bonus.headshot"]})" : "";
             string knifeBonus = xpKnife != 0 ? $"(+{xpKnife} {_localizer["xp.bonus.knife"]})" : "";
             string levelDiffBonus = levelBonus > 0 ? $"(+{levelBonus} {_localizer["xp.bonus.level"]})" : "";
+            //string firstkillBonus = xpFirstkill != 0 ? $"(+{xpFirstkill} {_localizer["xp.bonus.firstkill"]})" : "";
 
             string xpString = $" {_localizer["xp.kill", xpToAdd, victim.PlayerName, hsBonus, knifeBonus, levelDiffBonus]}";
             attacker.PrintToChat(xpString);

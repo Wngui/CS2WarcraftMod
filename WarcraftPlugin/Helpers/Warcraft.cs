@@ -666,12 +666,20 @@ namespace WarcraftPlugin.Helpers
             return player != null && player.IsValid && player.PlayerPawn.IsValid;
         }
 
-        public static string GetRealPlayerName(this CCSPlayerController player)
+        public static string GetRealPlayerNames(this CCSPlayerController player)
         {
             if (player == null || !player.IsValid) return string.Empty;
             var playerNameClean = Regex.Replace(player.PlayerName, @"\d+\s\[.*\]\s", "");
             return playerNameClean.Trim();
         }
+        public static string GetRealPlayerName(this CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid) return string.Empty;
+            var playerNameClean = Regex.Replace(player.PlayerName, @"\s-\s\[.*\]", "");
+            return playerNameClean.Trim();
+        }
+
+
 
         /// <summary>
         /// Adjusts the brightness of the color by a specified factor.

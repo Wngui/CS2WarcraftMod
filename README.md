@@ -50,7 +50,10 @@ Ultimate can be activated by binding it in the console, example
 
 ```!addxp <amount> [player]``` - Admin only, adds x amount of xp to current class. Player name/#steamid is optional
 
+```!autospell``` - Automatic leveling of talents to the end of the map
+
 ```!commands``` - Lists all commands
+
 
 ## Class Abilities
 
@@ -75,7 +78,7 @@ Ultimate can be activated by binding it in the console, example
 - **Splintered Soul**: Chance to cheat death with a fraction of vitality.
 - **Raise Dead**: Resurrect powerful undead minions to fight alongside you. 
 
-### Paladin
+### Paladin (Support class)
 
 - **Healing Aura**: Emit an aura that gradually heals nearby allies over time.
 - **Holy Shield**: Surround yourself with a protective barrier that absorbs incoming damage.
@@ -137,7 +140,7 @@ Ultimate can be activated by binding it in the console, example
 Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.json*
 ```jsonc
 {
-  "ConfigVersion": 6,
+  "ConfigVersion": 9,
   "DeactivatedClasses": ["Shapeshifter", "Rogue"], //Disables Shapeshifter & Rogue from the plugin
   "ShowCommandAdverts": true, //Enables adverts teaching new players about available commands
   "DefaultClass": "ranger", //Sets the default class for new players
@@ -145,8 +148,16 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
   "XpPerKill": 40, // Experience per kill
   "XpHeadshotModifier": 0.15, // Experience Modifier for headshots
   "XpKnifeModifier": 0.25, // Experience Modifier for knife kills
+
+  "XpPerRoundLose": 20, // Experience for loss a round
+  "XpPerExplosion": 20, // bomb exp
+  "XpPerPlanted": 20, //planted exp
+  "XpPerDefuse": 20, // defuce exp
+  "XpMultiply": 1, // total experience factor
+  "XpSupportClass": 100, // Additional exp for support class
+
   "XpPerRoundWin": 30, // Experience for winning a round
-  "MatchReset": true, // Reset all character progress at map start/end
+  "MatchReset": false, // Reset all character progress at map start/end
   "EnableLevelDifferenceXp": false, // Turn off bonus xp from killing higher level players
   "TotalLevelRequired": { // Total level required to unlock class
     "Shadowblade": 48, // Unlocks when you have 48 levels in total 
@@ -169,4 +180,5 @@ Config path: *counterstrikesharp\configs\plugins\WarcraftPlugin\WarcraftPlugin.j
 **csportalsk** - Testing and bug reporting</br>
 **pZyk** - Development</br>
 **Poisoned** - Development</br>
-**NightFury** - Development
+**NightFury** - Development</br>
+**Nikitaslit** - Development</br>
