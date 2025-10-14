@@ -7,6 +7,7 @@ using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -25,6 +26,7 @@ namespace WarcraftPlugin.Events
         private readonly WarcraftPlugin _plugin;
         private readonly Config _config;
         private readonly List<GameAction> _gameActions = [];
+        public int firstkill = 0; 
 
         internal EventSystem(WarcraftPlugin plugin, Config config)
         {
@@ -40,7 +42,11 @@ namespace WarcraftPlugin.Events
             RegisterEventHandler<EventPlayerDeath>(PlayerDeathHandler, HookMode.Pre);
             RegisterEventHandler<EventRoundEnd>(RoundEnd, HookMode.Pre);
             RegisterEventHandler<EventRoundStart>(RoundStart, HookMode.Pre);
+            RegisterEventHandler<EventRoundStart>(RoundStartXpSupport, HookMode.Pre);
             RegisterEventHandler<EventPlayerDisconnect>(PlayerDisconnectHandler, HookMode.Pre);
+            RegisterEventHandler<EventBombDefused>(BombDefused,HookMode.Pre);
+            RegisterEventHandler<EventBombPlanted>(BombPlanted, HookMode.Pre);
+            RegisterEventHandler<EventBombExploded>(BombExploded, HookMode.Pre);
 
             //Virtual functions
             VirtualFunctions.CCSPlayer_ItemServices_CanAcquireFunc.Hook(OnWeaponCanAcquire, HookMode.Pre);
@@ -203,27 +209,77 @@ namespace WarcraftPlugin.Events
                     foreach (var player in Utilities.GetPlayers().Where(p => p.Team == teamWinner && !p.ControllingBot))
                     {
                         _plugin.XpSystem.AddXp(player, (int)_config.XpPerRoundWin);
-                        player.PrintToChat(_plugin.Localizer["xp.roundwin", _config.XpPerRoundWin]);
+                        var xpToAdd = _plugin.NewMethod(player, _config.XpPerRoundWin);
+                        player.PrintToChat(_plugin.Localizer["xp.roundwin", xpToAdd]);
+                    }
+                    foreach (var player in Utilities.GetPlayers().Where(p => p.Team != teamWinner && !p.ControllingBot))
+                    {
+                        _plugin.XpSystem.AddXp(player, (int)_config.XpPerRoundLose);
+                        var xpToAdd = _plugin.NewMethod(player, _config.XpPerRoundLose);
+                        player.PrintToChat(_plugin.Localizer["xp.roundlose", xpToAdd]);
                     }
                 }
             }
             return HookResult.Continue;
         }
-
+        private HookResult BombDefused(EventBombDefused @event, GameEventInfo info)
+        {
+            var defuseplayer = @event.Userid;
+            _plugin.XpSystem.AddXp(defuseplayer, (int)_config.XpPerDefuse);
+            var xpToAdd = _plugin.NewMethod(defuseplayer, _config.XpPerDefuse);
+            defuseplayer.PrintToChat(_plugin.Localizer["xp.defuse", xpToAdd]);
+            return HookResult.Continue;
+        }
+        private HookResult BombPlanted(EventBombPlanted @event, GameEventInfo info)
+        {
+            var plantedplayer = @event.Userid;
+            _plugin.XpSystem.AddXp(plantedplayer, (int)_config.XpPerPlanted);
+            var xpToAdd = _plugin.NewMethod(plantedplayer, _config.XpPerPlanted);
+            plantedplayer.PrintToChat(_plugin.Localizer["xp.plant", xpToAdd]);
+            return HookResult.Continue;
+        }
+        private HookResult BombExploded(EventBombExploded @event, GameEventInfo info)
+        {
+            var explodedplayer = @event.Userid;
+            _plugin.XpSystem.AddXp(explodedplayer, (int)_config.XpPerExplosion);
+            var xpToAdd = _plugin.NewMethod(explodedplayer, _config.XpPerExplosion);
+            explodedplayer.PrintToChat(_plugin.Localizer["xp.explode", xpToAdd]);
+            return HookResult.Continue;
+        }
+        private HookResult RoundStartXpSupport(EventRoundStart @event, GameEventInfo info)
+        {
+            Utilities.GetPlayers().Where(x => !x.IsBot && !x.ControllingBot && x.GetWarcraftPlayer().GetClass().Support == true).ToList().ForEach(player =>
+            {
+                _plugin.XpSystem.AddXp(player, (int)_config.XpSupportClass);
+                var xpToAdd = _plugin.NewMethod(player, _config.XpSupportClass);
+                player.PrintToChat(_plugin.Localizer["xp.supportclass", xpToAdd]);
+                player.PrintToChat("Вы саппорт + экспи");
+            });
+            return HookResult.Continue;
+        }
         private HookResult RoundStart(EventRoundStart @event, GameEventInfo info)
         {
             Utilities.GetPlayers().Where(x => !x.IsBot && !x.ControllingBot).ToList().ForEach(player =>
             {
                 var warcraftPlayer = player.GetWarcraftPlayer();
                 var warcraftClass = warcraftPlayer?.GetClass();
+                firstkill = 0;
 
                 if (warcraftClass != null)
                 {
                     warcraftClass?.InvokeEvent(@event, HookMode.Pre);
 
+                    if (_plugin.fovSettings[player.Slot] == 1)
+                    {
+                        _plugin.AutoSpell(player);
+                        SkillsMenu.Close(warcraftPlayer);
+                    }
                     if (XpSystem.GetFreeSkillPoints(warcraftPlayer) > 0)
                     {
-                        SkillsMenu.Show(warcraftPlayer);
+                        if (_plugin.fovSettings[player.Slot] == 0)
+                        {
+                            SkillsMenu.Show(warcraftPlayer);
+                        }
                     }
                     else
                     {
@@ -240,15 +296,40 @@ namespace WarcraftPlugin.Events
 
                     warcraftPlayer.PrintItemsOwned();
 
-                    if (!warcraftPlayer.IsMaxLevel)
-                    {
-                        player.PrintToChat($" {_plugin.Localizer["xp.roundinfo", 
-                            warcraftPlayer?.GetClass()?.LocalizedDisplayName, 
-                            warcraftPlayer.currentLevel,
-                            warcraftPlayer.currentXp, 
-                            warcraftPlayer.amountToLevel]}");
-                    }
+
+                    // string xpString = $" {_plugin.Localizer["xp.roundinfo",
+                    //                     warcraftPlayer?.GetClass()?.LocalizedDisplayName,
+                    //                     warcraftPlayer.currentLevel,
+                    //                     warcraftPlayer.currentXp,
+                    //                     warcraftPlayer.amountToLevel]}";
+                    // player.PrintToChat(xpString);
+
+
+                    // player.PrintToChat($" {_plugin.Localizer["xp.roundinfo", 
+                    //                             warcraftPlayer?.GetClass()?.LocalizedDisplayName, 
+                    //                             warcraftPlayer.currentLevel,
+                    //                             warcraftPlayer.currentXp, 
+                    //                             warcraftPlayer.amountToLevel]}");
+                    // if (!warcraftPlayer.IsMaxLevel)
+                    // {
+                    //     player.PrintToChat($"\n Раса: {warcraftPlayer?.GetClass()?.LocalizedDisplayName}");
+                    //     player.PrintToChat($"\n Уровень: {warcraftPlayer.currentLevel}/{WarcraftPlugin.MaxLevel}");
+                    //     player.PrintToChat($"\n Опыт: {warcraftPlayer.currentXp}/{warcraftPlayer.amountToLevel}");
+                    // }
+                    // if (!warcraftPlayer.IsMaxLevel)
+                    // {
+                    player.PrintToChat($"\n {ChatColors.Gold}Раса: {ChatColors.Green}{warcraftPlayer?.GetClass()?.LocalizedDisplayName}");
+                    player.PrintToChat($"\n {ChatColors.Gold}Уровень: {ChatColors.Green}{warcraftPlayer.currentLevel}{ChatColors.Default}/{ChatColors.Lime}{WarcraftPlugin.MaxLevel}");
+                    player.PrintToChat($"\n {ChatColors.Gold}Опыт: {ChatColors.Green}{warcraftPlayer.currentXp}{ChatColors.Default}/{ChatColors.Lime}{warcraftPlayer.amountToLevel}");
+                    // }
                 }
+            });
+            Utilities.GetPlayers().Where(x => !x.IsBot && !x.ControllingBot && x.GetWarcraftPlayer().GetClass().Support == true).ToList().ForEach(player =>
+            {
+                _plugin.XpSystem.AddXp(player, (int)_config.XpSupportClass);
+                var xpToAdd = _plugin.NewMethod(player, _config.XpSupportClass);
+                player.PrintToChat(_plugin.Localizer["xp.supportclass", xpToAdd]);
+                player.PrintToChat("Вы саппорт + экспи");
             });
             return HookResult.Continue;
         }
@@ -320,6 +401,7 @@ namespace WarcraftPlugin.Events
             var headshot = @event.Headshot;
 
             if (attacker == null || victim == null) return HookResult.Continue;
+            
 
             if (attacker.IsValid && victim.IsValid && attacker != victim && attacker.PlayerPawn.IsValid && attacker.PawnIsAlive && !attacker.ControllingBot)
             {
@@ -357,6 +439,9 @@ namespace WarcraftPlugin.Events
                 var warcraftPlayer = player?.GetWarcraftPlayer()?.GetClass();
                 WarcraftPlugin.Instance.EffectManager.DestroyEffects(player, EffectDestroyFlags.OnDisconnect);
                 warcraftPlayer?.InvokeEvent(mockDeathEvent, HookMode.Pre);
+
+                //Автоспеел
+                _plugin.fovSettings[player.Slot] = 0;
             }
             return HookResult.Continue;
         }

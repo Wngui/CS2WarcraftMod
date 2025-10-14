@@ -17,8 +17,8 @@ namespace WarcraftPlugin.Classes
         private bool _hasUsedDivineResurrection = false;
 
         public override string DisplayName => "Paladin";
+        public override bool Support => true;
         public override Color DefaultColor => Color.Yellow;
-
         public override List<IWarcraftAbility> Abilities =>
         [
             new WarcraftAbility("Healing Aura", "Heal allies within 200/300/400/500/600 units for 1/2/3/4/5 HP every few seconds."),

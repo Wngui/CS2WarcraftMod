@@ -23,6 +23,10 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
             var warcraftClassInformations = new List<WarcraftClassInformation>();
             foreach (var warcraftClass in plugin.classManager.GetAllClasses())
             {
+                if (plugin.HasPermision(player, ["@css/root"]) && warcraftClass.DisplayName == "Spawner")
+                {
+                    continue;
+                }
                 // Try to get the class information from the dictionary
                 classInfoDict.TryGetValue(warcraftClass.InternalName, out var classInformation);
 
@@ -84,7 +88,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                 {
                     if (!isCurrentClass && !isLocked)
                     {
-                        p.PlayLocalSound("sounds/buttons/button9.vsnd");
+                        //p.PlayLocalSound("sounds/buttons/button9.vsnd");
                         MenuManager.CloseMenu(player);
 
                         if (player.IsValid)
@@ -103,7 +107,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     }
                     else
                     {
-                        p.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
+                        //p.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
                     }
                 });
             }

@@ -63,6 +63,7 @@ namespace WarcraftPlugin.Models
         public string LocalizedDisplayName => Localizer.Exists(InternalName) ? Localizer[InternalName] : DisplayName;
         public virtual DefaultClassModel DefaultModel { get; } = new DefaultClassModel();
         public abstract Color DefaultColor { get; }
+        public virtual bool Support { get; set; } = false;
         public WarcraftPlayer WarcraftPlayer { get; set; }
         public CCSPlayerController Player { get; set; }
 

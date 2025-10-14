@@ -10,7 +10,7 @@ namespace WarcraftPlugin.Models
     {
         private int _playerIndex;
         internal int Index => _playerIndex;
-        internal bool IsMaxLevel => currentLevel == WarcraftPlugin.MaxLevel;
+        internal bool IsMaxLevel => currentLevel >= WarcraftPlugin.UltLevel;
         internal CCSPlayerController GetPlayer() => Player;
 
         internal CCSPlayerController Player { get; init; }
@@ -90,7 +90,7 @@ namespace WarcraftPlugin.Models
 
         public void GrantAbilityLevel(int abilityIndex)
         {
-            Player.PlayLocalSound("sounds/buttons/button9.vsnd");
+            Player.PlayLocalSound("sounds/war3cs2/general/tome.vsnd");
             _abilityLevels[abilityIndex] += 1;
         }
     }

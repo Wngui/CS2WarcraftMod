@@ -122,8 +122,36 @@ internal class MenuPlayer
 
         UpdateCenterHtml();
     }
+    internal void ScrollDown5()
+    {
+        if (CurrentChoice == null || MainMenu == null)
+            return;
+        CurrentChoice = CurrentChoice.Next ?? CurrentChoice.List?.First;
+        MenuStart = CurrentChoice!.Value.Index >= VisibleOptions ? MenuStart!.Next : CurrentChoice.List?.First;
 
+        CurrentChoice?.Value.OnSelect?.Invoke(player, CurrentChoice.Value);
+
+        UpdateCenterHtml();
+    }
     internal void ScrollUp()
+    {
+        if (CurrentChoice == null || MainMenu == null)
+            return;
+        CurrentChoice = CurrentChoice.Previous ?? CurrentChoice.List?.Last;
+        if (CurrentChoice == CurrentChoice?.List?.Last && CurrentChoice?.Value.Index >= VisibleOptions)
+        {
+            MenuStart = CurrentChoice;
+            for (int i = 0; i < VisibleOptions - 1; i++)
+                MenuStart = MenuStart?.Previous;
+        }
+        else
+            MenuStart = CurrentChoice!.Value.Index >= VisibleOptions ? MenuStart!.Previous : CurrentChoice.List?.First;
+
+        CurrentChoice?.Value.OnSelect?.Invoke(player, CurrentChoice.Value);
+
+        UpdateCenterHtml();
+    }
+    internal void ScrollUp5()
     {
         if (CurrentChoice == null || MainMenu == null)
             return;

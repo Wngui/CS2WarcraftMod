@@ -29,9 +29,11 @@
   "xp.bonus.headshot": "Бонус за хедшот", // Headshot bonus
   "xp.bonus.knife": "Бонус за нож", // Knife bonus
   "xp.bonus.level": "Бонус за уровень", // level bonus
+  "xp.bonus.assist": "Бонус за ассист",
   "xp.kill": "{Gold}+{0} XP {Default}за убийство {Green}{1} {Default}{2}{3}{4}", // +{0} XP for killing {1} {2}{3}{4}
   "xp.add": "Добавление {0} опыта игроку {1}", // Adding {0} XP to player {1}
   "xp.roundwin": "{Gold}+{0} XP {Default}за победу в раунде", // +{0} XP for round win
+  "xp.roundlose": "{Gold}+{0} XP {Default}за поражение в раунде",
   "xp.roundinfo": "{Gold}{0} {Grey}| {White}Уровень {White}{1} {Grey}| {Lime}{2}{Default}/{Green}{3}{Default} ОП",
   "ability.ready": "{0} готово!", // {0} ready!
   "ultimate.countdown": "Ультимейт готов через {0}с", // Ultimate ready in {0}s
@@ -76,6 +78,21 @@
   "hammerstorm": "Громовой Молот",
   "sacred_warrior": "Священный Воин",
   "silent_assassin": "Безмолвный Убийца",
+  
+  
+  "undead_scourge": "Нежить", //Undead Scourge
+  "night_elf": "Ночной эльф",
+  "human_alliance": "Человек",
+  "crypt_lord": "Лорд Склепа",
+  "orcish_horde": "Орк", // Orcish Horde
+  "blood_mage": "Кровавый маг",
+  "warden": "Варден",
+  "laser_light_show": "Лазер",
+  "rapscallion": "Мошенник",
+  "shadow_hunter": "Теневой Охотник",
+  "bomj": "Тест",
+  "naix": "Найкс",
+
 
   //Stock class abilities //Способности классов
   "barbarian.ability.0": "Резня", // Carnage
@@ -203,6 +220,140 @@
   "silent_assassin.ability.2.description": "40% шанс нанести дополнительный урон ножом.",
   "silent_assassin.ability.3": "Призрачная Хода",
   "silent_assassin.ability.3.description": "Полностью невидим на 3 секунды. Перезарядка: 15 сек.",
+  
+  "human_alliance.ability.0": "Невидимость",
+  "human_alliance.ability.0.description": "Делает вас частично невидимым. Прозрачность увеличивается с уровнем.",
+  "human_alliance.ability.1": "Аура преданности",
+  "human_alliance.ability.1.description": "Предоставляет дополнительное здоровье в начале каждого раунда.",
+  "human_alliance.ability.2": "Стук",
+  "human_alliance.ability.2.description": "Шанс оглушить врага на 0.75 секунды при попадании.",
+  "human_alliance.ability.3": "Ультимативное: Телепортация",
+  "human_alliance.ability.3.description": "Телепортирует вас в выбранную точку.",
+
+
+  "crypt_lord.ability.0": "Пронзание",
+  "crypt_lord.ability.0.description": "Ваши атаки могут подбрасывать врагов в воздух.",
+  "crypt_lord.ability.1": "Шипастый Панцирь",
+  "crypt_lord.ability.1.description": "Вы начинаете с дополнительной броней и периодически отражаете урон.",
+  "crypt_lord.ability.2": "Мертвящие Жуки",
+  "crypt_lord.ability.2.description": "Ваши атаки имеют шанс нанести дополнительный урон.",
+  "crypt_lord.ability.3": "Ультимативная способность: Рой Саранчи",
+  "crypt_lord.ability.3.description": "Призывает саранчу, которая похищает здоровье и броню у ближайшего врага.",
+  "crypt_lord.ability.3.cooldown": "40 секунд",
+
+  "orcish_horde.ability.0": "Критический удар", // Critical Strike
+  "orcish_horde.ability.0.description": "Шанс нанести критический урон оружием.", // Chance to deal critical damage with weapons.
+  "orcish_horde.ability.1": "Критическая граната", // Critical Grenade
+  "orcish_horde.ability.1.description": "Ваши гранаты наносят увеличенный урон.", // Your grenades deal increased damage.
+  "orcish_horde.ability.2": "Перевоплощение", // Reincarnation
+  "orcish_horde.ability.2.description": "Шанс переродиться один раз за раунд.", // Chance to respawn once per round.
+  "orcish_horde.ability.3": "Ульта: Цепная молния", // Ultimate: Chain Lightning
+  "orcish_horde.ability.3.description": "Выпускает заряд молнии, поражающий ближайших врагов.", // Discharges a bolt of lightning that damages nearby enemies.
+
+  "blood_mage.ability.0": "Феникс",
+  "blood_mage.ability.0.description": "Шанс воскресить первого павшего союзника в каждом раунде.",
+  "blood_mage.ability.1": "Изгнание",
+  "blood_mage.ability.1.description": "Шанс ослепить и дезориентировать врага при попадании.",
+  "blood_mage.ability.2": "Похищение маны",
+  "blood_mage.ability.2.description": "Шанс украсть немного денег у врага при каждом ударе.",
+  "blood_mage.ability.3": "Ультимативное: Пламенный удар",
+  "blood_mage.ability.3.description": "Пассивно: шанс поджечь врагов, нанося урон с течением времени.",
+
+  "warden.ability.0": "Вихрь Кинжалов",
+  "warden.ability.0.description": "Шанс замаскироваться под врага и проникнуть в их команду.",
+  "warden.ability.1": "Плащ Стражницы",
+  "warden.ability.1.description": "Снижает урон и отражает его при атаке со спины.",
+  "warden.ability.2": "Удар Тени",
+  "warden.ability.2.description": "Шанс отравить врагов, нанося урон с течением времени.",
+  "warden.ability.3": "Ультимативное: Возмездие",
+  "warden.ability.3.description": "Один раз за раунд возрождает вас с оружием.",
+
+  "naix.ability.0": "Дымовая поддержка",
+  "naix.ability.0.description": "Вы появляетесь с дымовой гранатой и получаете дополнительно до 0/1/2/3/4 дымов.",
+  "naix.ability.1": "Поглощение",
+  "naix.ability.1.description": "Если вы убиваете врага в приседе, вы телепортируетесь на место его смерти, пополняете боезапас и восстанавливаете 5/10/15/25/35 здоровья.",
+  "naix.ability.2": "Акробатика",
+  "naix.ability.2.description": "Увеличивает скорость передвижения на 10/20/30/40/50% и позволяет прыгать дальше.",
+  "naix.ability.3": "Подрыв",
+  "naix.ability.3.description": "Взрывает гранату в центре последнего использованного дыма.",
+  "naix.ability.3.cooldown": "6 секунд",
+  
+  "bane.ability.0": "Яд", 
+  "bane.ability.0.description": "Каждые 10 секунд увеличивает здоровье на 25/50/75/100, после 5 секунд после получения хп (т.е. каждые 15 секунд), отнимает 20/40/60/80. Уменьшение до 1 хп возможно в частных случаях.", 
+  "bane.ability.1": "Сломанная кость", 
+  "bane.ability.1.description": "Через 25/20/15/10 секунд урон увеличивается на 1 каждую секунду. Через 60 секунд урон сбрасывается до обычного значения.",
+  "bane.ability.2": "Берсерк", 
+  "bane.ability.2.description": "Один раз за раунд получает бессмертие на 0.5/1/1.5/2/2.5 секунды, если здоровье меньше 35%.",
+  "bane.ability.3": "[U]", 
+  "bane.ability.3.description": "Рандомно увеличивает хп от 20 до 50, но с каждым использованием теряет 10% скорости до конца раунда. Перезарядка 10 секунд.",
+  "bane": "Бэйн",
+  
+  "blood_knight.ability.0": "Кровавая ярость", 
+  "blood_knight.ability.0.description": "Увеличивает урон по мере снижения HP, за каждые 5 потерянных хп урон возрастает на 2.", 
+  "blood_knight.ability.1": "Кровавое исцеление", 
+  "blood_knight.ability.1.description": "Часть урона возвращается в виде HP, шанс 10/15/20/25% вернуть 2/3/4/5 HP.", 
+  "blood_knight.ability.2": "Тёмное присутствие", 
+  "blood_knight.ability.2.description": "Потеря каждых 35/30/25/20 хп включает ВХ на 2 секунды.", 
+  "blood_knight.ability.3": "[U] Вампирская ярость", 
+  "blood_knight.ability.3.description": "Полное бессмертие, ВХ и 25 доп. хп на 2 сек. Перезарядка 25 секунд.", 
+  "blood_knight": "Кровавый рыцарь", 
+
+  "plague_bringer.ability.0": "Споровое облако", 
+  "plague_bringer.ability.0.description": "Уменьшает урон врагов на 10/20/30/40% на 0.5/1/1.5/2 секунды при попадании по вам.", 
+  "plague_bringer.ability.1": "Тотальный разложение", 
+  "plague_bringer.ability.1.description": "Наносит врагу яд, который наносит 2/3/4/5 периодического урона каждые 2 секунды, шанс наложить яд 15%.", 
+  "plague_bringer.ability.2": "Зараза", 
+  "plague_bringer.ability.2.description": "Накладывает метку заразы на врага с шансом 20% на 3/4/5/6 секунд. Если враг умирает, ближайший враг получает такую же метку.", 
+  "plague_bringer.ability.3": "[U] Эпидемия", 
+  "plague_bringer.ability.3.description": "Массовое заражение врагов в радиусе 1000 юнитов. Все задетые враги начинают получать 2/3/4/5 урона каждую секунду.", 
+  "plague_bringer": "Разносчик чумы", 
+  
+  
+  "natures_guardian.ability.0": "Возрождение", 
+  "natures_guardian.ability.0.description": "Регенерация здоровья 2/4/6/8/10 каждую секунду.", 
+  "natures_guardian.ability.1": "Шиповая броня", 
+  "natures_guardian.ability.1.description": "Возвращает 10/20/30/40% урона, полученного от врага.", 
+  "natures_guardian.ability.2": "Фотосинтез", 
+  "natures_guardian.ability.2.description": "Регенерация здоровья 10-50 хп за 15 секунд.",
+  "natures_guardian.ability.3": "[U] Омоложение", 
+  "natures_guardian.ability.3.description": "Регенерация 10 хп/сек для всей команды. Перезарядка 35 секунд.", 
+  "natures_guardian": "Страж природы",
+  
+  
+  "jester.displayName": "Джестер",
+  "jester.ability.0": "Миг",
+  "jester.ability.0.description": "20/40/60/80/100% шанс мигать каждую секунду.",
+  "jester.ability.1": "Здоровье",
+  "jester.ability.1.description": "Прыжок на 20/40/60/80/100 единиц с 200 HP.",
+  "jester.ability.2": "Усиление",
+  "jester.ability.2.description": "Вы становитесь сильнее.",
+  "jester.ability.3": "Шаг назад",
+  "jester.ability.3.description": "Телепортация за случайную цель на 1 секунду каждые 20 секунд.",
+  "jester.ability.3.cooldown": "20 секунд",
+
+  "healsteap.displayName": "Целитель",
+  "healsteap.ability.0": "Всплеск жизненной силы",
+  "healsteap.ability.0.description": "Увеличивает максимальное здоровье: 120/140/160/180/200 HP",
+  "healsteap.ability.1": "Благословение мученика",
+  "healsteap.ability.1.description": "При смерти: лечит союзников на 10/20/30/40/50 HP",
+  "healsteap.ability.2": "Боевой медик",
+  "healsteap.ability.2.description": "При убийстве: восстанавливает 10/12/14/16/20 HP",
+  "healsteap.ability.3": "Божественное вмешательство",
+  "healsteap.ability.3.description": "Лечит всех союзников на 20 HP и дает 20 щита.",
+  "healsteap.ability.3.cooldown": "50 секунд",
+
+  "generalGrivus.displayName": "Генерал Гривус",
+  "generalGrivus.ability.0": "Супер",
+  "generalGrivus.ability.0.description": "Скорость +1..5, урон +1..5 после убийства",
+  "generalGrivus.ability.1": "Супер броня",
+  "generalGrivus.ability.1.description": "Блокирует урон - броня.",
+  "generalGrivus.ability.2": "Киборг",
+  "generalGrivus.ability.2.description": "Добавляет HP -> 200",
+  "generalGrivus.ability.3": "Бег с ускорением",
+  "generalGrivus.ability.3.description": "Получаете супер скорость на 2 секунды чтобы скрыться!",
+  "generalGrivus.ability.3.cooldown": "30 секунд",
+  
+  
 
   //Stock class extras //Дополнительно
   "mage.frozen": "{Blue}[ЗАМОРОЖЕН]{Default}", // [FROZEN]

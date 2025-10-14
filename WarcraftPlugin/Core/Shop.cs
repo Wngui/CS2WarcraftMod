@@ -27,9 +27,7 @@ namespace WarcraftPlugin.Core
                 new AmuletOfVitality(),
                 new GlovesOfWrath(),
                 new GlovesOfCloud(),
-                new GlovesOfDazzle(),
-                new TomeOfExperience(),
-                new TomeOfGambling()
+                new GlovesOfDazzle()
             ];
         }
     }

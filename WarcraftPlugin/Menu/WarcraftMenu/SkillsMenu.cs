@@ -53,7 +53,7 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     {
                         isDisabled = true;
                         color = Color.Gray;
-                        displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} ({plugin.Localizer["menu.skills.ultimate.level", WarcraftPlugin.MaxLevel]})</font>";
+                        displayString = $"<font color='{color.Name}' class='{FontSizes.FontSizeSm}'>{ability.DisplayName} ({plugin.Localizer["menu.skills.ultimate.level", WarcraftPlugin.UltLevel]})</font>";
                     }
                 }
 
@@ -70,12 +70,15 @@ namespace WarcraftPlugin.Menu.WarcraftMenu
                     {
                         p.PlayLocalSound("sounds/ui/menu_invalid.vsnd");
                     }
-
                     Show(wcPlayer, opt.Index);
                 });
             }
 
             MenuManager.OpenMainMenu(wcPlayer.Player, skillsMenu, selectedOptionIndex);
+        }
+        internal static void Close(WarcraftPlayer wcPlayer)
+        {
+            MenuManager.CloseMenu(wcPlayer.Player);
         }
     }
 }
