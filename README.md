@@ -9,9 +9,11 @@
 </p>
 
 # Warcraft Mod for CS2
-
 An open-source Warcraft mod for CS2 featuring a fully-fledged RPG system.</br>
-Try the plugin here: [Connect](https://cs2browser.com/connect/136.244.80.208:27015)
+
+⚠️**Notice:** This repository is no longer under active development.</br>
+For the latest releases and updates, please visit our [Discord](https://discord.gg/VvD8aUHCNW), 
+or check out the [maintained fork](https://github.com/nikitaslit/CS2WarcraftMod) by Shoop
 
 ## Features
 
