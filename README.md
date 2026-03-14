@@ -1,3 +1,8 @@
+! ! ! NEW GIT: https://github.com/NightFuryPrime/CS2-Warcraft-Plugin   ! ! !
+
+
+
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/4f6fac3a-d098-4a41-8f46-2612e112529a">
 </p>
